@@ -463,6 +463,7 @@ namespace Myriadbits.MXF
 
 			// Execute validation tests
 			List<MXFValidator> allTest = new List<MXFValidator>();
+			allTest.Add(new MXFProfile01PictureDescriptorValidator());
 			allTest.Add(new MXFValidatorInfo());
 			allTest.Add(new MXFValidatorPartitions());
 			allTest.Add(new MXFValidatorRIP());

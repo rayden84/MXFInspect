@@ -125,6 +125,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Validators\ArdZdf\MXFProfile01PictureDescriptorValidator.cs" />
     <Compile Include="Validators\MXFValidator.cs" />
     <Compile Include="Validators\MXFValidatorIndex.cs" />
     <Compile Include="Validators\MXFValidatorInfo.cs" />
@@ -151,6 +152,7 @@
     <None Include="SMPTE\Groups.xml" />
     <None Include="SMPTE\Elements.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
