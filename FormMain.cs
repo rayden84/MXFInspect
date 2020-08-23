@@ -21,8 +21,11 @@
 //
 #endregion
 
+using Myriadbits.MXF;
+using Myriadbits.MXF.ConformanceValidators;
 using System;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Myriadbits.MXFInspect
@@ -266,6 +269,31 @@ namespace Myriadbits.MXFInspect
 			}				
 		}
 
+		private void tsmiArdZdfHDF01a_Click(object sender, EventArgs e)
+		{
+			if (this.ActiveView != null)
+			{
+				var file = this.ActiveView.File;
+
+				if (file != null)
+				{
+					var validator = new MXFProfile01Validator(file);
+					var result = validator.Validate(file);
+					if (result.IsValid)
+					{
+						MessageBox.Show("Picture Essence Descriptor is valid");
+					}
+					else
+					{
+						foreach (var err in result.Errors)
+						{
+							MessageBox.Show(err.ErrorMessage);
+						}
+					}
+				}
+				else MessageBox.Show("Cannot find Picture Essence Descriptor");
+			}
+		}
 
 		/// <summary>
 		/// Exit button pressed, quit the app
@@ -296,6 +324,7 @@ namespace Myriadbits.MXFInspect
 			this.tsbFindNext.Enabled = fEnable;
 			this.tsbFindPrevious.Enabled = fEnable;
 			this.tsbShowFillers.Enabled = fEnable;
+			this.tsdbConformance.Enabled = fEnable;
 		}
 
 		/// <summary>
@@ -391,5 +420,5 @@ namespace Myriadbits.MXFInspect
 				}
 			}
 		}
-	}
+    }
 }
