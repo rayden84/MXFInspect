@@ -6,3 +6,4 @@ bin
 /Publish/MXFInspect Sources 2.0.1.3.zip
 obj
 .vs/
+*.suo
