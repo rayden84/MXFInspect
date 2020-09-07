@@ -67,6 +67,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormConformanceReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormConformanceReport.designer.cs">
+      <DependentUpon>FormConformanceReport.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormReport.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -113,6 +119,9 @@
     <Compile Include="FormSettings.designer.cs">
       <DependentUpon>FormSettings.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="FormConformanceReport.resx">
+      <DependentUpon>FormConformanceReport.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormReport.resx">
       <DependentUpon>FormReport.cs</DependentUpon>
     </EmbeddedResource>

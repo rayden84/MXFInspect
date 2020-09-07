@@ -273,30 +273,8 @@ namespace Myriadbits.MXFInspect
 		{
 			if (this.ActiveView != null)
 			{
-				var file = this.ActiveView.File;
-
-				if (file != null)
-				{
-					ValidatorOptions.Global.LanguageManager.Enabled = false;
-					var validator = new MXFProfile01Validator(file);
-					var i = validator.CreateDescriptor();
-					
-					var result = validator.Validate(file);
-					if (result.IsValid)
-					{
-						MessageBox.Show("MXF file conforms to selected profile");
-					}
-					else
-					{
-						var sb = new StringBuilder();
-						foreach (var err in result.Errors)
-						{
-							sb.Append($"Error: {err.ErrorMessage}, Exp. Value: {""} Actual Value {err.AttemptedValue} \r\n");
-						}
-						MessageBox.Show(sb.ToString());
-					}
-				}
-				else MessageBox.Show("Cannot find Picture Essence Descriptor");
+				FormConformanceReport fr = new FormConformanceReport(this.ActiveView.File);
+				fr.ShowDialog();
 			}
 		}
 
