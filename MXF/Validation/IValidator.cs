@@ -1,6 +1,6 @@
 ﻿namespace Myriadbits.MXF.ConformanceValidators
 {
-    public interface IValidatable<T>
+    public interface IValidator<T>
     {
         ValidationResultEntry Validate(T objectToValidate);
     }

@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Myriadbits.MXF
 {
+    // TODO: really needed?
     public static class MXFFileExtensions
     {
         public static MXFPartition GetHeaderPartition(this MXFFile file)
