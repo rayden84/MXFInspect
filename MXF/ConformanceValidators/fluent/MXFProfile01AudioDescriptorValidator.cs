@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Myriadbits.MXF.ConformanceValidators
 {
-    public class MXFProfile01AES3AudioDescriptorValidator : AbstractValidator<MXFAES3AudioEssenceDescriptor>
+    public class MXFProfile01AudioDescriptorValidator : AbstractValidator<MXFAES3AudioEssenceDescriptor>
     {
         private enum ChannelStatusMode
         {
@@ -46,20 +46,19 @@ namespace Myriadbits.MXF.ConformanceValidators
         };
 
 
-        public MXFProfile01AES3AudioDescriptorValidator()
+        public MXFProfile01AudioDescriptorValidator()
         {
             CascadeMode = CascadeMode.StopOnFirstFailure;
 
             // Essence Container Label [212W] (Audio essence mapping)
             // 060e2b34.04010101.0d010301.02060300(= MXF - GC Frame - wrapped AES3 audio data)
             RuleFor(desc => desc.EssenceContainer)
-                .NotNull()
                 .Equal(ConformanceValidationKeys.GC_FrameWrapped_AES3_AudioData_Key);
 
             // Sound Essence Coding [230W] / Sound Essence Compression
             RuleFor(desc => desc.SoundEssenceCoding)
-                .NotNull()
-                .Must(coding => IsValidSoundEssenceCoding(coding));
+                .Must(coding => IsValidSoundEssenceCoding(coding))
+                .WithState(coding => "There are some valid codings");
 
             // Sample Rate
             RuleFor(desc => desc.SampleRate)
@@ -149,9 +148,10 @@ namespace Myriadbits.MXF.ConformanceValidators
 
         public bool IsValidSoundEssenceCoding(MXFKey coding)
         {
-            return IsSoundEssenceUndefindCoding(coding) ||
+            return coding != null &&
+                    (IsSoundEssenceUndefindCoding(coding) ||
                     IsSoundEssencePCMCoded(coding) ||
-                    IsSoundEssenceDolbyCoded(coding);
+                    IsSoundEssenceDolbyCoded(coding));
         }
 
         public bool IsChannelStatusDataForPCM_Standard(byte[] channelStatusData)
