@@ -42,7 +42,7 @@ namespace Myriadbits.MXFInspect
         private Stopwatch m_stopWatch = new Stopwatch();
         private int m_lastPercentage = -1;
 
-        public IList<MyValidationResult> reports = null;
+        public IList<ValidationResult> reports = null;
 
         /// <summary>
         /// Constructor, duh
@@ -69,7 +69,7 @@ namespace Myriadbits.MXFInspect
                 ValidatorOptions.Global.LanguageManager.Enabled = false;
                 var validator = new MXFProfile01Validator(m_mainFile);
 
-                reports = validator.Report;
+                reports = validator.ValidationResults;
 
                 DisplayFileInfo();
             }
@@ -103,14 +103,14 @@ namespace Myriadbits.MXFInspect
             // when do we can expand the tree?
             tlvConformanceResult.CanExpandGetter = delegate (object x)
             {
-                var result = x as MyValidationResult;
+                var result = x as ValidationResult;
                 return result != null && result.GetExecutedRules().Any();
 
             };
 
             tlvConformanceResult.ChildrenGetter = delegate (object x)
             {
-                return (x as MyValidationResult)?.GetExecutedRules() ?? null;
+                return (x as ValidationResult)?.GetExecutedRules() ?? null;
             };
 
 
@@ -118,7 +118,7 @@ namespace Myriadbits.MXFInspect
 
             colState.ImageGetter = delegate (object x)
             {
-                if (x is MyValidationResult result)
+                if (x is ValidationResult result)
                 {
                     return result.IsValid ? 1 : 0;
                 }
@@ -138,7 +138,7 @@ namespace Myriadbits.MXFInspect
 
             colRule.AspectGetter = delegate (object x)
             {
-                if (x is MyValidationResult validator)
+                if (x is ValidationResult validator)
                 {
                     return validator.ToString();
                 }
@@ -208,9 +208,10 @@ namespace Myriadbits.MXFInspect
                 else
                 {
                     sb.Append(ev.ToString());
-                    sb.Append(separator);
-                    separatorAdded = true;
                 }
+
+                sb.Append(separator);
+                separatorAdded = true;
 
             }
             if (separatorAdded)
