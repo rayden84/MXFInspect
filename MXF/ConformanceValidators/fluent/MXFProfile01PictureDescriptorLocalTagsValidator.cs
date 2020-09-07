@@ -2,8 +2,7 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using FluentValidation;
-
-
+using FluentValidation.Internal;
 
 namespace Myriadbits.MXF.ConformanceValidators
 {
@@ -26,26 +25,41 @@ namespace Myriadbits.MXF.ConformanceValidators
         private const byte closedGOPIndicator2 = 1;
         private const byte lowDelayIndicator = 0;
 
+        // keys for local tags in Picture Descriptor
+
+        private static readonly int[] firstKey = new int[] { 0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05 };
+
+        private readonly MXFKey BitRate_Key = new MXFKey(firstKey, new int[] { 0x04, 0x01, 0x06, 0x02, 0x01, 0x0b, 0x00, 0x00 });
+        private readonly MXFKey IdenticalGOPIndicator_Key = new MXFKey(firstKey, new int[] { 0x04, 0x01, 0x06, 0x02, 0x01, 0x07, 0x00, 0x00 });
+        private readonly MXFKey MaxGOPSize_Key = new MXFKey(firstKey, new int[] { 0x04, 0x01, 0x06, 0x02, 0x01, 0x08, 0x00, 0x00 });
+        private readonly MXFKey MaxBPictureCount_Key = new MXFKey(firstKey, new int[] { 0x04, 0x01, 0x06, 0x02, 0x01, 0x09, 0x00, 0x00 });
+        private readonly MXFKey ConstantBPictureFlag_Key = new MXFKey(firstKey, new int[] { 0x04, 0x01, 0x06, 0x02, 0x01, 0x03, 0x00, 0x00 });
+        private readonly MXFKey ContentScanningKind_Key = new MXFKey(firstKey, new int[] { 0x04, 0x01, 0x06, 0x02, 0x01, 0x04, 0x00, 0x00 });
+        private readonly MXFKey ProfileAndLevel_Key = new MXFKey(firstKey, new int[] { 0x04, 0x01, 0x06, 0x02, 0x01, 0x0a, 0x00, 0x00 });
+        private readonly MXFKey SingleSequenceFlag_Key = new MXFKey(firstKey, new int[] { 0x04, 0x01, 0x06, 0x02, 0x01, 0x02, 0x00, 0x00 });
+        private readonly MXFKey ClosedGOP_Key = new MXFKey(firstKey, new int[] { 0x04, 0x01, 0x06, 0x02, 0x01, 0x06, 0x00, 0x00 });
+        private readonly MXFKey LowDelay_Key = new MXFKey(firstKey, new int[] { 0x04, 0x01, 0x06, 0x02, 0x01, 0x05, 0x00, 0x00 });
+
         public MXFProfile01PictureDescriptorLocalTagsValidator(MXFCDCIPictureEssenceDescriptor desc)
         {
             // localtags that must be inspected
 
-            MXFLocalTag bitRate_Tag = GetLocalTagByAliasUID(desc, ConformanceValidationKeys.BitRate_Key);
-            MXFLocalTag identicalGOP_Tag = GetLocalTagByAliasUID(desc, ConformanceValidationKeys.IdenticalGOPIndicator_Key);
-            MXFLocalTag maxGOPSize_Tag = GetLocalTagByAliasUID(desc, ConformanceValidationKeys.MaxGOPSize_Key);
-            MXFLocalTag maxBPicCount_Tag = GetLocalTagByAliasUID(desc, ConformanceValidationKeys.MaxBPictureCount_Key);
-            MXFLocalTag constBPicFlag_Tag = GetLocalTagByAliasUID(desc, ConformanceValidationKeys.ConstantBPictureFlag_Key);
-            MXFLocalTag contentScanningKind_Tag = GetLocalTagByAliasUID(desc, ConformanceValidationKeys.ContentScanningKind_Key);
-            MXFLocalTag profileAndLevel_Tag = GetLocalTagByAliasUID(desc, ConformanceValidationKeys.ProfileAndLevel_Key);
-            MXFLocalTag singleSequenceFlag_Tag = GetLocalTagByAliasUID(desc, ConformanceValidationKeys.SingleSequenceFlag_Key);
-            MXFLocalTag closedGOP_Tag = GetLocalTagByAliasUID(desc, ConformanceValidationKeys.ClosedGOP_Key);
-            MXFLocalTag lowDelay_Tag = GetLocalTagByAliasUID(desc, ConformanceValidationKeys.LowDelay_Key);
+            MXFLocalTag bitRate_Tag = GetLocalTagByAliasUID(desc, BitRate_Key);
+            MXFLocalTag identicalGOP_Tag = GetLocalTagByAliasUID(desc, IdenticalGOPIndicator_Key);
+            MXFLocalTag maxGOPSize_Tag = GetLocalTagByAliasUID(desc, MaxGOPSize_Key);
+            MXFLocalTag maxBPicCount_Tag = GetLocalTagByAliasUID(desc, MaxBPictureCount_Key);
+            MXFLocalTag constBPicFlag_Tag = GetLocalTagByAliasUID(desc, ConstantBPictureFlag_Key);
+            MXFLocalTag contentScanningKind_Tag = GetLocalTagByAliasUID(desc, ContentScanningKind_Key);
+            MXFLocalTag profileAndLevel_Tag = GetLocalTagByAliasUID(desc, ProfileAndLevel_Key);
+            MXFLocalTag singleSequenceFlag_Tag = GetLocalTagByAliasUID(desc, SingleSequenceFlag_Key);
+            MXFLocalTag closedGOP_Tag = GetLocalTagByAliasUID(desc, ClosedGOP_Key);
+            MXFLocalTag lowDelay_Tag = GetLocalTagByAliasUID(desc, LowDelay_Key);
 
             // rules 
             var a = this.CreateDescriptor();
 
             CascadeMode = CascadeMode.StopOnFirstFailure;
-            this.
+
             // Bit Rate[158W], 50_000_000
             RuleFor(tags => GetTagValue(bitRate_Tag))
                 .NotNull()
