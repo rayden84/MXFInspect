@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Myriadbits.MXF.ConformanceValidators
 {
-    public class MXFProfile01AudioDescriptorValidator1 : Validator<MXFAES3AudioEssenceDescriptor>
+    public class MXFProfile01AudioValidator : Validator<MXFAES3AudioEssenceDescriptor>
     {
         private enum ChannelStatusMode
         {
@@ -68,7 +68,7 @@ namespace Myriadbits.MXF.ConformanceValidators
 
 
 
-        public MXFProfile01AudioDescriptorValidator1()
+        public MXFProfile01AudioValidator()
         {
             // Essence Container Label [212W] (Audio essence mapping)
             // 060e2b34.04010101.0d010301.02060300(= MXF - GC Frame - wrapped AES3 audio data)
