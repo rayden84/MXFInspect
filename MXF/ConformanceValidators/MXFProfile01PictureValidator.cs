@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Myriadbits.MXF.ConformanceValidators
 {
-    public class MXFProfile01PictureDescriptorLocalTagsValidator1 : Validator<IEnumerable<MXFLocalTag>>
+    public class MXFProfile01PictureValidator : Validator<IEnumerable<MXFLocalTag>>
     {
         // expected values
 
@@ -37,7 +37,7 @@ namespace Myriadbits.MXF.ConformanceValidators
         private readonly MXFKey ClosedGOP_Key = new MXFKey(firstKey, new int[] { 0x04, 0x01, 0x06, 0x02, 0x01, 0x06, 0x00, 0x00 });
         private readonly MXFKey LowDelay_Key = new MXFKey(firstKey, new int[] { 0x04, 0x01, 0x06, 0x02, 0x01, 0x05, 0x00, 0x00 });
 
-        public MXFProfile01PictureDescriptorLocalTagsValidator1(MXFCDCIPictureEssenceDescriptor desc)
+        public MXFProfile01PictureValidator(MXFCDCIPictureEssenceDescriptor desc)
         {
             MXFLocalTag bitRate_Tag = GetLocalTagByAliasUID(desc, BitRate_Key);
             MXFLocalTag identicalGOP_Tag = GetLocalTagByAliasUID(desc, IdenticalGOPIndicator_Key);

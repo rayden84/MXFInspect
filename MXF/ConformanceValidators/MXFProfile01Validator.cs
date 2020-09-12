@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
@@ -6,7 +7,7 @@ using System.Xml.Serialization;
 namespace Myriadbits.MXF.ConformanceValidators
 {
 
-    public class MXFProfile01Validator //: AbstractValidator<MXFFile>
+    public class MXFProfile01Validator
     {
         public IList<ValidationResult> ValidationResults { get; private set; } = new List<ValidationResult>();
 
@@ -15,6 +16,12 @@ namespace Myriadbits.MXF.ConformanceValidators
         public MXFProfile01Validator(MXFFile file)
         {
             _file = file;
+
+
+            Debug.WriteLine(file.IsFooterClosedAndComplete());
+            Debug.WriteLine(file.IsKAGSizeOfAllPartitionsEqual(512));
+            Debug.WriteLine(file.AreAllPartitionsOP1a());
+            Debug.WriteLine(file.ISRIPPresent());
 
             ValidatePictureDescriptor();
 
@@ -35,13 +42,13 @@ namespace Myriadbits.MXF.ConformanceValidators
 
         private void ValidateAudioDescriptor()
         {
-            var aes3descriptors = _file.GetMXFAES3AudioEssenceDescriptor().ToList();
+            var aes3descriptors = _file.GetMXFAES3AudioEssenceDescriptors().ToList();
 
             foreach (var desc in aes3descriptors)
             {
-                var audioDescriptorValidator = new MXFProfile01AudioDescriptorValidator1();
-                var validationResult = audioDescriptorValidator.Validate(desc);
-                var name = $"AudioDescriptor #{aes3descriptors.IndexOf(desc)}";
+                var audioDescriptorValidator = new MXFProfile01AudioValidator();
+                var name = $"Audio #{aes3descriptors.IndexOf(desc)+1}";
+                var validationResult = audioDescriptorValidator.Validate(desc, name);              
                 ValidationResults.Add(validationResult);
             }
 
@@ -56,10 +63,10 @@ namespace Myriadbits.MXF.ConformanceValidators
             //var validationResult = pictureDescriptorValidator.Validate(pictureDescriptor);
 
             var validator = new MXFProfile01PictureDescriptorValidator1(pictureDescriptor);
-            var result = validator.Validate(pictureDescriptor);
+            var result = validator.Validate(pictureDescriptor, "Video");
             var localtags = pictureDescriptor.Children?.OfType<MXFLocalTag>() ?? null;
 
-            var tagsvalidator = new MXFProfile01PictureDescriptorLocalTagsValidator1(pictureDescriptor);
+            var tagsvalidator = new MXFProfile01PictureValidator(pictureDescriptor);
             var tagsResult = tagsvalidator.Validate(localtags);
 
             result.Join(tagsResult.Entries);
