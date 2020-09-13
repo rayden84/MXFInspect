@@ -17,7 +17,7 @@
   <Class Name="Myriadbits.MXF.MXFFileExtensions">
     <Position X="28.5" Y="5.25" Width="3" />
     <TypeIdentifier>
-      <HashCode>AAAABIAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAACIAAAAAAgIIEAAAAAAACAQAAIBABAAAAQCCCE=</HashCode>
       <FileName>MXFFileExtensions.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -267,6 +267,317 @@
     <TypeIdentifier>
       <HashCode>AAAAAAIAAAAAAAAAAAABBAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Metadata\A01 MXFInterchangeObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFFiller">
+    <Position X="14.5" Y="32.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B11 MXFFiller.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFStructuralComponent">
+    <Position X="16" Y="27.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B08 MXFStructuralComponent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFContentStorage">
+    <Position X="19" Y="27.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\A04 MXFContentStorage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFPreface">
+    <Position X="10.25" Y="27.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAABAAAAAAQAAAABAAAIAAAAAAgAAAAAAAACAAA=</HashCode>
+      <FileName>Metadata\A02 MXFPreface.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFEssenceContainerData">
+    <Position X="22.25" Y="27.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAIAAAAABABAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\A05 MXFEssenceContainerData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFGenericPackage">
+    <Position X="52.25" Y="27.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAgAAAAAABAAAAAgAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B01 MXFGenericPackage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFGenericDescriptor">
+    <Position X="27.75" Y="27.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B02 MXFGenericDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFNetworkLocator">
+    <Position X="30.25" Y="27.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgBAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B04 MXFNetworkLocator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFTextLocator">
+    <Position X="32.75" Y="27.75" Width="1.75" />
+    <InheritanceLine Type="Myriadbits.MXF.MXFInterchangeObject" FixedToPoint="true">
+      <Path>
+        <Point X="14" Y="26.819" />
+        <Point X="14" Y="27.375" />
+        <Point X="33.562" Y="27.375" />
+        <Point X="33.562" Y="27.75" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B05 MXFTextLocator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFGenericTrack">
+    <Position X="42" Y="27.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAAAABAAAAAgAAAAAABAAAAAEAAAA=</HashCode>
+      <FileName>Metadata\B06 MXFGenericTrack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFSequence">
+    <Position X="19.25" Y="32.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B09 MXFSequence.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFSourceClip">
+    <Position X="16.75" Y="32.75" Width="2" />
+    <InheritanceLine Type="Myriadbits.MXF.MXFStructuralComponent" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="17.125" Y="29.819" />
+        <Point X="17.125" Y="32.375" />
+        <Point X="17.75" Y="32.375" />
+        <Point X="17.75" Y="32.75" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAACAAABAAAAAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Metadata\B10 MXFSourceClip.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFTimelineTrack">
+    <Position X="40.75" Y="31.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAhAAAA=</HashCode>
+      <FileName>Metadata\B12 MXFTimelineTrack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFEventTrack">
+    <Position X="43.75" Y="31.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAAAABAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B13 MXFEventTrack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFTimecodeComponent">
+    <Position X="22" Y="32.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAEABAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Metadata\B17 MXFTimecodeComponent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFFileDescriptor">
+    <Position X="27.5" Y="29.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAYAAAAAAAAABACAAAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Metadata\F02 MXFFileDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFMultipleDescriptor">
+    <Position X="25.25" Y="34.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\F03 MXFMultipleDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFGenericPictureEssenceDescriptor">
+    <Position X="33.5" Y="34.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>IAABAAAAAyAASgBAAggpAAAIAAAgkAAACSASAQAABAA=</HashCode>
+      <FileName>Metadata\F041 MXFGenericPictureEssenceDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFCDCIPictureEssenceDescriptor">
+    <Position X="35.75" Y="42.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQQAAIAABAAAABAAwAABABAAAAAYAAAA=</HashCode>
+      <FileName>Metadata\F042 MXFCDCIPictureEssenceDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFRGBAPictureEssenceDescriptor">
+    <Position X="32.5" Y="42.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAgAAAAAAAQABACAAAAAAAMAAAAAAACAEAAA=</HashCode>
+      <FileName>Metadata\F043 MXFRGBAPictureEssenceDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFGenericSoundEssenceDescriptor">
+    <Position X="29.25" Y="34.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AASCAAAgAAAAhAAAAAABAAAAAAAAAAACAAAAAAAQAAA=</HashCode>
+      <FileName>Metadata\F05 MXFGenericSoundEssenceDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFGenericDataEssenceDescriptor">
+    <Position X="37.25" Y="34.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\F06 MXFGenericDataEssenceDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFDCTimedTextDescriptor">
+    <Position X="37.25" Y="37.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\F061 MXFDCTimedTextDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFAES3AudioEssenceDescriptor">
+    <Position X="29.25" Y="43.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAABAAAAAAAAABAgFAASAAAAAAA=</HashCode>
+      <FileName>Metadata\SMPTE 382M MXFAES3AudioEssenceDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFWaveAudioEssenceDescriptor">
+    <Position X="29.25" Y="38.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAggAACAAIAAAABoAAAACAEAAAACAMBAAAAAAA=</HashCode>
+      <FileName>Metadata\SMPTE 382M MXFWaveAudioEssenceDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFIndexTableSegment">
+    <Position X="7.5" Y="27.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAhAAAAAIAGCAABAAIABAAAAAAAAQAAAAAQCAA=</HashCode>
+      <FileName>Metadata\XXX MXFIndexTableSegment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFSegment">
+    <Position X="11.5" Y="32.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B29 MXFSegment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFEvent">
+    <Position X="12.75" Y="36.25" Width="2.5" />
+    <InheritanceLine Type="Myriadbits.MXF.MXFSegment" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="12.625" Y="34.175" />
+        <Point X="12.625" Y="35.915" />
+        <Point X="14.125" Y="35.915" />
+        <Point X="14.125" Y="36.25" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAEAABAAA=</HashCode>
+      <FileName>Metadata\B30 MXFEvent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFDMSegment">
+    <Position X="12.75" Y="38.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAABAAAAAAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B32 MXFDMSegment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFDMSourceClip">
+    <Position X="16.25" Y="36" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B33 MXFDMSourceClip.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFPackageMarkerObject">
+    <Position X="9.5" Y="36.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B34 MXFPackageMarkerObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.ACESPictureSubDescriptor">
+    <Position X="24.75" Y="27.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B40 MXFACESPictureSubDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.TargetFrameSubDescriptor">
+    <Position X="38.75" Y="27.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B41 MXFTargetFrameSubDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.JPEG2000SubDescriptor">
+    <Position X="48.75" Y="27.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B50 JPEG2000SubDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MCALabelSubDescriptor">
+    <Position X="55.25" Y="27.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B60 MCALabelSubDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.AudioChannelLabelSubDescriptor">
+    <Position X="58" Y="27.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B61 AudioChannelLabelSubDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.SoundfieldGroupLabelSubDescriptor">
+    <Position X="35" Y="27.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B62 SoundfieldGroupLabelSubDescriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.GroupOfSoundfieldGroupsLabelSubDescriptor">
+    <Position X="45" Y="27.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\B63 GroupOfSoundfieldGroupsLabelSub Descriptor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFDescriptiveFramework">
+    <Position X="49.5" Y="31.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\D01 MXFDescriptiveFramework.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFMaterialPackage">
+    <Position X="55" Y="31.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\E01 MXFMaterialPackage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Myriadbits.MXF.MXFSourcePackage">
+    <Position X="52.25" Y="31.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Metadata\E02 MXFSourcePackage.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Struct Name="Myriadbits.MXF.MXFShortKey">
