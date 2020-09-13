@@ -22,10 +22,11 @@ namespace Myriadbits.MXF.ConformanceValidators
             Debug.WriteLine(file.IsKAGSizeOfAllPartitionsEqual(512));
             Debug.WriteLine(file.AreAllPartitionsOP1a());
             Debug.WriteLine(file.ISRIPPresent());
+            Debug.WriteLine(file.IsDurationOfBodiesCorrect());
 
-            ValidatePictureDescriptor();
+            ValidatePicture();
 
-            ValidateAudioDescriptor();
+            ValidateAudio();
 
             // TODO: check file structure (partitions, the beginning of the PDF specs)
 
@@ -40,9 +41,9 @@ namespace Myriadbits.MXF.ConformanceValidators
 
         }
 
-        private void ValidateAudioDescriptor()
+        private void ValidateAudio()
         {
-            var aes3descriptors = _file.GetMXFAES3AudioEssenceDescriptors().ToList();
+            var aes3descriptors = _file.GetAudioEssenceDescriptorsInHeader().ToList();
 
             foreach (var desc in aes3descriptors)
             {
@@ -55,9 +56,9 @@ namespace Myriadbits.MXF.ConformanceValidators
             //RuleForEach(file => aes3descriptors).SetValidator(new MXFProfile01AES3AudioDescriptorValidator());
         }
 
-        private void ValidatePictureDescriptor()
+        private void ValidatePicture()
         {
-            var pictureDescriptor = _file.GetMXFPictureDescriptorInHeader();
+            var pictureDescriptor = _file.GetPictureDescriptorInHeader();
 
             //var pictureDescriptorValidator = new MXFProfile01PictureDescriptorValidator();
             //var validationResult = pictureDescriptorValidator.Validate(pictureDescriptor);

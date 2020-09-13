@@ -24,7 +24,21 @@ namespace Myriadbits.MXF
                     .SingleOrDefault(p => p.PartitionType == PartitionType.Footer);
         }
 
-        public static MXFCDCIPictureEssenceDescriptor GetMXFPictureDescriptorInHeader(this MXFFile file)
+        public static IEnumerable<MXFPartition> GetBodies(this MXFFile file)
+        {
+            return file
+                    .FlatList.OfType<MXFPartition>()
+                    .Where(p => p.PartitionType == PartitionType.Body);
+        }
+
+        public static IEnumerable<MXFPartition> GetBodiesContainingEssences(this MXFFile file)
+        {
+            return file
+                    .GetBodies()
+                    .Where(b => b.Children.OfType<MXFEssenceElement>().Any());
+        }
+
+        public static MXFCDCIPictureEssenceDescriptor GetPictureDescriptorInHeader(this MXFFile file)
         {
             return file
                     .GetHeader()
@@ -33,7 +47,7 @@ namespace Myriadbits.MXF
                     .SingleOrDefault();
         }
 
-        public static IEnumerable<MXFAES3AudioEssenceDescriptor> GetMXFAES3AudioEssenceDescriptors(this MXFFile file)
+        public static IEnumerable<MXFAES3AudioEssenceDescriptor> GetAudioEssenceDescriptorsInHeader(this MXFFile file)
         {
             return file
                 .GetHeader()
@@ -72,5 +86,19 @@ namespace Myriadbits.MXF
             return file.RIP != null;
         }
 
+        public static long GetPartitionDuration(this MXFPartition partition) {
+            return partition.Children.OfType<MXFEssenceElement>().Where(e => e.IsPicture).Count();
+        }
+
+        public static bool IsPartitionDurationBetween(this MXFPartition partition, long min, long max)
+        {
+            return partition.GetPartitionDuration() >= min && 
+                partition.GetPartitionDuration() <= max;
+        }
+
+        public static bool IsDurationOfBodiesCorrect(this MXFFile file)
+        {
+            return file.GetBodiesContainingEssences().All(b => b.IsPartitionDurationBetween(1, 240));
+        }
     }
 }
