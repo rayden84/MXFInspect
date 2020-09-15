@@ -8,7 +8,7 @@ namespace Myriadbits.MXF.ConformanceValidators
 {
     public class MXFProfile01StructureValidator : Validator<MXFFile>
     {
-        public MXFProfile01StructureValidator()
+        public MXFProfile01StructureValidator(MXFFile file)
         {
             // File format[252W]
 
@@ -76,6 +76,15 @@ namespace Myriadbits.MXF.ConformanceValidators
 
             // Timecode System Item[26W]
 
+        }
+
+        public IEnumerable<MXFTimelineTrack> GetMaterialPackageTracks(MXFFile file)
+        {
+            return file
+                //.GetMaterialPackages()
+                //.FirstOrDefault()
+                .Children
+                .OfType<MXFTimelineTrack>();
         }
     }
 }

@@ -55,6 +55,23 @@ namespace Myriadbits.MXF
                 .OfType<MXFAES3AudioEssenceDescriptor>();
         }
 
+        public static IEnumerable<MXFMaterialPackage> GetMaterialPackages(this MXFFile file)
+        {
+            return file.FlatList.OfType<MXFMaterialPackage>();
+        }
+
+        public static IEnumerable<MXFSourcePackage> GetSourcePackage(this MXFFile file)
+        {
+            return file.FlatList.OfType<MXFSourcePackage>();
+        }
+
+        public static IEnumerable<MXFMaterialPackage> GetTracks(this MXFFile file)
+        {
+            return file.FlatList.OfType<MXFMaterialPackage>();
+        }
+
+
+
         public static bool IsKAGSizeOfAllPartitionsEqual(this MXFFile file, uint size)
         {
             return file.Partitions.Select(p => p.KagSize).All(s => s == size);

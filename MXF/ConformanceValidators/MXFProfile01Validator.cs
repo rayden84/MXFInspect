@@ -35,11 +35,7 @@ namespace Myriadbits.MXF.ConformanceValidators
         }
         private void ValidateStructure()
         {
-
-            //var pictureDescriptorValidator = new MXFProfile01PictureDescriptorValidator();
-            //var validationResult = pictureDescriptorValidator.Validate(pictureDescriptor);
-
-            var validator = new MXFProfile01StructureValidator();
+            var validator = new MXFProfile01StructureValidator(_file);
             var result = validator.Validate(_file, "General");
 
             ValidationResults.Add(result);
