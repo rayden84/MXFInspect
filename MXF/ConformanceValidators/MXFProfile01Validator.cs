@@ -18,43 +18,33 @@ namespace Myriadbits.MXF.ConformanceValidators
             _file = file;
 
 
-            Debug.WriteLine(file.IsFooterClosedAndComplete());
-            Debug.WriteLine(file.IsKAGSizeOfAllPartitionsEqual(512));
-            Debug.WriteLine(file.AreAllPartitionsOP1a());
-            Debug.WriteLine(file.ISRIPPresent());
-            Debug.WriteLine(file.IsDurationOfBodiesCorrect());
+            ValidateStructure();
 
+            // ValidateIndexTable(Segment)
+            
             ValidatePicture();
 
             ValidateAudio();
 
-            // TODO: check file structure (partitions, the beginning of the PDF specs)
+            // Validate timelinetrack
 
-            // TODO: check all video and audio essences and wrappings 
+            // validate ancillary data
 
-            // check all video specs
-            //RuleFor(file => file.GetMXFPictureDescriptorInHeader()).SetValidator(new MXFProfile01PictureDescriptorValidator());
-
-            // check all audio specs
-            //var aes3descriptors = file.GetMXFAES3AudioEssenceDescriptor();
-            //RuleForEach(file => aes3descriptors).SetValidator(new MXFProfile01AudioDescriptorValidator());
+            // validate Other (dark metadata)
 
         }
-
-        private void ValidateAudio()
+        private void ValidateStructure()
         {
-            var aes3descriptors = _file.GetAudioEssenceDescriptorsInHeader().ToList();
 
-            foreach (var desc in aes3descriptors)
-            {
-                var audioDescriptorValidator = new MXFProfile01AudioValidator();
-                var name = $"Audio #{aes3descriptors.IndexOf(desc)+1}";
-                var validationResult = audioDescriptorValidator.Validate(desc, name);              
-                ValidationResults.Add(validationResult);
-            }
+            //var pictureDescriptorValidator = new MXFProfile01PictureDescriptorValidator();
+            //var validationResult = pictureDescriptorValidator.Validate(pictureDescriptor);
 
-            //RuleForEach(file => aes3descriptors).SetValidator(new MXFProfile01AES3AudioDescriptorValidator());
+            var validator = new MXFProfile01StructureValidator();
+            var result = validator.Validate(_file, "General");
+
+            ValidationResults.Add(result);
         }
+
 
         private void ValidatePicture()
         {
@@ -74,6 +64,24 @@ namespace Myriadbits.MXF.ConformanceValidators
 
             ValidationResults.Add(result);
         }
+
+
+        private void ValidateAudio()
+        {
+            var aes3descriptors = _file.GetAudioEssenceDescriptorsInHeader().ToList();
+
+            foreach (var desc in aes3descriptors)
+            {
+                var audioDescriptorValidator = new MXFProfile01AudioValidator();
+                var name = $"Audio #{aes3descriptors.IndexOf(desc)+1}";
+                var validationResult = audioDescriptorValidator.Validate(desc, name);              
+                ValidationResults.Add(validationResult);
+            }
+
+            //RuleForEach(file => aes3descriptors).SetValidator(new MXFProfile01AES3AudioDescriptorValidator());
+        }
+
+
     }
 }
 

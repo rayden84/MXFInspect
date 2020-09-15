@@ -24,19 +24,7 @@ namespace Myriadbits.MXF.ConformanceValidators
 
         public virtual ValidationResult Validate(T objectToValidate)
         {
-            var retval = new List<ValidationResultEntry>();
-
-            foreach (var rule in validationRules)
-            {
-                var entries = rule.Validate(objectToValidate);
-                retval.Add(entries);
-            }
-
-            return new ValidationResult()
-            {
-                Name = string.Empty,
-                Entries = retval
-            };
+            return Validate(objectToValidate, string.Empty);
         }
 
         public virtual ValidationResult Validate(T objectToValidate, string resultName)

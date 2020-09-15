@@ -71,6 +71,11 @@ namespace Myriadbits.MXF
             return file.GetFooter().Closed && file.GetFooter().Complete == true;
         }
 
+        public static bool AreBodiesClosedAndComplete(this MXFFile file)
+        {
+            return file.GetBodies().All(b => b.Closed && b.Complete);
+        }
+
         public static bool IsHeaderStatusValid(this MXFFile file)
         {
             return !(file.GetHeader().Closed == false  && file.GetHeader().Complete == true);

@@ -6,7 +6,7 @@ namespace Myriadbits.MXF.ConformanceValidators.validation_Framework
 {
     public static class PropertyRuleExtensions
     {
-        public static void MustSatisfy<T, TProp>(this PropertyRule<T, TProp> rule, Func<TProp, bool> predicate)
+        public static void MustSatisfy<T, TProp>(this PropertyRule<T, TProp> rule, Func<T, bool> predicate)
         {
             var validator = new PredicateValidator<T, TProp>(predicate);
             rule.Validator = validator;

@@ -6,80 +6,35 @@ namespace Myriadbits.MXF.ConformanceValidators
 {
     public class PredicateValidator<T, TProp> : IPropertyValidator<T, TProp>
     {
-        public Func<TProp, bool> Predicate { get; protected set; }
-        public bool IsCheckConditionSet { get; private set; }
+        public Func<T, bool> Predicate { get; protected set; }
 
-        public PredicateValidator(Func<TProp, bool> predicate)
+        public PredicateValidator(Func<T, bool> predicate)
         {
             Predicate = predicate;
         }
 
-        //public PredicateValidationRule<T, TProp> MustSatisfy(Func<TProp, bool> predicate)
-        //{
-        //    if (predicate == null)
-        //    {
-        //        throw new ArgumentException("The predicate cannot be null.");
-        //    }
-        //    if (IsCheckConditionSet)
-        //    {
-        //        throw new InvalidOperationException("Rule already has a check condition.");
-        //    }
-        //    ExpectedValues = null;
-        //    Predicate = predicate;
-        //    IsCheckConditionSet = true;
-        //    return this;
-        //}
-
-        //private bool ValidateRule(T objectToValidate)
-        //{
-        //    var actualValue = InspectedProperty.Invoke(objectToValidate);
-        //    // is rule properly formed
-        //    if (IsCheckConditionSet && Predicate != null)
-        //    {
-        //        return Predicate.Invoke(actualValue);
-        //    }
-        //    else
-        //    {
-
-        //        throw new InvalidOperationException($"Rule with name {Name} does not have a check condition.");
-        //    }
-        //}
-
-        public ValidationResultEntry Validate(T objectToValidate, PropertyRule<T, TProp> propertyRule)
+        public ValidationResultEntry Validate(T objectToValidate, PropertyRule<T, TProp> rule)
         {
-            //var mustBeExecuted = WhenCondition?.Invoke(objectToValidate) ?? true;
-            //var actualValue = InspectedProperty.Invoke(objectToValidate);
+            //object actualValue = rule.InspectedProperty.Invoke(objectToValidate);
+            bool mustbeExecuted = rule.WhenCondition?.Invoke(objectToValidate) ?? true;
+            bool? passed;
+            if (mustbeExecuted)
+            {
+                passed = Predicate.Invoke(objectToValidate);
+            }
+            else
+            {
+                passed = null;
+            }
 
-            ValidationResultEntry entry = new ValidationResultEntry();
-
-            //if (mustBeExecuted)
-            //{
-            //    var outcome = ValidateRule(objectToValidate);
-
-
-            //    entry = new ValidationResultEntry()
-            //    {
-            //        Name = Name,
-            //        State = State,
-            //        Passed = outcome,
-            //        HasBeenExecuted = true,
-            //        ActualValue = actualValue,
-            //        //ExpectedValues = expectedValues.Cast<object>(),
-            //    };
-            //}
-            //else
-            //{
-            //    entry = new ValidationResultEntry()
-            //    {
-            //        Name = Name,
-            //        State = State,
-            //        Passed = null,
-            //        HasBeenExecuted = false,
-            //        ActualValue = actualValue,
-            //        //ExpectedValues = expectedValues.Cast<object>(),
-            //    };
-            //}
-            return entry;
+            return new ValidationResultEntry
+            {
+                Name = rule.Name,
+                ActualValue = passed,
+                ExpectedValues = new string[] { "true" },
+                Passed = passed,
+                HasBeenExecuted = mustbeExecuted
+            };
         }
     }
 }
