@@ -10,7 +10,15 @@ namespace Myriadbits.MXF.ConformanceValidators
     {
         public MXFProfile01StructureValidator(MXFFile file)
         {
-            // File format[252W]
+            //File format [252W]
+            AddRule(f => f)
+                .WithName("File format MXF Version [252W]")
+                .MustSatisfy(f => f.AreAllPartitionVersionsEqual(new MXFVersion(1, 3)));
+
+            //File format [252W]
+            AddRule(f => f)
+                .WithName("File format Preface Version [252W]")
+                .MustSatisfy(f => f.IsPrefaceVersionEqualTo(259));
 
             // Operational Pattern [25W] = OP1a(SMPTE st378: 2004)
             AddRule(f => f)
@@ -19,7 +27,7 @@ namespace Myriadbits.MXF.ConformanceValidators
 
             // Is RIP Present[200W] (Amendment 2:2012 to SMPTE st377 - 1:2011)
             AddRule(f => f)
-                .WithName("Is RIP Present[200W]")
+                .WithName("Is RIP Present [200W]")
                 .MustSatisfy(f => f.ISRIPPresent());
 
             // Header Partition Status [63W]
@@ -34,7 +42,7 @@ namespace Myriadbits.MXF.ConformanceValidators
 
             // Body partition duration [65W, 150W] (when containing essence)
             AddRule(f => f)
-                .WithName("Body Partition Status [63W]")
+                .WithName("Body partition duration [65W, 150W] (when containing essence)")
                 .MustSatisfy(f => f.IsDurationOfBodiesCorrect());
 
             // Footer Partition Status [63W]
@@ -44,7 +52,7 @@ namespace Myriadbits.MXF.ConformanceValidators
 
             // KAG Size[151W]
             AddRule(f => f)
-                .WithName("Body Partition Status [63W]")
+                .WithName("KAG Size [151W]")
                 .MustSatisfy(f => f.IsKAGSizeOfAllPartitionsEqual(512));
 
             // Header Metadata in Header Partition [117W]
@@ -81,8 +89,8 @@ namespace Myriadbits.MXF.ConformanceValidators
         public IEnumerable<MXFTimelineTrack> GetMaterialPackageTracks(MXFFile file)
         {
             return file
-                //.GetMaterialPackages()
-                //.FirstOrDefault()
+                .GetMaterialPackages()
+                .FirstOrDefault()
                 .Children
                 .OfType<MXFTimelineTrack>();
         }

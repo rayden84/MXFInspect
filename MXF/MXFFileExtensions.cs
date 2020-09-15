@@ -70,17 +70,22 @@ namespace Myriadbits.MXF
             return file.FlatList.OfType<MXFMaterialPackage>();
         }
 
-
-
         public static bool IsKAGSizeOfAllPartitionsEqual(this MXFFile file, uint size)
         {
-            return file.Partitions.Select(p => p.KagSize).All(s => s == size);
+            return file.Partitions.All(p => p.KagSize == size);
         }
 
         public static bool AreAllPartitionsOP1a(this MXFFile file)
         {
             MXFKey op1a = new MXFKey(0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01, 0x0D, 0x01, 0x02, 0x01, 0x01, 0x01, 0x09, 0x00);
             return file.Partitions.Select(p => p.OP).Any(s => s == op1a);
+        }
+
+        public static bool AreAllPartitionVersionsEqual(this MXFFile file, MXFVersion version)
+        {
+            return file
+                .Partitions
+                .All(p => p.Version == version);
         }
 
         public static bool IsFooterClosedAndComplete(this MXFFile file)
@@ -121,6 +126,11 @@ namespace Myriadbits.MXF
         public static bool IsDurationOfBodiesCorrect(this MXFFile file)
         {
             return file.GetBodiesContainingEssences().All(b => b.IsPartitionDurationBetween(1, 240));
+        }
+
+        public static bool IsPrefaceVersionEqualTo(this MXFFile file, ushort version)
+        {
+            return file.FlatList.OfType<MXFPreface>().FirstOrDefault().Version.Value == version;
         }
     }
 }
