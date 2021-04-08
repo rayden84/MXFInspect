@@ -31,10 +31,10 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.tslActivity = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tslSpacer = new System.Windows.Forms.ToolStripStatusLabel();
             this.tslOffsetStyle = new System.Windows.Forms.ToolStripStatusLabel();
             this.tslPartialLoading = new System.Windows.Forms.ToolStripStatusLabel();
             this.tslVersion = new System.Windows.Forms.ToolStripStatusLabel();
-            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.tsmiFile = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiOpenFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,7 +72,6 @@
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.tsbSettings = new System.Windows.Forms.ToolStripButton();
             this.tabMain = new System.Windows.Forms.TabControl();
-            this.tslSpacer = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip.SuspendLayout();
             this.menuMain.SuspendLayout();
             this.toolStrip.SuspendLayout();
@@ -100,6 +99,12 @@
             this.tslActivity.Size = new System.Drawing.Size(327, 19);
             this.tslActivity.Spring = true;
             this.tslActivity.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // tslSpacer
+            // 
+            this.tslSpacer.Name = "tslSpacer";
+            this.tslSpacer.Size = new System.Drawing.Size(327, 19);
+            this.tslSpacer.Spring = true;
             // 
             // tslOffsetStyle
             // 
@@ -462,12 +467,6 @@
             this.tabMain.Visible = false;
             this.tabMain.SelectedIndexChanged += new System.EventHandler(this.tabMain_SelectedIndexChanged);
             // 
-            // tslSpacer
-            // 
-            this.tslSpacer.Name = "tslSpacer";
-            this.tslSpacer.Size = new System.Drawing.Size(327, 19);
-            this.tslSpacer.Spring = true;
-            // 
             // FormMain
             // 
             this.AllowDrop = true;
@@ -504,7 +503,6 @@
 		#endregion
 
 		private System.Windows.Forms.StatusStrip statusStrip;
-		private System.ComponentModel.BackgroundWorker backgroundWorker;
 		private System.Windows.Forms.MenuStrip menuMain;
 		private System.Windows.Forms.ToolStripMenuItem tsmiFile;
 		private System.Windows.Forms.ToolStripMenuItem tsmiOpenFile;
@@ -544,7 +542,6 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiShowPropInfo;
         private System.Windows.Forms.ToolStripStatusLabel tslVersion;
         private System.Windows.Forms.ToolStripStatusLabel tslActivity;
-        private System.Windows.Forms.ToolStripStatusLabel tslTest1;
         private System.Windows.Forms.ToolStripStatusLabel tslOffsetStyle;
         private System.Windows.Forms.ToolStripStatusLabel tslPartialLoading;
         private System.Windows.Forms.ToolStripStatusLabel tslSpacer;

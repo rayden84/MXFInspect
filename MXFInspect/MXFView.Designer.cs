@@ -41,8 +41,6 @@
             this.rtfHexViewer = new Myriadbits.MXFInspect.HexViewer();
             this.txtOverall = new System.Windows.Forms.TextBox();
             this.mainPanel = new System.Windows.Forms.Panel();
-            this.prbProcessing = new System.Windows.Forms.ProgressBar();
-            this.bgwProcess = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
             this.splitMain.Panel1.SuspendLayout();
             this.splitMain.Panel2.SuspendLayout();
@@ -78,6 +76,7 @@
             this.splitMain.SplitterDistance = 525;
             this.splitMain.SplitterWidth = 6;
             this.splitMain.TabIndex = 0;
+            this.splitMain.Visible = false;
             // 
             // tabMain
             // 
@@ -107,21 +106,19 @@
             // tlvPhysical
             // 
             this.tlvPhysical.AlternateRowBackColor = System.Drawing.Color.WhiteSmoke;
-            this.tlvPhysical.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.tlvPhysical.Cursor = System.Windows.Forms.Cursors.Default;
+            this.tlvPhysical.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlvPhysical.EmptyListMsg = "No items present";
             this.tlvPhysical.EmptyListMsgFont = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.tlvPhysical.FullRowSelect = true;
             this.tlvPhysical.HideSelection = false;
-            this.tlvPhysical.Location = new System.Drawing.Point(6, 6);
+            this.tlvPhysical.Location = new System.Drawing.Point(3, 3);
             this.tlvPhysical.MultiSelect = false;
             this.tlvPhysical.Name = "tlvPhysical";
             this.tlvPhysical.RowHeight = 19;
             this.tlvPhysical.SelectedBackColor = System.Drawing.SystemColors.Highlight;
             this.tlvPhysical.ShowGroups = false;
-            this.tlvPhysical.Size = new System.Drawing.Size(503, 505);
+            this.tlvPhysical.Size = new System.Drawing.Size(509, 511);
             this.tlvPhysical.TabIndex = 15;
             this.tlvPhysical.TintSortColumn = true;
             this.tlvPhysical.UnfocusedSelectedBackColor = System.Drawing.SystemColors.Highlight;
@@ -173,9 +170,7 @@
             // 
             // splitRight
             // 
-            this.splitRight.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitRight.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitRight.Location = new System.Drawing.Point(0, 0);
             this.splitRight.Name = "splitRight";
             this.splitRight.Orientation = System.Windows.Forms.Orientation.Horizontal;
@@ -187,8 +182,8 @@
             // splitRight.Panel2
             // 
             this.splitRight.Panel2.Controls.Add(this.rtfHexViewer);
-            this.splitRight.Size = new System.Drawing.Size(574, 549);
-            this.splitRight.SplitterDistance = 388;
+            this.splitRight.Size = new System.Drawing.Size(577, 548);
+            this.splitRight.SplitterDistance = 387;
             this.splitRight.SplitterWidth = 6;
             this.splitRight.TabIndex = 16;
             // 
@@ -199,29 +194,27 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.propGrid.DisabledItemForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(1)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.propGrid.HelpVisible = false;
-            this.propGrid.Location = new System.Drawing.Point(3, 26);
+            this.propGrid.Location = new System.Drawing.Point(0, 28);
             this.propGrid.Name = "propGrid";
             this.propGrid.PropertySort = System.Windows.Forms.PropertySort.Categorized;
             this.propGrid.ReadOnly = true;
-            this.propGrid.Size = new System.Drawing.Size(565, 359);
+            this.propGrid.Size = new System.Drawing.Size(577, 359);
             this.propGrid.TabIndex = 1;
             this.propGrid.ToolbarVisible = false;
             this.propGrid.ViewForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             // 
             // rtfHexViewer
             // 
-            this.rtfHexViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.rtfHexViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.rtfHexViewer.BytesPerLine = 16;
+            this.rtfHexViewer.DisplayableBytesThreshold = ((long)(1000000));
+            this.rtfHexViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.rtfHexViewer.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.rtfHexViewer.HideSelection = false;
-            this.rtfHexViewer.Location = new System.Drawing.Point(3, 3);
-            this.rtfHexViewer.DisplayableBytesThreshold = ((long)(1000000));
+            this.rtfHexViewer.Location = new System.Drawing.Point(0, 0);
             this.rtfHexViewer.Name = "rtfHexViewer";
             this.rtfHexViewer.ReadOnly = true;
-            this.rtfHexViewer.Size = new System.Drawing.Size(565, 142);
+            this.rtfHexViewer.Size = new System.Drawing.Size(577, 155);
             this.rtfHexViewer.TabIndex = 16;
             this.rtfHexViewer.Text = "";
             // 
@@ -239,7 +232,6 @@
             // mainPanel
             // 
             this.mainPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.mainPanel.Controls.Add(this.prbProcessing);
             this.mainPanel.Controls.Add(this.txtOverall);
             this.mainPanel.Controls.Add(this.splitMain);
             this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -247,22 +239,6 @@
             this.mainPanel.Name = "mainPanel";
             this.mainPanel.Size = new System.Drawing.Size(1111, 581);
             this.mainPanel.TabIndex = 12;
-            // 
-            // prbProcessing
-            // 
-            this.prbProcessing.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.prbProcessing.Location = new System.Drawing.Point(3, 535);
-            this.prbProcessing.Name = "prbProcessing";
-            this.prbProcessing.Size = new System.Drawing.Size(1105, 18);
-            this.prbProcessing.TabIndex = 16;
-            // 
-            // bgwProcess
-            // 
-            this.bgwProcess.WorkerReportsProgress = true;
-            this.bgwProcess.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwProcess_DoWork);
-            this.bgwProcess.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgwProcess_ProgressChanged);
-            this.bgwProcess.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgwProcess_RunWorkerCompleted);
             // 
             // MXFView
             // 
@@ -307,8 +283,6 @@
 		private System.Windows.Forms.TabControl tabMain;
 		private System.Windows.Forms.TabPage tpPhysical;
 		private System.Windows.Forms.Panel mainPanel;
-		private System.ComponentModel.BackgroundWorker bgwProcess;
-		private System.Windows.Forms.ProgressBar prbProcessing;
 		private System.Windows.Forms.SplitContainer splitRight;
 		private System.Windows.Forms.TabPage tpLogical;
 		private HexViewer rtfHexViewer;
