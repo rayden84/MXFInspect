@@ -338,15 +338,15 @@ This document shows the SMPTE groups register as a hierarchical inheritance tree
         - [ ] APP_TimecodeBreakFramework 
         - [ ] DM_AS_11_UKDPP_Framework 
         - [ ] AS_07_Core_DMS_Framework 
-- [ ] MetaDefinition *(abstract)*
-    - [ ] ClassDefinition 
-    - [ ] PropertyDefinition
-    - [ ] TypeDefinition [0] *(abstract)*
-        - [ ] TypeDefinitionInteger 
-        - [ ] TypeDefinitionStrongObjectReference
-        - [ ] TypeDefinitionWeakObjectReference
-        - [ ] TypeDefinitionEnumeration 
-        - [ ] TypeDefinitionFixedArray 
+- [x] MetaDefinition [4/4] *(abstract)*
+    - [x] ClassDefinition [3/3]
+    - [x] PropertyDefinition [4/4]
+    - [x] TypeDefinition [0/0] *(abstract)*
+        - [x] TypeDefinitionInteger [2/2]
+        - [x] TypeDefinitionStrongObjectReference [1/1]
+        - [x] TypeDefinitionWeakObjectReference [2/2]
+        - [x] TypeDefinitionEnumeration [3/3]
+        - [x] TypeDefinitionFixedArray [2/2]
         - [ ] TypeDefinitionVariableArray 
         - [ ] TypeDefinitionSet 
         - [ ] TypeDefinitionString 
@@ -357,19 +357,19 @@ This document shows the SMPTE groups register as a hierarchical inheritance tree
         - [ ] TypeDefinitionIndirect
             - [ ] TypeDefinitionOpaque
         - [ ] TypeDefinitionCharacter
-- [ ] PartitionPack [13] *(abstract)*
-    - [ ] HeaderPartitionPack [0] *(abstract)*
-        - [ ] HeaderPartitionOpenIncomplete 
-        - [ ] HeaderPartitionClosedIncomplete
-        - [ ] HeaderPartitionOpenComplete 
-        - [ ] HeaderPartitionClosedComplete 
-    - [ ] BodyPartitionPack [0]*(abstract)*
-        - [ ] BodyPartitionOpenIncomplete 
-        - [ ] BodyPartitionClosedIncomplete 
-        - [ ] BodyPartitionOpenComplete 
-        - [ ] BodyPartitionClosedComplete 
-        - [ ] GenericStreamPartition 
-    - [ ] FooterPartitionPack [0] *(abstract)*
-        - [ ] FooterPartitionClosedIncomplete
-        - [ ] FooterPartitionClosedComplete *
+- [x] PartitionPack [13] *(abstract)*
+    - [x] HeaderPartitionPack [0] *(abstract)*
+        - [x] HeaderPartitionOpenIncomplete 
+        - [x] HeaderPartitionClosedIncomplete
+        - [x] HeaderPartitionOpenComplete 
+        - [x] HeaderPartitionClosedComplete 
+    - [x] BodyPartitionPack [0]*(abstract)*
+        - [x] BodyPartitionOpenIncomplete 
+        - [x] BodyPartitionClosedIncomplete 
+        - [x] BodyPartitionOpenComplete 
+        - [x] BodyPartitionClosedComplete 
+        - [x] GenericStreamPartition 
+    - [x] FooterPartitionPack [0] *(abstract)*
+        - [x] FooterPartitionClosedIncomplete
+        - [x] FooterPartitionClosedComplete *
 </font>

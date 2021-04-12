@@ -30,7 +30,7 @@ namespace Myriadbits.MXF
         public MXFTypeDefinition(MXFReader reader, MXFKLV headerKLV)
             : base(reader, headerKLV, "TypeDefinition")
         {
-            this.MetaDefinitionName = "TypeDefinition";
+            this.MetaDataName = "TypeDefinition";
         }
     }
 }
