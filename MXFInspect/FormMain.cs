@@ -26,6 +26,7 @@ using Myriadbits.MXF.Identifiers;
 using System;
 using System.Collections.Specialized;
 using System.IO;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Myriadbits.MXFInspect
@@ -190,8 +191,8 @@ namespace Myriadbits.MXFInspect
         {
             // Update the MRU
             AddFileToMRU(fileName);
-            
-            FileInfo fi = new FileInfo(fileName);  
+
+            FileInfo fi = new FileInfo(fileName);
 
             var fileParseMode = DetermineFileParseMode(fi);
 
@@ -310,7 +311,18 @@ namespace Myriadbits.MXFInspect
             if (this.ActiveView != null)
             {
                 FormReport fr = new FormReport(this.ActiveView.File);
-                fr.ShowDialog(this);
+                try
+                {
+                    fr.ShowDialog(this);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    //Log.ForContext<MXFView>().Warning(ex, $"File opening aborted by user:");
+                    //this.ParentMainForm.SetActivityText("File opening aborted by user");
+                    fr.Close();
+
+                }
+
             }
         }
 
