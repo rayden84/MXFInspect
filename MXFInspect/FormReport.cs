@@ -185,6 +185,14 @@ namespace Myriadbits.MXFInspect
 
                 this.prbProcessing.Visible = false;
                 this.tlvValidationResults.Enabled = true;
+
+                btnClose.Click += btnClose_Click;
+                btnClose.Click -= btnCancel_Click;
+            }
+            catch (OperationCanceledException ex)
+            {
+                Log.ForContext<FormReport>().Error(ex, $"OperationCanceled exception occured while validating file:");
+                this.Close();
             }
             catch (Exception ex)
             {
@@ -195,7 +203,6 @@ namespace Myriadbits.MXFInspect
             finally
             {
                 btnClose.Text = "Close";
-                //this.Close();
             }
 
         }
@@ -222,5 +229,10 @@ namespace Myriadbits.MXFInspect
             this.prbProcessing.SetValueFast(report.Percent);
         }
 
+        private void FormReport_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // set cancellation on cancellation token
+            cts.Cancel();
+        }
     }
 }
