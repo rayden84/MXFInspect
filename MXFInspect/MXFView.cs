@@ -23,13 +23,16 @@
 
 using Myriadbits.MXF;
 using Myriadbits.MXF.Exceptions;
+using Myriadbits.MXF.KLV;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Myriadbits.MXFInspect
@@ -370,6 +373,152 @@ namespace Myriadbits.MXFInspect
             this.tlvPhysical.SetOffsetStyle(Properties.Settings.Default.ShowOffsetAsHex);
             this.tlvPhysical.SetHyperLinkStyle(Properties.Settings.Default.Color_Reference);
             this.rtfHexViewer.SetOffsetStyle(Properties.Settings.Default.ShowOffsetAsHex);
+        }
+
+        private void tlvPhysical_MouseHover(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tlvPhysical_CellToolTipShowing(object sender, BrightIdeasSoftware.ToolTipShowingEventArgs e)
+        {
+
+        }
+
+        private void tlvPhysical_CellRightClick(object sender, BrightIdeasSoftware.CellRightClickEventArgs e)
+        {
+            if (e.ColumnIndex == 2 && e.Model is MXFEssenceElement el && el.IsPicture)
+            {
+                var elValue = GetObjectDataValue(el);
+
+                Task<MemoryStream> outputTask = GetThumbnailFromByteStream(elValue);
+
+                try
+                {
+                    var image = Image.FromStream(outputTask.Result);
+                    PictureBox pic = GetPictureBox(e.Location.X, e.Location.Y);
+                    pic.Image = image;
+                    this.ParentMainForm.Controls.Add(pic);
+                    pic.BringToFront();
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+            }
+        }
+
+        private static Task<MemoryStream> GetThumbnailFromByteStream(byte[] elValue)
+        {
+            string ffmpegpath = @"G:\Downloads\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe";
+            //string framePath = @"G:\MXF\mxf samples\frame-extracts\frame_Color Bars ARD_ZDF 01a";
+
+            var arguments = new List<string>() {
+               "-loglevel level+trace",       // set loglevel to highest 
+               //$"-i \"{framePath}\"",       // this sets the input to stdin
+               "-i -",                        // input via stdin  
+                "-vframes 1",                 // we are interested in the first and only frame
+               //"-c:v jpeg",                 // codec option, output as png
+               "-f image2pipe -"              // -f fmt force format output to pipe to sdtout
+                };
+
+            var psi = new ProcessStartInfo
+            {
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                Arguments = string.Join(" ", arguments),
+                FileName = ffmpegpath
+            };
+
+            var process = new Process
+            {
+                StartInfo = psi,
+                EnableRaisingEvents = true
+            };
+
+            process.ErrorDataReceived += (sender, eventArgs) =>
+            {
+                Debug.WriteLine(eventArgs.Data);
+            };
+
+            Debug.WriteLine($"Executing \"{psi.FileName}\" with arguments \"{psi.Arguments}\".");
+
+            process.Start();
+            process.BeginErrorReadLine();
+
+            var inputTask = Task.Run(() =>
+            {
+                using (var input = new MemoryStream(elValue))
+                {
+                    input.CopyTo(process.StandardInput.BaseStream);
+                    process.StandardInput.Close();
+                }
+            });
+
+            var outputTask = Task.Run(() =>
+            {
+                var output = new MemoryStream();
+                process.StandardOutput.BaseStream.CopyTo(output);
+                return output;
+            });
+
+
+            Task.WaitAll(inputTask, outputTask);
+            process.WaitForExit();
+            return outputTask;
+        }
+
+        private byte[] GetObjectDataValue(MXFObject obj)
+        {
+            byte[] data = new byte[obj.TotalLength];
+
+            FileInfo fi = (obj.Root() as MXFFile).File;
+            using (var byteReader = new KLVStreamReader(new FileStream(fi.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, 10240)))
+            {
+                byteReader.Seek(obj.Offset);
+                return byteReader.ReadBytes(data.Length);
+            }
+        }
+
+        public PictureBox GetPictureBox(int x, int y)
+        {
+            try
+            {
+                PictureBox _picBox = new PictureBox();
+                _picBox.Size = new Size(640, 480);
+                _picBox.BorderStyle = BorderStyle.FixedSingle;
+                _picBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                _picBox.BackColor = Color.Black;
+                _picBox.Location = new Point(x, y);
+                //_displayedImage.Add(_picBox);
+
+                return _picBox;
+
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message);
+                return null;
+            }
+        }
+
+        private void tlvPhysical_CellOver(object sender, BrightIdeasSoftware.CellOverEventArgs e)
+        {
+
+        }
+
+        private void tlvPhysical_MouseMove(object sender, MouseEventArgs e)
+        {
+            var pic = this.ParentMainForm.Controls.OfType<PictureBox>().LastOrDefault();
+            if (pic != null)
+            {
+                this.ParentMainForm.Controls.Remove(pic);
+            }
+            
         }
     }
 }
