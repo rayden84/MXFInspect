@@ -59,11 +59,11 @@ namespace Myriadbits.MXF
                     if (dna != null)
                         return dna.Description;
                     else
-                        return "";
+                        return base.ConvertTo(context, culture, value, destType); ;
                 }
 
             }
-            return "";
+            return base.ConvertTo(context, culture, value, destType);
         }
 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type srcType)

@@ -21,6 +21,8 @@
 //
 #endregion
 
+using Myriadbits.MXF.EssenceParser;
+using Myriadbits.MXF.Utils;
 using Serilog.Core;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -69,6 +71,10 @@ namespace Myriadbits.MXF
         [Browsable(false)]
         // TODO helper property for indexvalidator that should be avoided
         public bool Indexed { get; set; }
+
+        [Category("EssenceInfo")]
+        [Description("Additional essence information")]
+        public ProResEssenceInfo EssenceInfo { get; set; }
 
         public MXFEssenceElement(MXFPack pack)
             : base(pack)
