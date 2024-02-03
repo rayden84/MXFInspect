@@ -43,8 +43,6 @@ namespace Myriadbits.MXF.EssenceParser
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public Frame Frame { get; private set; }
 
-        public int log2_desired_slice_size_in_mb { get; private set; }
-
         public ProResEssenceInfo(MXFEssenceElement el)
         {
             EssenceElement = el;
@@ -54,6 +52,11 @@ namespace Myriadbits.MXF.EssenceParser
             {
                 Frame = new Frame(reader);
             }
+        }
+
+        public override string ToString()
+        {
+            return $"Apple ProRes {Frame?.ToString() ?? string.Empty}";
         }
 
     }
@@ -68,26 +71,44 @@ namespace Myriadbits.MXF.EssenceParser
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public Picture SecondPicture { get; private set; }
 
-        public uint frame_size { get; set; }
-        public ushort frame_header_size { get; set; }
-        public byte[] frame_identifier { get; set; }
-        public byte bitstream_version { get; set; }
-        public byte[] encoder_identifier { get; set; }
-        public ushort horizontal_size { get; set; }
-        public ushort vertical_size { get; set; }
-        public ProResAspectRatio? aspect_ratio_information { get; set; }
-        public ProResChromaFormat? chroma_format { get; set; }
-        public ProResInterlaceMode? interlace_mode { get; set; }
+        public uint FrameSize { get; private set; }
+        public ushort FrameHeaderSize { get; private set; }
+
+        [TypeConverter(typeof(ByteArrayConverter))]
+        public byte[] FrameIdentifier { get; private set; }
+        public byte BitstreamVersion { get; private set; }
+
+        [TypeConverter(typeof(ByteArrayConverter))]
+        public byte[] EncoderIdentifier { get; private set; }
+        public ushort HorizontalSize { get; private set; }
+        public ushort VerticalSize { get; private set; }
 
         [TypeConverter(typeof(EnumDescriptionConverter))]
-        public ProResFrameRate? frame_rate_code { get; set; }
-        public byte color_primaries { get; set; }
-        public byte transfer_characteristic { get; set; }
-        public byte matrix_coefficients { get; set; }
-        public int alpha_channel_type { get; set; }
-        public bool load_luma_quantization_matrix { get; set; }
-        public bool load_chroma_quantization_matrix { get; set; }
-        public long stuffing_size { get; private set; }
+        public ProResAspectRatio AspectRatio { get; private set; }
+
+        [TypeConverter(typeof(EnumDescriptionConverter))]
+        public ProResChromaFormat ChromaFormat { get; private set; }
+
+        [TypeConverter(typeof(EnumDescriptionConverter))]
+        public ProResInterlaceMode InterlaceMode { get; private set; }
+
+        [TypeConverter(typeof(EnumDescriptionConverter))]
+        public ProResFrameRate FrameRate { get; private set; }
+
+        [TypeConverter(typeof(EnumDescriptionConverter))]
+        public ProResColorPrimaries ColorPrimaries { get; private set; }
+
+        [TypeConverter(typeof(EnumDescriptionConverter))]
+        public ProResTransferCharacteristic TransferCharacteristic { get; private set; }
+
+        [TypeConverter(typeof(EnumDescriptionConverter))]
+        public ProResMatrixCoefficients MatrixCoefficients { get; private set; }
+
+        [TypeConverter(typeof(EnumDescriptionConverter))]
+        public ProResAlphaChannelType? AlphaChannelType { get; private set; }
+        public bool LoadLumaQuantizationMatrix { get; private set; }
+        public bool LoadChromaQuantizationMatrix { get; private set; }
+        public long StuffingSize { get; private set; }
 
         public byte[,] chroma_quantization_matrix;
 
@@ -96,10 +117,10 @@ namespace Myriadbits.MXF.EssenceParser
         public Frame(BinaryReader _reader)
         {
             reader = _reader;
-            frame_size = reader.ReadUInt32();
-            frame_identifier = reader.ReadBytes(4); // should be 0x69637066 = ICPF
+            FrameSize = reader.ReadUInt32();
+            FrameIdentifier = reader.ReadBytes(4); // should be 0x69637066 = ICPF
 
-            if (frame_identifier.SequenceEqual(ProResEssenceInfo.ICPF))
+            if (FrameIdentifier.SequenceEqual(ProResEssenceInfo.ICPF))
             {
                 ParseFrameHeader();
 
@@ -107,63 +128,105 @@ namespace Myriadbits.MXF.EssenceParser
                 long readerPos = reader.BaseStream.Position;
 
                 FirstPicture = new Picture(reader, this, TemporalOrder.First);
-                if (interlace_mode == ProResInterlaceMode.Interlaced_TFF || interlace_mode == ProResInterlaceMode.Interlaced_BFF)
+                if (InterlaceMode == ProResInterlaceMode.Interlaced_TFF || InterlaceMode == ProResInterlaceMode.Interlaced_BFF)
                 {
                     // position reader right after first picture
-                    reader.BaseStream.Seek(readerPos + FirstPicture.picture_size, SeekOrigin.Begin);
+                    reader.BaseStream.Seek(readerPos + FirstPicture.PictureSize, SeekOrigin.Begin);
                     SecondPicture = new Picture(reader, this, TemporalOrder.Second);
                 }
-                stuffing_size = CalculateStuffingSize();
+                StuffingSize = CalculateStuffingSize();
 
-                if (stuffing_size > 0)
+                if (StuffingSize > 0)
                 {
-                    ParseStuffing(stuffing_size);
+                    ParseStuffing(StuffingSize);
                 }
             }
         }
 
         public override string ToString()
         {
-            return $"{vertical_size} × {horizontal_size} {interlace_mode}";
+            return $"{VerticalSize} × {HorizontalSize} {InterlaceMode}";
         }
 
         private void ParseFrameHeader()
         {
-            frame_header_size = reader.ReadUInt16();
+            FrameHeaderSize = reader.ReadUInt16();
             reader.ReadByte(); // skip one byte (reserved byte)
-            bitstream_version = reader.ReadByte();
-            encoder_identifier = reader.ReadBytes(4);
-            horizontal_size = reader.ReadUInt16();
-            vertical_size = reader.ReadUInt16();
+            BitstreamVersion = reader.ReadByte();
+            EncoderIdentifier = reader.ReadBytes(4);
+            HorizontalSize = reader.ReadUInt16();
+            VerticalSize = reader.ReadUInt16();
 
             byte currByte = reader.ReadByte();
-            chroma_format = (ProResChromaFormat)((currByte & 0b1100_0000) >> 6);
-            interlace_mode = (ProResInterlaceMode)((currByte & 0b0000_1100) >> 2);
+            ChromaFormat = (ProResChromaFormat)((currByte & 0b1100_0000) >> 6);
+            InterlaceMode = (ProResInterlaceMode)((currByte & 0b0000_1100) >> 2);
 
             currByte = reader.ReadByte();
-            aspect_ratio_information = (ProResAspectRatio?)((currByte & 0b1111_0000) >> 4);
-            frame_rate_code = (ProResFrameRate?)(currByte & 0b0000_1111);
+            AspectRatio = (ProResAspectRatio)((currByte & 0b1111_0000) >> 4);
+            FrameRate = (ProResFrameRate)(currByte & 0b0000_1111);
 
-            color_primaries = reader.ReadByte();
-            transfer_characteristic = reader.ReadByte();
-            matrix_coefficients = reader.ReadByte();
+            ColorPrimaries = GetColorPrimaries(reader.ReadByte());
+            TransferCharacteristic = GetTransferCharacteristic(reader.ReadByte());
+            MatrixCoefficients = GetProResMatrixCoefficients(reader.ReadByte());
 
-            alpha_channel_type = (reader.ReadByte() & 0x0000_1111) >> 4;
+            AlphaChannelType = GetAlphaChannelType((byte)((reader.ReadByte() & 0b0000_1111) >> 4));
 
             reader.ReadByte(); // skip one byte (reserved byte)
 
             currByte = reader.ReadByte();
-            load_luma_quantization_matrix = (currByte & 0b0000_0010 >> 1) == 1 ? true : false;
-            load_chroma_quantization_matrix = (currByte & 0b0000_0001) == 1 ? true : false;
+            LoadLumaQuantizationMatrix = (currByte & 0b0000_0010 >> 1) == 1 ? true : false;
+            LoadChromaQuantizationMatrix = (currByte & 0b0000_0001) == 1 ? true : false;
 
-            if (load_luma_quantization_matrix)
+            if (LoadLumaQuantizationMatrix)
             {
                 luma_quantization_matrix = GetMatrix();
             }
 
-            if (load_chroma_quantization_matrix)
+            if (LoadChromaQuantizationMatrix)
             {
                 chroma_quantization_matrix = GetMatrix();
+            }
+        }
+
+        private ProResMatrixCoefficients GetProResMatrixCoefficients(byte value)
+        {
+            if (value >= 10)
+            {
+                return ProResMatrixCoefficients.Reserved_10;
+            }
+            else return (ProResMatrixCoefficients)value;
+        }
+
+        private ProResColorPrimaries GetColorPrimaries(byte value)
+        {
+            if (value > 13)
+            {
+                return ProResColorPrimaries.Reserved_13;
+            }
+            else return (ProResColorPrimaries)value;
+        }
+
+        private ProResAlphaChannelType GetAlphaChannelType(byte value)
+        {
+            if (value > 13)
+            {
+                return ProResAlphaChannelType.Reserved;
+            }
+            else return (ProResAlphaChannelType)value;
+        }
+
+        private ProResTransferCharacteristic GetTransferCharacteristic(byte value)
+        {
+            switch (value)
+            {
+                case 0:
+                case 1:
+                case 2:
+                case 16:
+                    return (ProResTransferCharacteristic) value;
+
+                default:
+                    return ProResTransferCharacteristic.Unknown_Unspecified_0;
             }
         }
 
@@ -183,12 +246,12 @@ namespace Myriadbits.MXF.EssenceParser
 
         private long CalculateStuffingSize()
         {
-            var frameDataSize = 4 + 4 + frame_header_size + FirstPicture.picture_size;
-            if (interlace_mode == ProResInterlaceMode.Interlaced_TFF || interlace_mode == ProResInterlaceMode.Interlaced_BFF)
+            var frameDataSize = 4 + 4 + FrameHeaderSize + FirstPicture.PictureSize;
+            if (InterlaceMode == ProResInterlaceMode.Interlaced_TFF || InterlaceMode == ProResInterlaceMode.Interlaced_BFF)
             {
-                frameDataSize += SecondPicture.picture_size;
+                frameDataSize += SecondPicture.PictureSize;
             }
-            return frame_size - frameDataSize;
+            return FrameSize - frameDataSize;
         }
 
         private bool ParseStuffing(long stuffing_size)
@@ -208,18 +271,18 @@ namespace Myriadbits.MXF.EssenceParser
             protected readonly BinaryReader reader;
             protected readonly Frame frame;
 
-            public TemporalOrder TemporalOrder { get; init; }
+            public TemporalOrder TemporalOrder { get; private set; }
 
-            public int picture_header_size { get; private set; }
-            public ushort picture_vertical_size { get; private set; }
-            public ushort width_in_mb { get; private set; }
-            public ushort height_in_mb { get; private set; }
-            public List<ushort> slice_size_in_mb { get; private set; } = new List<ushort>();
-            public int number_of_slices_per_mb_row { get; private set; }
-            public ushort[,] coded_size_of_slice { get; private set; }
-            public uint picture_size { get; private set; }
-            public ushort deprecated_number_of_slices { get; private set; }
-            public int log2_desired_slice_size_in_mb { get; private set; }
+            public int PictureHeaderSize { get; private set; }
+            public ushort PictureVerticalSize { get; private set; }
+            public ushort WidthInMacroBlocks { get; private set; }
+            public ushort HeightInMacroBlocks { get; private set; }
+            public List<ushort> SliceSizeInMacroBlocks { get; private set; } = new List<ushort>();
+            public int NumberOfSlicesPerMacroBlockRow { get; private set; }
+            public ushort[,] CodedSizeofSlice { get; private set; }
+            public uint PictureSize { get; private set; }
+            public ushort DeprecatedNumberOfSlices { get; private set; }
+            public int Log2DesiredSliceSizeInMacroBlocks { get; private set; }
 
             public Picture(BinaryReader _reader, Frame _frame, TemporalOrder to)
             {
@@ -233,9 +296,9 @@ namespace Myriadbits.MXF.EssenceParser
                 CalculateWidth_in_mb();
                 CalculateSliceSize();
                 ParseSliceTable();
-                for (ushort i = 0; i < height_in_mb; i++)
+                for (ushort i = 0; i < HeightInMacroBlocks; i++)
                 {
-                    for (int j = 0; j < number_of_slices_per_mb_row; j++)
+                    for (int j = 0; j < NumberOfSlicesPerMacroBlockRow; j++)
                     {
                         ParseSlice(i, j);
                     }
@@ -246,33 +309,33 @@ namespace Myriadbits.MXF.EssenceParser
             public override string ToString()
             {
 
-                return $"{height_in_mb} × {width_in_mb} macroblocks";
+                return $"{HeightInMacroBlocks} × {WidthInMacroBlocks} macroblocks";
             }
 
             private void ParsePictureHeader()
             {
                 byte currByte = reader.ReadByte();
-                picture_header_size = (currByte & 0b1111_1000) >> 3;
-                picture_size = reader.ReadUInt32();
-                deprecated_number_of_slices = reader.ReadUInt16();
+                PictureHeaderSize = (currByte & 0b1111_1000) >> 3;
+                PictureSize = reader.ReadUInt32();
+                DeprecatedNumberOfSlices = reader.ReadUInt16();
                 currByte = reader.ReadByte();
-                log2_desired_slice_size_in_mb = (currByte & 0b0011_0000) >> 4;
+                Log2DesiredSliceSizeInMacroBlocks = (currByte & 0b0011_0000) >> 4;
             }
 
             private void CalculatePicture_vertical_size(TemporalOrder temporalOrder)
             {
-                if (frame.interlace_mode == 0)
+                if (frame.InterlaceMode == 0)
                 {
-                    picture_vertical_size = frame.vertical_size;
+                    PictureVerticalSize = frame.VerticalSize;
                 }
                 else
                 {
-                    ushort topFieldVerticalSize = (ushort)((frame.vertical_size + 1) / 2);
-                    ushort bottomFieldVerticalSize = (ushort)(frame.vertical_size / 2);
+                    ushort topFieldVerticalSize = (ushort)((frame.VerticalSize + 1) / 2);
+                    ushort bottomFieldVerticalSize = (ushort)(frame.VerticalSize / 2);
 
-                    picture_vertical_size =
-                        frame.interlace_mode == ProResInterlaceMode.Interlaced_TFF && temporalOrder == TemporalOrder.First ||
-                        frame.interlace_mode == ProResInterlaceMode.Interlaced_BFF && temporalOrder == TemporalOrder.Second
+                    PictureVerticalSize =
+                        frame.InterlaceMode == ProResInterlaceMode.Interlaced_TFF && temporalOrder == TemporalOrder.First ||
+                        frame.InterlaceMode == ProResInterlaceMode.Interlaced_BFF && temporalOrder == TemporalOrder.Second
                     ?
                         topFieldVerticalSize
                     :
@@ -285,7 +348,7 @@ namespace Myriadbits.MXF.EssenceParser
             /// </summary>
             private void CalculateWidth_in_mb()
             {
-                width_in_mb = (ushort)((frame.horizontal_size + 15) / 16);
+                WidthInMacroBlocks = (ushort)((frame.HorizontalSize + 15) / 16);
             }
 
             /// <summary>
@@ -293,7 +356,7 @@ namespace Myriadbits.MXF.EssenceParser
             /// </summary>
             private void CalculateHeight_in_mb()
             {
-                height_in_mb = (ushort)((picture_vertical_size + 15) / 16);
+                HeightInMacroBlocks = (ushort)((PictureVerticalSize + 15) / 16);
             }
 
             private void ParseSlice(ushort i, int j)
@@ -308,12 +371,12 @@ namespace Myriadbits.MXF.EssenceParser
 
             private void ParseSliceTable()
             {
-                coded_size_of_slice = new ushort[height_in_mb, number_of_slices_per_mb_row];
-                for (ushort i = 0; i < height_in_mb; i++)
+                CodedSizeofSlice = new ushort[HeightInMacroBlocks, NumberOfSlicesPerMacroBlockRow];
+                for (ushort i = 0; i < HeightInMacroBlocks; i++)
                 {
-                    for (ushort j = 0; j < number_of_slices_per_mb_row; j++)
+                    for (ushort j = 0; j < NumberOfSlicesPerMacroBlockRow; j++)
                     {
-                        coded_size_of_slice[i, j] = reader.ReadUInt16();
+                        CodedSizeofSlice[i, j] = reader.ReadUInt16();
                     }
                 }
             }
@@ -327,58 +390,165 @@ namespace Myriadbits.MXF.EssenceParser
             private void CalculateSliceSize()
             {
                 int j = 0;
-                ushort sliceSize = (ushort)(1 << log2_desired_slice_size_in_mb);
-                ushort numMbsRemainingInRow = width_in_mb;
+                ushort sliceSize = (ushort)(1 << Log2DesiredSliceSizeInMacroBlocks);
+                ushort numMbsRemainingInRow = WidthInMacroBlocks;
                 do
                 {
                     while (numMbsRemainingInRow >= sliceSize)
                     {
-                        slice_size_in_mb.Add(sliceSize);
+                        SliceSizeInMacroBlocks.Add(sliceSize);
                         numMbsRemainingInRow -= sliceSize;
                     }
                     sliceSize /= 2;
                 } while (numMbsRemainingInRow > 0);
-                number_of_slices_per_mb_row = slice_size_in_mb.Count();
+                NumberOfSlicesPerMacroBlockRow = SliceSizeInMacroBlocks.Count();
             }
         }
     }
 
 
-
     public enum ProResChromaFormat
     {
+        [Description("Reserved")]
         Reserved_0 = 0x00,
+        [Description("Reserved")]
         Reserved_1 = 0x01,
+        [Description("4:2:2")]
         ChromaFormat_422 = 0x02,
+        [Description("4:4:4")]
         ChromaFormat_444 = 0x03,
+    }
+
+    public enum ProResTransferCharacteristic
+    {
+        [Description("Unknown/Unspecified")]
+        Unknown_Unspecified_0 = 0x00,
+        [Description("ITU-R BT.601/BT.709/BT.2020")]
+        ITU_R = 0x01,
+        [Description("Unknown/Unspecified")]
+        Unknown_Unspecified_1 = 0x02,
+        [Description("SMPTE ST 2084:2014")]
+        SMPTE_ST_2084_2014 = 0x16,      
+        [Description("Reserved")]
+        Reserved = 0x17,
+    }
+
+    public enum ProResMatrixCoefficients
+    {
+        [Description("Unknown/Unspecified")]
+        Unknown_Unspecified = 0x00,
+        [Description("ITU-R BT.709")]
+        BT_709 = 0x01,
+        [Description("Unknown/Unspecified")]
+        Unknown = 0x02,
+        [Description("Reserved")]
+        Reserved_3 = 0x03,
+        [Description("Reserved")]
+        Reserved_4 = 0x04,
+        [Description("Reserved")]
+        Reserved_5 = 0x05,
+        [Description("ITU-R BT.601")]
+        BT_601 = 0x06,
+        [Description("Reserved")]
+        Reserved_7 = 0x03,
+        [Description("Reserved")]
+        Reserved_8 = 0x03,
+        [Description("ITU-R BT.2020")]
+        BT_2020 = 0x03,
+        [Description("Reserved")]
+        Reserved_10 = 0x10,
+    }
+
+
+    public enum ProResAlphaChannelType
+    {
+        [Description("No encoded alpha data present in bitstream")]
+        NoAlpha = 0x00,
+        [Description("8 bits/sample integral alpha")]
+        Bits_8 = 0x01,
+        [Description("16 bits/sample integral alpha")]
+        Bits_16 = 0x02,
+        [Description("Reserved")]
+        Reserved = 0x03,
+    }
+
+    public enum ProResColorPrimaries
+    {
+        [Description("Unknown/Unspecified")]
+        Unknown_0 = 0x00,
+        [Description("ITU-R BT.709")]
+        BT_709 = 0x01,
+        [Description("Unknown/Unspecified")]
+        Unknown_2 = 0x02,
+        [Description("Reserved")]
+        Reserved_3 = 0x03,
+        [Description("Reserved")]
+        Reserved_4 = 0x04,
+        [Description("ITU-R BT.601 625")]
+        BT_601_625 = 0x05,
+        [Description("ITU-R BT.601 525")]
+        BT_601_525 = 0x06,
+        [Description("Reserved")]
+        Reserved_7 = 0x07,
+        [Description("Reserved")]
+        Reserved_8 = 0x08,
+        [Description("ITU-R BT.2020")]
+        BT_2020 = 0x09,
+        [Description("Reserved")]
+        Reserved_10 = 0x10,
+        [Description("DCI P3")]
+        DCI_P3 = 0x11,
+        [Description("P3 D65")]
+        P3_D65 = 0x12,
+        [Description("Reserved")]
+        Reserved_13 = 0x13,
     }
 
     public enum ProResInterlaceMode
     {
+        [Description("Progressive")]
         Progressive = 0x00,
+        [Description("Interlaced TFF")]
         Interlaced_TFF = 0x01,
+        [Description("Interlaced BFF")]
         Interlaced_BFF = 0x02,
+        [Description("Reserved")]
         Reserved = 0x03
     }
 
     public enum ProResAspectRatio
     {
-
+        [Description("Unknown/Unspecified")]
         Unknown_Unspecified = 0x00,
+        [Description("Square Pixels")]
         Square_pixels = 0x01,
+        [Description("4:3")]
         AspectRatio_4_3 = 0x02,
+        [Description("16:9")]
         AspectRatio_16_9 = 0x03,
+        [Description("Reserved")]
         Reserved_4 = 0x04,
+        [Description("Reserved")]
         Reserved_5 = 0x05,
+        [Description("Reserved")]
         Reserved_6 = 0x06,
+        [Description("Reserved")]
         Reserved_7 = 0x07,
+        [Description("Reserved")]
         Reserved_8 = 0x08,
+        [Description("Reserved")]
         Reserved_9 = 0x09,
+        [Description("Reserved")]
         Reserved_10 = 0x0A,
+        [Description("Reserved")]
         Reserved_11 = 0x0B,
+        [Description("Reserved")]
         Reserved_12 = 0x0C,
+        [Description("Reserved")]
         Reserved_13 = 0x0D,
+        [Description("Reserved")]
         Reserved_14 = 0x0E,
+        [Description("Reserved")]
         Reserved_15 = 0x0F,
     }
 
@@ -391,27 +561,27 @@ namespace Myriadbits.MXF.EssenceParser
 
     public enum ProResFrameRate
     {
-        [Description("Unknown/unspecified")]
+        [Description("Unknown/Unspecified")]
         Unknown_Unspecified = 0x00,
-        [Description("24 ÷ 1.001 (23.976\u0005)")]
+        [Description("24 ÷ 1.001 (23.976)")]
         FrameRate_24_1001 = 0x01,
         [Description("24")]
         FrameRate_24 = 0x02,
         [Description("25")]
         FrameRate_25 = 0x03,
-        [Description("30 ÷ 1.001 (29.97\u0005)")]
+        [Description("30 ÷ 1.001 (29.97)")]
         FrameRate_30_1001 = 0x04,
         [Description("30")]
         FrameRate_30 = 0x05,
         [Description("50")]
         FrameRate_50 = 0x06,
-        [Description("60 ÷ 1.001 (59.94\u0005)")]
+        [Description("60 ÷ 1.001 (59.94)")]
         FrameRate_60_1001 = 0x07,
         [Description("60")]
         FrameRate_60 = 0x08,
         [Description("100")]
         FrameRate_100 = 0x09,
-        [Description("120 ÷ 1.001 (119.88\u0005)")]
+        [Description("120 ÷ 1.001 (119.88)")]
         FrameRate_120_1001 = 0x0A,
         [Description("120")]
         FrameRate_120 = 0x0B,
