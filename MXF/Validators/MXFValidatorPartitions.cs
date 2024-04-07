@@ -200,14 +200,8 @@ namespace Myriadbits.MXF
 
             var primerPack = p.Children.FirstOrDefault(c => c is MXFPrimerPack);
             var lastHeaderMetadata = p.Children.TakeWhile(c => c.IsHeaderMetadataLike())?.LastOrDefault();
-            //var trailingKLV = lastHeaderMetadata?.NextSibling();
 
-            //// add trailing KLV Fill item if any
-            //if (trailingKLV != null && trailingKLV.IsFiller())
-            //{
-            //    lastHeaderMetadata = trailingKLV;
-            //}
-
+            // TODO: what if there are two or more consecutive filler?
             if (primerPack != null && lastHeaderMetadata != null)
             {
                 headerByteCount = (ulong)(lastHeaderMetadata.Offset + lastHeaderMetadata.TotalLength) - (ulong)primerPack.Offset;
