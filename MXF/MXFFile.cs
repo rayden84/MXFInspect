@@ -35,6 +35,7 @@ using Myriadbits.MXF.Exceptions;
 using Myriadbits.MXF.KLV;
 using Myriadbits.MXF.EssenceParser;
 using System.Reflection;
+using Myriadbits.MXF.EssenceParsers;
 
 namespace Myriadbits.MXF
 {
@@ -148,6 +149,7 @@ namespace Myriadbits.MXF
 
         private int ParseEssences(IProgress<TaskReport> overallProgress = null, IProgress<TaskReport> singleProgress = null, CancellationToken ct = default)
         {
+            //var dict = 
             int currentPercentage = 0;
             int previousPercentage = 0;
 
@@ -155,7 +157,7 @@ namespace Myriadbits.MXF
             int essenceElementsCount = essenceElements.Count;
             for (int index = 0; index < essenceElements.Count; index++)
             {
-                essenceElements[index].EssenceInfo = new ProResEssenceInfo(essenceElements[index]);
+                essenceElements[index].EssenceInfo = MXFEssenceParserFactory.ParseEssence(essenceElements[index]);
 
                 ct.ThrowIfCancellationRequested();
 

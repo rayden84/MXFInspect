@@ -73,7 +73,7 @@ namespace Myriadbits.MXF
         public bool Indexed { get; set; }
 
         [Category(CATEGORYNAME)]
-        public ProResEssenceInfo EssenceInfo { get; set; }
+        public MXFEssenceInfoBase EssenceInfo { get; set; }
 
         public MXFEssenceElement(MXFPack pack)
             : base(pack)

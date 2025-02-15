@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Xml.Linq;
 using Microsoft.Win32;
@@ -33,23 +34,23 @@ namespace Myriadbits.MXF.Identifiers
     public static class SMPTERegisters
     {
         private static bool Initialized { get; set; }
-        private static Dictionary<ByteArray, ULDescription> LabelsDictionary { get; set; }
-        private static Dictionary<ByteArray, ULDescription> ElementsDictionary { get; set; }
-        private static Dictionary<ByteArray, ULDescription> GroupsDictionary { get; set; }
-        private static Dictionary<ByteArray, ULDescription> EssencesDictionary { get; set; }
-        private static Dictionary<(byte, byte), DIDDescription> DIDDictionary { get; set; }
+        private static Dictionary<ByteArray, ULDescription> LabelsDictionary { get; set; } = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
+        private static Dictionary<ByteArray, ULDescription> ElementsDictionary { get; set; } = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
+        private static Dictionary<ByteArray, ULDescription> GroupsDictionary { get; set; } = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
+        private static Dictionary<ByteArray, ULDescription> EssencesDictionary { get; set; } = new Dictionary<ByteArray, ULDescription>(new SMPTEEssenceRegisterComparer());
+        private static Dictionary<(byte, byte), DIDDescription> DIDDictionary { get; set; } = new Dictionary<(byte, byte), DIDDescription>();
 
+        public static IReadOnlyDictionary<ByteArray, ULDescription> Labels { get; } = new ReadOnlyDictionary<ByteArray, ULDescription>(LabelsDictionary);
+        public static IReadOnlyDictionary<ByteArray, ULDescription> Elements { get; } = new ReadOnlyDictionary<ByteArray, ULDescription>(ElementsDictionary);
+        public static IReadOnlyDictionary<ByteArray, ULDescription> Groups { get; } = new ReadOnlyDictionary<ByteArray, ULDescription>(GroupsDictionary); 
+        public static IReadOnlyDictionary<ByteArray, ULDescription> Essences { get; } = new ReadOnlyDictionary<ByteArray, ULDescription>(EssencesDictionary); 
+        
         public static int TotalEntriesCount { get; private set; } = 0;
 
         public static void Initialize()
         {
             if (!Initialized)
             {
-                LabelsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
-                ElementsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
-                GroupsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
-                EssencesDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTEEssenceRegisterComparer());
-
                 FillDictionary(Properties.Resources.Labels, LabelsDictionary);
                 Log.ForContext(typeof(SMPTERegisters)).Information($"A total of {LabelsDictionary.Count} SMPTE labels register entries added to SMPTE dictionary");
 
@@ -182,8 +183,6 @@ namespace Myriadbits.MXF.Identifiers
 
         private static void FillDIDDictionary()
         {
-            DIDDictionary = new Dictionary<(byte, byte), DIDDescription>();
-
             string allText = Properties.Resources.ANC_Identifiers;
             string[] allLines = allText.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             if (allLines.Length > 0)

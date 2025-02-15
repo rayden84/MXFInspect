@@ -345,22 +345,22 @@ namespace Myriadbits.MXF
                 }
             }
         }
+    }
 
-        // TODO use wildcatd (0x7F) for hashing
-        internal class KeyPartialMatchComparer : IEqualityComparer<ByteArray>
+    // TODO use wildcard (0x7F) for hashing
+    public class KeyPartialMatchComparer : IEqualityComparer<ByteArray>
+    {
+        // if the keys to compare are of the same category (meaning the same hash) compare
+        // whether the byte sequence is equal
+        public bool Equals(ByteArray x, ByteArray y)
         {
-            // if the keys to compare are of the same category (meaning the same hash) compare
-            // whether the byte sequence is equal
-            public bool Equals(ByteArray x, ByteArray y)
-            {
-                return x.HasSameBeginning(y);
-            }
+            return x.HasSameBeginning(y);
+        }
 
-            public int GetHashCode(ByteArray obj)
-            {
-                // hash only the first 12 bytes (prefix is 4 bytes + 5th byte = key category)
-                return obj.ArrayLength >= 12 ? obj.GetHashCode(12) : obj.GetHashCode();
-            }
+        public int GetHashCode(ByteArray obj)
+        {
+            // hash only the first 12 bytes (prefix is 4 bytes + 5th byte = key category)
+            return obj.ArrayLength >= 12 ? obj.GetHashCode(12) : obj.GetHashCode();
         }
     }
 }

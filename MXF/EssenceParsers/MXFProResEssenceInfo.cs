@@ -32,23 +32,16 @@ using System.Linq;
 namespace Myriadbits.MXF.EssenceParser
 {
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public class ProResEssenceInfo
+    public class MXFProResEssenceInfo : MXFEssenceInfoBase
     {
         public static readonly ImmutableArray<byte> ICPF = ImmutableArray.Create<byte>(0x69, 0x63, 0x70, 0x66);
-        protected readonly BinaryReader reader;
-
-        [Browsable(false)]
-        public MXFEssenceElement EssenceElement { get; private set; }
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public Frame Frame { get; private set; }
 
-        public ProResEssenceInfo(MXFEssenceElement el)
+        public MXFProResEssenceInfo(MXFEssenceElement el) : base(el)
         {
-            EssenceElement = el;
-
-            SubStream ss = el.GetValueStream();
-            using (reader = new KLVStreamReader(ss))
+            using (reader)
             {
                 Frame = new Frame(reader);
             }
@@ -120,7 +113,7 @@ namespace Myriadbits.MXF.EssenceParser
             FrameSize = reader.ReadUInt32();
             FrameIdentifier = reader.ReadBytes(4); // should be 0x69637066 = ICPF
 
-            if (FrameIdentifier.SequenceEqual(ProResEssenceInfo.ICPF))
+            if (FrameIdentifier.SequenceEqual(MXFProResEssenceInfo.ICPF))
             {
                 ParseFrameHeader();
 
