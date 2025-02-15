@@ -72,8 +72,7 @@ namespace Myriadbits.MXF
         // TODO helper property for indexvalidator that should be avoided
         public bool Indexed { get; set; }
 
-        [Category("EssenceInfo")]
-        [Description("Additional essence information")]
+        [Category(CATEGORYNAME)]
         public ProResEssenceInfo EssenceInfo { get; set; }
 
         public MXFEssenceElement(MXFPack pack)

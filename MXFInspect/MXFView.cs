@@ -243,11 +243,6 @@ namespace Myriadbits.MXFInspect
                     // Display the mxfobject as hex dump
                     rtfHexViewer.SetObject(PhysicalTreeSelectedObject);
 
-                    // if EssenceElement then parse it
-                    if (PhysicalTreeSelectedObject is MXFEssenceElement el && el.EssenceInfo == null)
-                    {
-                        el.EssenceInfo = new ProResEssenceInfo(el);
-                    }
 
                     m_fDoNotSelectOther = false;
                 }

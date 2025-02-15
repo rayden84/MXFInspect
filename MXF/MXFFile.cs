@@ -33,6 +33,8 @@ using System.Threading.Tasks;
 using Serilog;
 using Myriadbits.MXF.Exceptions;
 using Myriadbits.MXF.KLV;
+using Myriadbits.MXF.EssenceParser;
+using System.Reflection;
 
 namespace Myriadbits.MXF
 {
@@ -47,10 +49,12 @@ namespace Myriadbits.MXF
     /// </summary>
     public class MXFFile : MXFObject
     {
-        private const int MIN_PARSER_PERCENTAGE = 12;
-        private const int MAX_PARSER_PERCENTAGE = 65;
-        private const int MIN_LOCALTAG_PERCENTAGE = 70;
-        private const int MAX_LOCALTAG_PERCENTAGE = 88;
+        private const int MIN_KLVPARSER_PERCENTAGE = 12;
+        private const int MAX_KLVPARSER_PERCENTAGE = 55;
+        private const int MIN_LOCALTAG_PERCENTAGE = 60;
+        private const int MAX_LOCALTAG_PERCENTAGE = 72;
+        private const int MIN_ESSSENCEPARSER_PERCENTAGE = 72;
+        private const int MAX_ESSENCEPARSER_PERCENTAGE = 88;
         private const int REFERENCE_PERCENTAGE = 90;
         private const int LOGICALTREE_PERCENTAGE = 97;
 
@@ -96,7 +100,7 @@ namespace Myriadbits.MXF
 
                     // Now process the pack list (partition packs, treat special cases)
 
-                    overallProgress?.Report(new TaskReport(MAX_PARSER_PERCENTAGE, "Process packs"));
+                    overallProgress?.Report(new TaskReport(MAX_KLVPARSER_PERCENTAGE, "Process packs"));
                     sw.Restart();
                     PartitionAndPostProcessMXFPacks(mxfPacks);
                     Log.ForContext<MXFFile>().Information($"Finished processing MXF packs [{mxfPacks.Count} items] in {sw.ElapsedMilliseconds} ms");
@@ -107,6 +111,12 @@ namespace Myriadbits.MXF
                     overallProgress?.Report(new TaskReport(MIN_LOCALTAG_PERCENTAGE, "Resolving tags"));
                     ResolveAndReadLocalTags(overallProgress, singleProgress, ct);
                     Log.ForContext<MXFFile>().Information($"Finished resolving local tags in {sw.ElapsedMilliseconds} ms");
+
+                    // Parse essence elements
+
+                    sw.Restart();
+                    int essencesParsedCount = ParseEssences(overallProgress, singleProgress, ct);
+                    Log.ForContext<MXFFile>().Information($"{essencesParsedCount} essences parsed in {sw.ElapsedMilliseconds} ms");
 
                     // Resolve the references
 
@@ -122,6 +132,8 @@ namespace Myriadbits.MXF
                     CreateLogicalTree();
                     Log.ForContext<MXFFile>().Information($"Logical tree created in {sw.ElapsedMilliseconds} ms");
 
+
+
                     // Set property description by reading the description attribute (for all types)
                     MXFPackFactory.SetDescriptionFromAttributeForAllTypes();
 
@@ -132,6 +144,36 @@ namespace Myriadbits.MXF
             }, ct);
 
             return result;
+        }
+
+        private int ParseEssences(IProgress<TaskReport> overallProgress = null, IProgress<TaskReport> singleProgress = null, CancellationToken ct = default)
+        {
+            int currentPercentage = 0;
+            int previousPercentage = 0;
+
+            var essenceElements = this.Descendants().OfType<MXFEssenceElement>().ToList();
+            int essenceElementsCount = essenceElements.Count;
+            for (int index = 0; index < essenceElements.Count; index++)
+            {
+                essenceElements[index].EssenceInfo = new ProResEssenceInfo(essenceElements[index]);
+
+                ct.ThrowIfCancellationRequested();
+
+                // update progress
+                currentPercentage = (int)(index * 100.0 / essenceElementsCount);
+                if (currentPercentage > previousPercentage)
+                {
+                    // TODO really need to check this?
+                    if (currentPercentage < 100)
+                    {
+                        int overallPercentage = MIN_ESSSENCEPARSER_PERCENTAGE + currentPercentage * (MAX_ESSENCEPARSER_PERCENTAGE - MIN_ESSSENCEPARSER_PERCENTAGE) / 100;
+                        overallProgress?.Report(new TaskReport(overallPercentage, "Parsing essence elements"));
+                        singleProgress?.Report(new TaskReport(currentPercentage, $"Parsing essence element {index:N0}/{essenceElementsCount:N0}"));
+                        previousPercentage = currentPercentage;
+                    }
+                }
+            }
+            return essenceElementsCount;
         }
 
         public override string ToString()
@@ -322,7 +364,7 @@ namespace Myriadbits.MXF
                     // TODO really need to check this?
                     if (currentPercentage < 100)
                     {
-                        int overallPercentage = MIN_PARSER_PERCENTAGE + currentPercentage * (MAX_PARSER_PERCENTAGE - MIN_PARSER_PERCENTAGE) / 100;
+                        int overallPercentage = MIN_KLVPARSER_PERCENTAGE + currentPercentage * (MAX_KLVPARSER_PERCENTAGE - MIN_KLVPARSER_PERCENTAGE) / 100;
                         overallProgress?.Report(new TaskReport(overallPercentage, "Reading KLV stream"));
                         singleProgress?.Report(new TaskReport(currentPercentage, "Parsing packs..."));
                         previousPercentage = currentPercentage;
@@ -456,7 +498,7 @@ namespace Myriadbits.MXF
                     {
                         int overallPercentage = MIN_LOCALTAG_PERCENTAGE + currentPercentage * (MAX_LOCALTAG_PERCENTAGE - MIN_LOCALTAG_PERCENTAGE) / 100;
                         overallProgress?.Report(new TaskReport(overallPercentage, "Resolving tags"));
-                        singleProgress?.Report(new TaskReport(currentPercentage, $"Resolving tag {index}/{localSetListCount}"));
+                        singleProgress?.Report(new TaskReport(currentPercentage, $"Resolving tag {index:N0}/{localSetListCount:N0}"));
                         previousPercentage = currentPercentage;
                     }
                 }
