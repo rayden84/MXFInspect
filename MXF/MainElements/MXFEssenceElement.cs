@@ -80,7 +80,7 @@ namespace Myriadbits.MXF
         {
             if (essenceTypes.TryGetValue(this.Key[12], out string itemType))
             {
-                this.EssenceType = itemType;
+                this.EssenceType = $"{itemType}-{this.Key[12]:x}";
             }
             else
             {
@@ -94,7 +94,7 @@ namespace Myriadbits.MXF
 
             this.IsPicture = (this.Key[12] == 0x05 || this.Key[12] == 0x15);
             this.ElementCount = this.Key[13];
-            this.ElementType = this.Key[14];
+            this.ElementType = this.Key[14]; // see SMPTE 331M
             this.ElementNumber = this.Key[15];
         }
 
