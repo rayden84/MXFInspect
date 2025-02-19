@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "ObjectListView2022NET/2.9.5": {
+        "runtime": {
+          "ObjectListView2022NET.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ObjectListView2022NET/2.9.5": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
