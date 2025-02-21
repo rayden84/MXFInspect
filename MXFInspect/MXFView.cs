@@ -393,34 +393,37 @@ namespace Myriadbits.MXFInspect
 
                 Task<MemoryStream> outputTask = GetThumbnailFromByteStream(elValue);
 
-                try
+                if(outputTask != null)
                 {
-                    var image = Image.FromStream(outputTask.Result);
-                    PictureBox pic = GetPictureBox(e.Location.X, e.Location.Y);
-                    pic.Image = image;
-                    this.ParentMainForm.Controls.Add(pic);
-                    pic.BringToFront();
-                }
-                catch (Exception ex)
-                {
+                    try
+                    {
+                        var image = Image.FromStream(outputTask.Result);
+                        PictureBox pic = GetPictureBox(e.Location.X, e.Location.Y);
+                        pic.Image = image;
+                        this.ParentMainForm.Controls.Add(pic);
+                        pic.BringToFront();
+                    }
+                    catch (Exception ex)
+                    {
 
+                    }
                 }
-
             }
         }
 
         private static Task<MemoryStream> GetThumbnailFromByteStream(byte[] elValue)
         {
-            string ffmpegpath = @"G:\Downloads\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe";
+            string ffmpegpath = @"G:\Downloads\ffmpeg-7.1-essentials_build\bin\ffmpeg.exe";
             //string framePath = @"G:\MXF\mxf samples\frame-extracts\frame_Color Bars ARD_ZDF 01a";
 
             var arguments = new List<string>() {
-               "-loglevel level+trace",       // set loglevel to highest 
+                "-loglevel level+trace",       // set loglevel to highest 
+                "-c prores",
                //$"-i \"{framePath}\"",       // this sets the input to stdin
                "-i -",                        // input via stdin  
                 "-vframes 1",                 // we are interested in the first and only frame
                //"-c:v jpeg",                 // codec option, output as png
-               "-f image2pipe -"              // -f fmt force format output to pipe to sdtout
+               "-f image2pipe -"
                 };
 
             var psi = new ProcessStartInfo
@@ -450,26 +453,31 @@ namespace Myriadbits.MXFInspect
             process.Start();
             process.BeginErrorReadLine();
 
-            var inputTask = Task.Run(() =>
+            if (!process.HasExited)
             {
-                using (var input = new MemoryStream(elValue))
+                var inputTask = Task.Run(() =>
                 {
-                    input.CopyTo(process.StandardInput.BaseStream);
-                    process.StandardInput.Close();
-                }
-            });
+                    using (var input = new MemoryStream(elValue))
+                    {
+                        input.CopyTo(process.StandardInput.BaseStream);
+                        process.StandardInput.Close();
+                    }
+                });
 
-            var outputTask = Task.Run(() =>
-            {
-                var output = new MemoryStream();
-                process.StandardOutput.BaseStream.CopyTo(output);
-                return output;
-            });
+                var outputTask = Task.Run(() =>
+                {
+                    var output = new MemoryStream();
+                    process.StandardOutput.BaseStream.CopyTo(output);
+                    return output;
+                });
 
 
-            Task.WaitAll(inputTask, outputTask);
-            process.WaitForExit();
-            return outputTask;
+                Task.WaitAll(inputTask, outputTask);
+                process.WaitForExit();
+                return outputTask;
+            }
+            return null;
+
         }
 
         private byte[] GetObjectDataValue(MXFObject obj)
