@@ -29,6 +29,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using Myriadbits.MXF.Properties;
+using Myriadbits.MXF.Extensions;
 
 namespace Myriadbits.MXF
 {

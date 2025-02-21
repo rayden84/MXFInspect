@@ -1,7 +1,7 @@
-﻿#region license
+#region license
 //
-// MXFInspect - Myriadbits MXF Viewer. 
-// Inspect MXF Files.
+// MXF - Myriadbits .NET MXF library. 
+// Read MXF Files.
 // Copyright (C) 2015 Myriadbits, Jochem Bakker
 //
 // This program is free software: you can redistribute it and/or modify
@@ -21,18 +21,18 @@
 //
 #endregion
 
-using BrightIdeasSoftware;
-using Myriadbits.MXF;
-using Myriadbits.MXF.Extensions;
-
-namespace Myriadbits.MXFInspect
+namespace Myriadbits.MXF.Extensions
 {
-    public class ExcludeFillerFilter : IModelFilter
+    public static class MXFTrackExtensions
     {
-        public bool Filter(object modelObject)
+        public static MXFSourcePackage GetContainingSourcePackage (this MXFTrack t)
         {
-            return !((modelObject as MXFPack)?.IsFiller() ?? false);
+            return t.Parent as MXFSourcePackage;
         }
 
+        public static MXFMaterialPackage GetContainingMaterialPackage(this MXFTrack t)
+        {
+            return t.Parent as MXFMaterialPackage;
+        }
     }
 }

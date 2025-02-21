@@ -25,7 +25,7 @@ using Myriadbits.MXF.Identifiers;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Myriadbits.MXF
+namespace Myriadbits.MXF.Extensions
 {
     public static class MXFFileExtensions
     {
@@ -100,7 +100,7 @@ namespace Myriadbits.MXF
 
         public static bool IsHeaderPartitionClosedAndComplete(this MXFFile file)
         {
-            return !(file.GetHeaderPartition().IsClosedAndComplete());
+            return !file.GetHeaderPartition().IsClosedAndComplete();
         }
 
         public static bool IsClosedAndComplete(this MXFPartition p)

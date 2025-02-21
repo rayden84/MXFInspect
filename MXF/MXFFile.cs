@@ -30,6 +30,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Myriadbits.MXF.Exceptions;
+using Myriadbits.MXF.Extensions;
 
 namespace Myriadbits.MXF
 {

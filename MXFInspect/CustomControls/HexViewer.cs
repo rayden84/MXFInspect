@@ -22,6 +22,7 @@
 #endregion
 
 using Myriadbits.MXF;
+using Myriadbits.MXF.Extensions;
 using Myriadbits.MXF.KLV;
 using System;
 using System.Drawing;

@@ -21,13 +21,9 @@
 //
 #endregion
 
-using Myriadbits.MXF.Utils;
-using System;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
-namespace Myriadbits.MXF
+namespace Myriadbits.MXF.Extensions
 {
     public static class MXFObjectExtensions
     {
@@ -86,13 +82,13 @@ namespace Myriadbits.MXF
         public static bool IsMetadataLike(this MXFObject obj)
         {
             return obj is MXFMetadataBaseclass or MXFPackageMetaData or MXFPrimerPack or MXFLocalSet
-                || (obj is IResolvable r)
+                || obj is IResolvable r
                 || obj.Ancestors().Any(a => a is MXFMetadataBaseclass or MXFPackageMetaData or MXFPrimerPack);
         }
 
         public static bool IsHeaderMetadataLike(this MXFObject obj)
         {
-            return (obj is MXFMetadataBaseclass && obj is not MXFIndexTableSegment) ||
+            return obj is MXFMetadataBaseclass && obj is not MXFIndexTableSegment ||
                 obj is MXFPrimerPack ||
                 // this includes also Filler Packs
                 (obj as MXFPack)?.Key.RegistryDesignator == Identifiers.ULRegistries.MetadataDictionaries;

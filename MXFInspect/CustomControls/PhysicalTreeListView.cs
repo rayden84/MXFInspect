@@ -23,6 +23,7 @@
 
 using BrightIdeasSoftware;
 using Myriadbits.MXF;
+using Myriadbits.MXF.Extensions;
 using System;
 using System.Drawing;
 using System.Linq;

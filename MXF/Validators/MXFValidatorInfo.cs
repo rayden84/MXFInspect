@@ -30,6 +30,7 @@ using Serilog;
 using System.Diagnostics;
 using Myriadbits.MXF.Identifiers;
 using System.Text;
+using Myriadbits.MXF.Extensions;
 
 namespace Myriadbits.MXF
 {

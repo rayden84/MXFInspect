@@ -21,6 +21,7 @@
 //
 #endregion
 
+using Myriadbits.MXF.Extensions;
 using Myriadbits.MXF.Identifiers;
 using System;
 using System.Collections.Generic;

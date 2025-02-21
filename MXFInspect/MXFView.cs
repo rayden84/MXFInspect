@@ -23,6 +23,7 @@
 
 using Myriadbits.MXF;
 using Myriadbits.MXF.Exceptions;
+using Myriadbits.MXF.Extensions;
 using Serilog;
 using System;
 using System.Diagnostics;
