@@ -23,14 +23,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Myriadbits.MXF
 {
-    public class MXFValidator
+    public abstract class MXFValidator
     {
         public MXFFile File { get; set; }
         public string Description { get; set; }
