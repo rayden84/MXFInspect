@@ -28,9 +28,11 @@ namespace Myriadbits.MXF
     [ULGroup("urn:smpte:ul:060e2b34.027f0101.0d010101.01010900")]
 	public class MXFFiller : MXFSegment
 	{
-        // The Filler serves an entirely different function as the KLV Fill Item(= FillerData).
-		// The KLV Fill item is used to add bytes in the serialized bitstream.
-		// The Filler is used to signal empty Essence along the timeline of a Track.
+        /// <summary>
+        /// The Filler serves an entirely different function as the KLV Fill Item(= FillerData),/// <see cref="MXFFillerData">
+        /// The Filler item is used to add bytes in the serialized bitstream.
+        /// The Filler is used to signal empty Essence along the timeline of a Track.
+        /// </summary>
 
         public MXFFiller(MXFPack pack)
 			: base(pack, "Filler")
