@@ -53,6 +53,11 @@ namespace Myriadbits.MXF.Validators
         {
             return this.File.GetPartitions().Any();
         }
+        public bool IsHeaderPartitionPresent()
+        {
+            var firstPartition = this.File.GetPartitions()?.First();
+            return firstPartition != null && firstPartition.IsHeaderPartition();
+        }
 
         public bool IsFooterPartitionPresent()
         {
@@ -60,22 +65,25 @@ namespace Myriadbits.MXF.Validators
             return lastPartition != null && lastPartition.IsFooterPartition();
         }
 
-        public bool IsHeaderPartitionPresent()
-        {
-            var firstPartition = this.File.GetPartitions()?.First();
-            return firstPartition != null && firstPartition.IsHeaderPartition();
-        }
-
         public bool IsHeaderPartitionUnique()
         {
             int count = this.File.GetPartitions().Where(p => p.IsHeaderPartition()).Count();
             return count <= 1;
         }
-
         public bool IsFooterPartitionUnique()
         {
             int count = this.File.GetPartitions().Where(p => p.IsFooterPartition()).Count();
             return count <= 1;
+        }
+
+        // Helpers
+        public bool IsHeaderPartitionOpen()
+        {
+            if (IsHeaderPartitionPresent())
+            {
+                return !this.File.GetPartitions().First().IsClosed();
+            }
+            return false;
         }
 
         public bool AreBodyPartitionsPresent()
@@ -93,6 +101,15 @@ namespace Myriadbits.MXF.Validators
             if (IsHeaderPartitionPresent() && IsHeaderPartitionUnique())
             {
                 return this.File.GetPartitions()?.First().ContainsIndexTableSegments() ?? false;
+            }
+            else return false;
+        }
+
+        public bool FooterPartitionContainsIndexTableSegments()
+        {
+            if (IsFooterPartitionPresent() && IsFooterPartitionUnique())
+            {
+                return this.File.GetPartitions()?.Last().Children.Where(c => c is MXFIndexTableSegment).Any() ?? false;
             }
             else return false;
         }
@@ -123,16 +140,6 @@ namespace Myriadbits.MXF.Validators
             }
             else return false;
         }
-
-        public bool FooterPartitionContainsIndexTableSegments()
-        {
-            if (IsFooterPartitionPresent() && IsFooterPartitionUnique())
-            {
-                return this.File.GetPartitions()?.Last().Children.Where(c => c is MXFIndexTableSegment).Any() ?? false;
-            }
-            else return false;
-        }
-
         public bool IsThisPartitionValueCorrect(MXFPartition p)
         {
             return p.ThisPartition + runInHeaderOffset == (ulong)p.Offset;
@@ -177,7 +184,7 @@ namespace Myriadbits.MXF.Validators
                 p.Status == PartitionStatus.ClosedComplete;
         }
 
-        public bool MajorVersinEqualsTo(MXFPartition p, int versionNumber)
+        public bool MajorVersionEqualsTo(MXFPartition p, int versionNumber)
         {
             return p.MajorVersion == versionNumber;
         }
@@ -212,7 +219,6 @@ namespace Myriadbits.MXF.Validators
         {
             ulong indexByteCount = 0;
 
-            //var firstIndexTableSegment = p.Children.FirstOrDefault(c => c is MXFIndexTableSegment);
             var indexTableSegments = p.Children.TakeWhile(c => c is MXFIndexTableSegment);
 
             if (indexTableSegments.Any())
@@ -229,18 +235,6 @@ namespace Myriadbits.MXF.Validators
 
             return p.IndexByteCount == indexByteCount;
         }
-
-
-        // Helpers
-        public bool IsHeaderPartitionOpen()
-        {
-            if (IsHeaderPartitionPresent())
-            {
-                return !this.File.GetPartitions().First().IsClosed();
-            }
-            return false;
-        }
-
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)
         {
             ct.ThrowIfCancellationRequested();
@@ -389,91 +383,7 @@ namespace Myriadbits.MXF.Validators
 
                     foreach (var p in this.File.GetPartitions())
                     {
-                        if (!IsThisPartitionValueCorrect(p))
-                        {
-                            retval.Add(ValidationRules.CreateValidationResult(
-                                ValidationRuleIDs.ID_0095,
-                                p,
-                                p.Offset,
-                                p.PartitionNumber
-                            ));
-                        }
-
-                        if (!IsPreviousPartitionValueCorrect(p))
-                        {
-                            retval.Add(ValidationRules.CreateValidationResult(
-                                ValidationRuleIDs.ID_0096,
-                                p,
-                                p.Offset,
-                                p.PartitionNumber
-                            ));
-                        }
-
-                        if (IsFooterPartitionPresent() && IsFooterPartitionUnique())
-                        {
-                            // TODO Consider if Partition is open
-                            if (!IsFooterPartitionValueCorrect(p))
-                            {
-                                retval.Add(ValidationRules.CreateValidationResult(
-                                    ValidationRuleIDs.ID_0097,
-                                    p,
-                                    p.Offset,
-                                    p.PartitionNumber
-                                ));
-                            }
-                        }
-                        else if (!IsFooterPartitionPresent() && p.FooterPartition != 0)
-                        {
-                            retval.Add(ValidationRules.CreateValidationResult(
-                                ValidationRuleIDs.ID_0710,
-                                p,
-                                p.Offset,
-                                p.PartitionNumber
-                            ));
-                        }
-
-                        if (!IsPartitionStatusValid(p))
-                        {
-                            retval.Add(ValidationRules.CreateValidationResult(
-                                ValidationRuleIDs.ID_0114,
-                                p,
-                                p.Offset,
-                                p.PartitionNumber,
-                                (byte)p.Status
-                            ));
-                        }
-
-                        if (!MajorVersinEqualsTo(p, MAJOR_VERSION))
-                        {
-                            retval.Add(ValidationRules.CreateValidationResult(
-                                ValidationRuleIDs.ID_0107,
-                                p,
-                                p.Offset,
-                                p.PartitionNumber,
-                                p.MajorVersion
-                            ));
-                        }
-
-                        if (!MinorVersionEqualsTo(p, MINOR_VERSION_SMPTE377M_2011))
-                        {
-                            retval.Add(ValidationRules.CreateValidationResult(
-                                ValidationRuleIDs.ID_0108,
-                                p,
-                                p.Offset,
-                                p.PartitionNumber,
-                                p.MinorVersion
-                            ));
-                        }
-
-                        if (!IsHeaderByteCountCorrect(p))
-                        {
-                            retval.Add(ValidationRules.CreateValidationResult(
-                                ValidationRuleIDs.ID_0098,
-                                p,
-                                p.Offset,
-                                p.PartitionNumber
-                            ));
-                        }
+                        CheckPartitionProperties(retval, p);
                     }
                 }
                 else
@@ -492,6 +402,103 @@ namespace Myriadbits.MXF.Validators
             return result;
         }
 
+        private void CheckPartitionProperties(List<MXFValidationResult> retval, MXFPartition p)
+        {
+            if (!IsThisPartitionValueCorrect(p))
+            {
+                retval.Add(ValidationRules.CreateValidationResult(
+                    ValidationRuleIDs.ID_0095,
+                    p,
+                    p.Offset,
+                    p.PartitionNumber
+                ));
+            }
 
+            if (!IsPreviousPartitionValueCorrect(p))
+            {
+                retval.Add(ValidationRules.CreateValidationResult(
+                    ValidationRuleIDs.ID_0096,
+                    p,
+                    p.Offset,
+                    p.PartitionNumber
+                ));
+            }
+
+            if (IsFooterPartitionPresent() && IsFooterPartitionUnique())
+            {
+                // TODO Consider if Partition is open
+                if (!IsFooterPartitionValueCorrect(p))
+                {
+                    retval.Add(ValidationRules.CreateValidationResult(
+                        ValidationRuleIDs.ID_0097,
+                        p,
+                        p.Offset,
+                        p.PartitionNumber
+                    ));
+                }
+            }
+            else if (!IsFooterPartitionPresent() && p.FooterPartition != 0)
+            {
+                retval.Add(ValidationRules.CreateValidationResult(
+                    ValidationRuleIDs.ID_0710,
+                    p,
+                    p.Offset,
+                    p.PartitionNumber
+                ));
+            }
+
+            if (!IsPartitionStatusValid(p))
+            {
+                retval.Add(ValidationRules.CreateValidationResult(
+                    ValidationRuleIDs.ID_0114,
+                    p,
+                    p.Offset,
+                    p.PartitionNumber,
+                    (byte)p.Status
+                ));
+            }
+
+            if (!MajorVersionEqualsTo(p, MAJOR_VERSION))
+            {
+                retval.Add(ValidationRules.CreateValidationResult(
+                    ValidationRuleIDs.ID_0107,
+                    p,
+                    p.Offset,
+                    p.PartitionNumber,
+                    p.MajorVersion
+                ));
+            }
+
+            if (!MinorVersionEqualsTo(p, MINOR_VERSION_SMPTE377M_2011))
+            {
+                retval.Add(ValidationRules.CreateValidationResult(
+                    ValidationRuleIDs.ID_0108,
+                    p,
+                    p.Offset,
+                    p.PartitionNumber,
+                    p.MinorVersion
+                ));
+            }
+
+            if (!IsHeaderByteCountCorrect(p))
+            {
+                retval.Add(ValidationRules.CreateValidationResult(
+                    ValidationRuleIDs.ID_0098,
+                    p,
+                    p.Offset,
+                    p.PartitionNumber
+                ));
+            }
+
+            // TODO Check Index byte count
+
+            // TODO Check body offset
+
+            // TODO Check body SID
+
+            // TODO Check index SID
+
+            // TODO Check KAG size
+        }
     }
 }
