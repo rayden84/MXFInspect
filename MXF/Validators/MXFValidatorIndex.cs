@@ -21,18 +21,14 @@
 //
 #endregion
 
-using Serilog;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Reflection;
 using Myriadbits.MXF.Extensions;
 
-namespace Myriadbits.MXF
+namespace Myriadbits.MXF.Validators
 {
     public class MXFValidatorIndex : MXFValidator
     {
@@ -51,6 +47,16 @@ namespace Myriadbits.MXF
             {
                 var retval = new List<MXFValidationResult>();
 
+                retval.Add(new MXFValidationResult(
+                    MXFValidationCategory.IndexTables,
+                    MXFValidationSeverity.Question,
+                    null,
+                    null,
+                    "Index table test not executed"
+                ));
+
+                
+                /*
                 Stopwatch sw = Stopwatch.StartNew();
                 progress?.Report(new TaskReport(12, "Locating index tables"));
 
@@ -345,7 +351,7 @@ namespace Myriadbits.MXF
                 {
                     retval.AddRange(CheckUserDates(this.File));
                     retval.AddRange(CheckContinuityCounter(this.File));
-                }
+                }*/
                 return retval;
             }, ct);
             return result;
@@ -513,120 +519,120 @@ namespace Myriadbits.MXF
         /// </summary>
         /// <param name="file"></param>
         /// <param name="results"></param>
-        protected List<MXFValidationResult> CheckUserDates(MXFFile file)
-        {
-            var retval = new List<MXFValidationResult>();
+        //protected List<MXFValidationResult> CheckUserDates(MXFFile file)
+        //{
+        //    var retval = new List<MXFValidationResult>();
 
-            List<MXFSystemMetaDataPack> items = this.m_systemItems.OrderBy(a => a.ContinuityCount).ToList();
-            if (items.Count > 1)
-            {
-                MXFTimeStamp ts = new MXFTimeStamp(items.First().UserDate);
-                if (ts != null)
-                {
-                    MXFTimeStamp tsLast = null;
-                    for (int n = 1; n < items.Count() - 1; n++) // Skip last one (always invalid??)
-                    {
-                        ts.Increase();
-                        if (!items[n].UserDate.IsEmpty())
-                        {
-                            if (!items[n].UserDate.IsSame(ts))
-                            {
-                                retval.Add(new MXFValidationResult
-                                {
-                                    Category = "Index Tables",
-                                    Severity = MXFValidationSeverity.Error,
-                                    Message = $"Invalid user date at offset {items[n].Offset} (was {items[n].UserDate}, expected {ts})!"
+        //    List<MXFSystemMetaDataPack> items = this.m_systemItems.OrderBy(a => a.ContinuityCount).ToList();
+        //    if (items.Count > 1)
+        //    {
+        //        MXFTimeStamp ts = new MXFTimeStamp(items.First().UserDate);
+        //        if (ts != null)
+        //        {
+        //            MXFTimeStamp tsLast = null;
+        //            for (int n = 1; n < items.Count() - 1; n++) // Skip last one (always invalid??)
+        //            {
+        //                ts.Increase();
+        //                if (!items[n].UserDate.IsEmpty())
+        //                {
+        //                    if (!items[n].UserDate.IsSame(ts))
+        //                    {
+        //                        retval.Add(new MXFValidationResult
+        //                        {
+        //                            Category = "Index Tables",
+        //                            Severity = MXFValidationSeverity.Error,
+        //                            Message = $"Invalid user date at offset {items[n].Offset} (was {items[n].UserDate}, expected {ts})!"
 
-                                });
-                                return retval;
-                            }
-                            tsLast = items[n].UserDate;
-                        }
-                    }
-                    if (tsLast != null)
-                        retval.Add(new MXFValidationResult
-                        {
-                            Category = "Index Tables",
-                            Severity = MXFValidationSeverity.Success,
-                            Message = $"UserDates are continious from {items.First().UserDate} to {tsLast}, at {ts.FrameRate} fps!"
+        //                        });
+        //                        return retval;
+        //                    }
+        //                    tsLast = items[n].UserDate;
+        //                }
+        //            }
+        //            if (tsLast != null)
+        //                retval.Add(new MXFValidationResult
+        //                {
+        //                    Category = "Index Tables",
+        //                    Severity = MXFValidationSeverity.Success,
+        //                    Message = $"UserDates are continious from {items.First().UserDate} to {tsLast}, at {ts.FrameRate} fps!"
 
-                        });
-                    else
-                        retval.Add(new MXFValidationResult
-                        {
-                            Category = "Index Tables",
-                            Severity = MXFValidationSeverity.Success,
-                            Message = $"UserDates are continious!"
+        //                });
+        //            else
+        //                retval.Add(new MXFValidationResult
+        //                {
+        //                    Category = "Index Tables",
+        //                    Severity = MXFValidationSeverity.Success,
+        //                    Message = $"UserDates are continious!"
 
-                        });
-                }
-            }
-            return retval;
-        }
+        //                });
+        //        }
+        //    }
+        //    return retval;
+        //}
 
 
-        /// <summary>
-        /// Check the essence range
-        /// </summary>
-        /// <param name="file"></param>
-        /// <param name="results"></param>
-        protected List<MXFValidationResult> CheckContinuityCounter(MXFFile file)
-        {
-            var retval = new List<MXFValidationResult>();
+        ///// <summary>
+        ///// Check the essence range
+        ///// </summary>
+        ///// <param name="file"></param>
+        ///// <param name="results"></param>
+        //protected List<MXFValidationResult> CheckContinuityCounter(MXFFile file)
+        //{
+        //    var retval = new List<MXFValidationResult>();
 
-            // Check for continous range
-            // Continuity count = modulo 65536 count as per SMPTE 326M. Note that the continuity
-            // count is not strictly required in many applications of an MXF file because the header metadata
-            // should correctly describe the timeline of the essence container. However, to maintain
-            // compatibility with the SDTI-CP system item definition, the continuity count must comply
-            // with SMPTE 326M.
+        //    // Check for continous range
+        //    // Continuity count = modulo 65536 count as per SMPTE 326M. Note that the continuity
+        //    // count is not strictly required in many applications of an MXF file because the header metadata
+        //    // should correctly describe the timeline of the essence container. However, to maintain
+        //    // compatibility with the SDTI-CP system item definition, the continuity count must comply
+        //    // with SMPTE 326M.
 
-            int cc = -1;
-            int errorCount = 0;
-            this.m_systemItems = this.m_systemItems.OrderBy(si => si.ContinuityCount).ToList();
-            foreach (MXFSystemMetaDataPack si in this.m_systemItems)
-            {
-                if (si.ContinuityCount - cc != 1)
-                {
-                    errorCount++;
-                    //valResult.SetError(string.Format("Invalid continuity count for system item at offset {0}. CC should be {1} but is {2}!", si.Offset, cc + 1, si.ContinuityCount));
-                    //return;
-                }
-                cc = si.ContinuityCount;
-            }
+        //    int cc = -1;
+        //    int errorCount = 0;
+        //    this.m_systemItems = this.m_systemItems.OrderBy(si => si.ContinuityCount).ToList();
+        //    foreach (MXFSystemMetaDataPack si in this.m_systemItems)
+        //    {
+        //        if (si.ContinuityCount - cc != 1)
+        //        {
+        //            errorCount++;
+        //            //valResult.SetError(string.Format("Invalid continuity count for system item at offset {0}. CC should be {1} but is {2}!", si.Offset, cc + 1, si.ContinuityCount));
+        //            //return;
+        //        }
+        //        cc = si.ContinuityCount;
+        //    }
 
-            if (errorCount > 0)
-            {
-                if (errorCount >= this.m_systemItems.Count() - 1)
-                    retval.Add(new MXFValidationResult
-                    {
-                        Category = "Index Tables",
-                        Severity = MXFValidationSeverity.Warning,
-                        Message = "All continuity counter values are not set!"
+        //    if (errorCount > 0)
+        //    {
+        //        if (errorCount >= this.m_systemItems.Count() - 1)
+        //            retval.Add(new MXFValidationResult
+        //            {
+        //                Category = "Index Tables",
+        //                Severity = MXFValidationSeverity.Warning,
+        //                Message = "All continuity counter values are not set!"
 
-                    });
-                else
-                    retval.Add(new MXFValidationResult
-                    {
-                        Category = "Index Tables",
-                        Severity = MXFValidationSeverity.Warning,
-                        Message = $"Found {errorCount} invalid continuity counter values (total system items {this.m_systemItems.Count()})!"
+        //            });
+        //        else
+        //            retval.Add(new MXFValidationResult
+        //            {
+        //                Category = "Index Tables",
+        //                Severity = MXFValidationSeverity.Warning,
+        //                Message = $"Found {errorCount} invalid continuity counter values (total system items {this.m_systemItems.Count()})!"
 
-                    });
-            }
-            else
-            {
-                retval.Add(new MXFValidationResult
-                {
-                    Category = "Index Tables",
-                    Severity = MXFValidationSeverity.Success,
-                    Message = "Continuity counter values are correct!"
+        //            });
+        //    }
+        //    else
+        //    {
+        //        retval.Add(new MXFValidationResult
+        //        {
+        //            Category = "Index Tables",
+        //            Severity = MXFValidationSeverity.Success,
+        //            Message = "Continuity counter values are correct!"
 
-                });
-            }
+        //        });
+        //    }
 
-            return retval;
-        }
+        //    return retval;
+        //}
 
     }
 }

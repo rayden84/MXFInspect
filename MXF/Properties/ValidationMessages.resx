@@ -156,7 +156,7 @@
     <value>The Operational Pattern property is not consistent across all partitions</value>
   </data>
   <data name="ID_0066" xml:space="preserve">
-    <value>KLV Validator</value>
+    <value>Non-KLV chunk of data from {0} to {1}</value>
   </data>
   <data name="ID_0067" xml:space="preserve">
     <value>RIP/ KAG</value>
@@ -168,7 +168,7 @@
     <value>KLV Validator?</value>
   </data>
   <data name="ID_0070" xml:space="preserve">
-    <value>KLV Validator?</value>
+    <value>Run-In present which is not allowed for Generic Operational Pattern and Operational Pattern Atom files</value>
   </data>
   <data name="ID_0071" xml:space="preserve">
     <value>KLV/ KAG</value>
@@ -249,7 +249,7 @@
   <data name="ID_0708" xml:space="preserve">
     <value>Footer Partition present</value>
   </data>
-  <data name="ID_0709" xml:space="preserve">
+  <data name="ID_0060" xml:space="preserve">
     <value>The Footer Partition, if present, must be closed</value>
   </data>
   <data name="ID_0710" xml:space="preserve">
@@ -271,5 +271,14 @@
   </data>
   <data name="ID_0715" xml:space="preserve">
     <value>RIP entries are not stored in ascending Byte Offset order</value>
+  </data>
+  <data name="ID_0716" xml:space="preserve">
+    <value>KLV triplet with indefinite BER length</value>
+  </data>
+  <data name="ID_0717" xml:space="preserve">
+    <value>Unknown Universal Label: {0}</value>
+  </data>
+  <data name="ID_0718" xml:space="preserve">
+    <value>Privately registered UL: {0}</value>
   </data>
 </root>

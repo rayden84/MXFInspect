@@ -22,7 +22,7 @@
 #endregion
 
 
-namespace Myriadbits.MXF
+namespace Myriadbits.MXF.Validators
 {
     public enum MXFValidationSeverity
     {
@@ -33,17 +33,34 @@ namespace Myriadbits.MXF
         Question = 5
     };
 
+    public enum MXFValidationCategory
+    {
+        General,
+        KLVStream,
+        PartitionStructure,
+                RIP,
+        IndexTables,
+        Metadata,
+        SMPTERegisters,
+        Essences,
+        TrackInfo,
+    }
+
     public class MXFValidationResult
     {
-        public string Category { get; set; }
-        public MXFObject Object { get; set; }
-        public long Offset { get { return Object?.Offset ?? 0; } set { } }
-        public MXFValidationSeverity Severity { get; set; }
-        public string Message { get; set; }
+        public MXFValidationCategory Category { get; }
+        public MXFObject Object { get; }
+        public long? Offset { get; }
+        public MXFValidationSeverity Severity { get; }
+        public string Message { get; }
 
-        public MXFValidationResult()
+        public MXFValidationResult(MXFValidationCategory category, MXFValidationSeverity severity, MXFObject mxfObject, long? offset, string message)
         {
-
+            Category = category;
+            Severity = severity;
+            Object = mxfObject;
+            Offset = offset;
+            Message = message;
         }
     }
 }

@@ -108,6 +108,13 @@ namespace Myriadbits.MXF.Extensions
             return p.Status == PartitionStatus.ClosedComplete;
         }
 
+        public static bool IsOpen(this MXFPartition p)
+        {
+            return
+                p.Status == PartitionStatus.OpenComplete ||
+                p.Status == PartitionStatus.OpenIncomplete;
+        }
+
         public static bool IsClosed(this MXFPartition p)
         {
             return p.Status == PartitionStatus.ClosedComplete || p.Status == PartitionStatus.ClosedIncomplete;
@@ -144,16 +151,6 @@ namespace Myriadbits.MXF.Extensions
         {
             // TODO assuming there is at least one material package linked to the content storage
             return file.LogicalDescendants().OfType<MXFMaterialPackage>().FirstOrDefault();
-        }
-
-        public static IEnumerable<MXFTrack> GetTracks(this MXFPackage package)
-        {
-            return package.LogicalChildren.OfType<MXFTrack>();
-        }
-
-        public static MXFSequence GetFirstMXFSequence(this MXFTrack track)
-        {
-            return track.LogicalChildren.OfType<MXFSequence>().FirstOrDefault();
         }
     }
 }

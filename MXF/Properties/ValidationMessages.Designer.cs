@@ -133,6 +133,15 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Footer Partition, if present, must be closed.
+        /// </summary>
+        internal static string ID_0060 {
+            get {
+                return ResourceManager.GetString("ID_0060", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to RIP entry {0} not pointing to a partition location.
         /// </summary>
         internal static string ID_0062 {
@@ -169,7 +178,7 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to KLV Validator.
+        ///   Looks up a localized string similar to Non-KLV chunk of data from {0} to {1}.
         /// </summary>
         internal static string ID_0066 {
             get {
@@ -205,7 +214,7 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to KLV Validator?.
+        ///   Looks up a localized string similar to Run-In present which is not allowed for Generic Operational Pattern and Operational Pattern Atom files.
         /// </summary>
         internal static string ID_0070 {
             get {
@@ -430,15 +439,6 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The Footer Partition, if present, must be closed.
-        /// </summary>
-        internal static string ID_0709 {
-            get {
-                return ResourceManager.GetString("ID_0709", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to FooterPartition value of Partition #{0} is non-zero but the file has no Footer Partition.
         /// </summary>
         internal static string ID_0710 {
@@ -489,6 +489,33 @@ namespace Myriadbits.MXF.Properties {
         internal static string ID_0715 {
             get {
                 return ResourceManager.GetString("ID_0715", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to KLV triplet with indefinite BER length.
+        /// </summary>
+        internal static string ID_0716 {
+            get {
+                return ResourceManager.GetString("ID_0716", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown Universal Label: {0}.
+        /// </summary>
+        internal static string ID_0717 {
+            get {
+                return ResourceManager.GetString("ID_0717", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Privately registered UL: {0}.
+        /// </summary>
+        internal static string ID_0718 {
+            get {
+                return ResourceManager.GetString("ID_0718", resourceCulture);
             }
         }
     }

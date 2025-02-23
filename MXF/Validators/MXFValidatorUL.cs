@@ -29,7 +29,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Myriadbits.MXF
+namespace Myriadbits.MXF.Validators
 {
     public class MXFValidatorUL : MXFValidator
     {
@@ -56,20 +56,14 @@ namespace Myriadbits.MXF
 
                 foreach (var klv in klvsWithUnknownUL)
                 {
-                    MXFValidationResult valResult = new MXFValidationResult
-                    {
-                        Severity = MXFValidationSeverity.Warning,
-                        Category = "Universal Label",
-                        Message = $"Unknown Universal Label: {klv.Key}",
-                        Offset = klv.Offset,
-                        Object = klv
-                    };
-
                     if (klv.Key.IdentifiesPrivatelyRegisteredUL())
                     {
-                        valResult.Message = $"{klv.Key}";
+                        retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0718, klv, klv.Offset, klv.Key));
                     }
-                    retval.Add(valResult);
+                    else
+                    {
+                        retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0717, klv, klv.Offset, klv.Key));
+                    }
                 }
                 Log.ForContext<MXFValidatorUL>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");
                 return retval;

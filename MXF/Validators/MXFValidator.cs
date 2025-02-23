@@ -27,11 +27,11 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Myriadbits.MXF
+namespace Myriadbits.MXF.Validators
 {
     public abstract class MXFValidator
     {
-        public MXFFile File { get; set; }
+        public MXFFile File { get; init; }
         public string Description { get; set; }
         protected List<MXFValidationResult> Results { get; set; }
 

@@ -28,10 +28,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
-using Myriadbits.MXF.Properties;
 using Myriadbits.MXF.Extensions;
 
-namespace Myriadbits.MXF
+namespace Myriadbits.MXF.Validators
 {
     public class MXFValidatorRIP : MXFValidator
     {
@@ -54,8 +53,6 @@ namespace Myriadbits.MXF
         /// <param name="results"></param>
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)
         {
-            const string CATEGORY_NAME = "Random Index Pack";
-
             List<MXFValidationResult> result = await Task.Run(() =>
             {
                 var retval = new List<MXFValidationResult>();
@@ -71,24 +68,11 @@ namespace Myriadbits.MXF
 
                 if (rip != null)
                 {
-                    retval.Add(new MXFValidationResult
-                    {
-                        Category = CATEGORY_NAME,
-                        Object = rip,
-                        Severity = MXFValidationSeverity.Success,
-                        Message = ValidationMessages.ID_0074
-                    });
-
+                    retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0074, rip, rip.Offset));
 
                     if (!AreAllRIPChildrenRIPEntries(rip))
                     {
-                        retval.Add(new MXFValidationResult
-                        {
-                            Category = CATEGORY_NAME,
-                            Object = rip,
-                            Severity = MXFValidationSeverity.Error,
-                            Message = ValidationMessages.ID_0712
-                        });
+                        retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0712, rip, rip.Offset));
                     }
 
 
@@ -99,25 +83,13 @@ namespace Myriadbits.MXF
 
                     if (!RIPEntryCountEqualsPartitionCount(rip))
                     {
-                        retval.Add(new MXFValidationResult
-                        {
-                            Category = CATEGORY_NAME,
-                            Object = rip,
-                            Severity = MXFValidationSeverity.Error,
-                            Message = string.Format(ValidationMessages.ID_0713, ripEntryCount, partitionCount)
-                        });
+                        retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0712, rip, rip.Offset, ripEntryCount, partitionCount));
 
                         foreach (var p in partitions)
                         {
                             if (!HasPartitionRIPEntry(p, rip))
                             {
-                                retval.Add(new MXFValidationResult
-                                {
-                                    Category = CATEGORY_NAME,
-                                    Object = rip,
-                                    Severity = MXFValidationSeverity.Error,
-                                    Message = string.Format(ValidationMessages.ID_0714, p.PartitionNumber)
-                                });
+                                retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0714, rip, rip.Offset, p.PartitionNumber));
                             }
                         }
                     }
@@ -129,13 +101,7 @@ namespace Myriadbits.MXF
                         {
                             if (!IsRIPEntryPointingToPartition(ripEntry))
                             {
-                                retval.Add(new MXFValidationResult
-                                {
-                                    Category = CATEGORY_NAME,
-                                    Object = rip.Children[n],
-                                    Severity = MXFValidationSeverity.Error,
-                                    Message = string.Format(ValidationMessages.ID_0062, rip.Children[n])
-                                });
+                                retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0062, rip.Children[n], rip.Offset, rip.Children[n]));
                             }
                         }
                     }
@@ -143,13 +109,7 @@ namespace Myriadbits.MXF
                     // check if RIP entries are ordered ascending
                     if (!AreAllRIPEntriesAscending(rip))
                     {
-                        retval.Add(new MXFValidationResult
-                        {
-                            Category = CATEGORY_NAME,
-                            Object = rip,
-                            Severity = MXFValidationSeverity.Error,
-                            Message = ValidationMessages.ID_0715
-                        });
+                        retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0715, rip, rip.Offset));
                     }
 
                     // TODO check DeclaredTotalLength against effective TotalLength
@@ -157,13 +117,7 @@ namespace Myriadbits.MXF
                 }
                 else
                 {
-                    retval.Add(new MXFValidationResult
-                    {
-                        Category = CATEGORY_NAME,
-                        Object = rip,
-                        Severity = MXFValidationSeverity.Success,
-                        Message = ValidationMessages.ID_0075
-                    });
+                    retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0075, null, null));
                 }
                 Log.ForContext<MXFValidatorRIP>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");
                 return retval;

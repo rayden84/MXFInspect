@@ -28,14 +28,16 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
-using Myriadbits.MXF.Properties;
 using Myriadbits.MXF.Extensions;
 
-namespace Myriadbits.MXF
+namespace Myriadbits.MXF.Validators
 {
     public class MXFValidatorPartitions : MXFValidator
     {
-        private ulong runInHeaderOffset = 0;
+        private readonly ulong runInHeaderOffset = 0;
+        public static readonly int MAJOR_VERSION = 1;
+        public static readonly int MINOR_VERSION_SMPTE377M_2004 = 2;
+        public static readonly int MINOR_VERSION_SMPTE377M_2011 = 3;
 
         public MXFValidatorPartitions(MXFFile file) : base(file)
         {
@@ -154,7 +156,7 @@ namespace Myriadbits.MXF
 
                 // In Open Partitions, the value shall be as defined in Section 7.1 or zero(0).
                 // If the Footer Partition is not present in the file then the value of this Property shall be zero(0).
-                if (IsOpen(p))
+                if (p.IsOpen())
                 {
                     return (p.FooterPartition + runInHeaderOffset == (ulong)footer.Offset) || p.FooterPartition == 0;
                 }
@@ -175,22 +177,17 @@ namespace Myriadbits.MXF
                 p.Status == PartitionStatus.ClosedComplete;
         }
 
-        public bool IsOpen(MXFPartition p)
+        public bool MajorVersinEqualsTo(MXFPartition p, int versionNumber)
         {
-            return
-                p.Status == PartitionStatus.OpenComplete ||
-                p.Status == PartitionStatus.OpenIncomplete;
-        }
-        public bool IsMajorVersionCorrect(MXFPartition p)
-        {
-            return p.MajorVersion == 1;
+            return p.MajorVersion == versionNumber;
         }
 
-        public bool IsMinorVersionCorrect(MXFPartition p)
+        public bool MinorVersionEqualsTo(MXFPartition p, int versionNumber)
         {
             // SMPTE 377:2011 requires Minor Version 1.3
-            return p.MinorVersion == 3;
+            return p.MinorVersion == versionNumber;
         }
+
 
         public bool IsHeaderByteCountCorrect(MXFPartition p)
         {
@@ -211,6 +208,30 @@ namespace Myriadbits.MXF
             return p.HeaderByteCount == headerByteCount;
         }
 
+        public bool IsIndexByteCountCorrect(MXFPartition p)
+        {
+            ulong indexByteCount = 0;
+
+            //var firstIndexTableSegment = p.Children.FirstOrDefault(c => c is MXFIndexTableSegment);
+            var indexTableSegments = p.Children.TakeWhile(c => c is MXFIndexTableSegment);
+
+            if (indexTableSegments.Any())
+            {
+                indexByteCount = (ulong)(indexTableSegments.Last().Offset + indexTableSegments.Last().TotalLength) - (ulong)indexTableSegments.First().Offset;
+            }
+
+            if (indexTableSegments.Last().NextSibling() is MXFFillerData filler)
+            {
+                indexByteCount += indexByteCount + (ulong)filler.TotalLength;
+            }
+
+            // TODO what if there are two or more consecutive filler?
+
+            return p.IndexByteCount == indexByteCount;
+        }
+
+
+        // Helpers
         public bool IsHeaderPartitionOpen()
         {
             if (IsHeaderPartitionPresent())
@@ -220,13 +241,8 @@ namespace Myriadbits.MXF
             return false;
         }
 
-        /// <summary>
-        /// Check if partition structure and its values are correct 
-        /// </summary>
-        /// <param name="results"></param>
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)
         {
-            const string CATEGORY_NAME = "Partitions";
             ct.ThrowIfCancellationRequested();
 
             List<MXFValidationResult> result = await Task.Run(() =>
@@ -240,44 +256,37 @@ namespace Myriadbits.MXF
                 {
                     if (AreBodyPartitionsPresent())
                     {
-                        retval.Add(new MXFValidationResult
-                        {
-                            Category = CATEGORY_NAME,
-                            Object = File.GetPartitionRoot(),
-                            Severity = MXFValidationSeverity.Success,
-                            Message = string.Format(ValidationMessages.ID_0054, this.File.GetBodyPartitions().Count())
-                        }); ;
+                        retval.Add(ValidationRules.CreateValidationResult(
+                            ValidationRuleIDs.ID_0054, 
+                            File.GetPartitionRoot(), 
+                            File.GetPartitionRoot().Offset, 
+                            this.File.GetBodyPartitions().Count()));
 
                         if (AreIndexTableSegmentsInBodyPartitions())
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Severity = MXFValidationSeverity.Success,
-                                Message = ValidationMessages.ID_0052
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0052,
+                                null,
+                                0
+                            ));
                         }
 
                         if (!IsOperationalPatternConsistent())
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = File.GetPartitionRoot(),
-                                Severity = MXFValidationSeverity.Error,
-                                Message = ValidationMessages.ID_0065
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0065,
+                                File.GetPartitionRoot(),
+                                File.GetPartitionRoot().Offset
+                            ));
                         }
 
                         if (!IsMajorMinorVersionConsistent())
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = File.GetPartitionRoot(),
-                                Severity = MXFValidationSeverity.Error,
-                                Message = ValidationMessages.ID_0707
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0707,
+                                File.GetPartitionRoot(),
+                                File.GetPartitionRoot().Offset
+                            ));
                         }
                     }
 
@@ -285,58 +294,50 @@ namespace Myriadbits.MXF
 
                     if (!IsHeaderPartitionUnique())
                     {
-                        retval.Add(new MXFValidationResult
-                        {
-                            Category = CATEGORY_NAME,
-                            Offset = 0,
-                            Severity = MXFValidationSeverity.Error,
-                            Message = ValidationMessages.ID_0056
-                        });
+                        retval.Add(ValidationRules.CreateValidationResult(
+                            ValidationRuleIDs.ID_0056,
+                            null,
+                            0
+                        ));
                     }
 
                     if (!IsHeaderPartitionPresent())
                     {
-                        retval.Add(new MXFValidationResult
-                        {
-                            Category = CATEGORY_NAME,
-                            Object = this.File.GetPartitions()?.First(),
-                            Severity = MXFValidationSeverity.Error,
-                            Message = ValidationMessages.ID_0055
-                        });
+                        var firstPartition = this.File.GetPartitions()?.First();
+                        retval.Add(ValidationRules.CreateValidationResult(
+                            ValidationRuleIDs.ID_0055,
+                            firstPartition,
+                            firstPartition?.Offset
+                        ));
                     }
                     else
                     {
+                        var firstPartition = this.File.GetPartitions()?.First();
                         if (IsHeaderPartitionOpen())
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = this.File.GetPartitions()?.First(),
-                                Severity = MXFValidationSeverity.Success,
-                                Message = ValidationMessages.ID_0092
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0092,
+                                firstPartition,
+                                firstPartition?.Offset
+                            ));
                         }
 
                         if (!HeaderPartitionContainsMetadata())
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = this.File.GetPartitions()?.First(),
-                                Severity = MXFValidationSeverity.Error,
-                                Message = ValidationMessages.ID_0058
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0058,
+                                firstPartition,
+                                firstPartition?.Offset
+                            ));
                         }
 
                         if (HeaderPartitionContainsIndexTableSegments())
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = this.File.GetPartitions()?.First(),
-                                Severity = MXFValidationSeverity.Success,
-                                Message = ValidationMessages.ID_0051
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0051,
+                                firstPartition,
+                                firstPartition?.Offset
+                            ));
                         }
                     }
 
@@ -345,49 +346,43 @@ namespace Myriadbits.MXF
                     //  TODO check if at least two partitions
                     if (!IsFooterPartitionUnique())
                     {
-                        retval.Add(new MXFValidationResult
-                        {
-                            Category = CATEGORY_NAME,
-                            Offset = 0,
-                            Severity = MXFValidationSeverity.Error,
-                            Message = ValidationMessages.ID_0057
-                        });
+                        retval.Add(ValidationRules.CreateValidationResult(
+                            ValidationRuleIDs.ID_0057,
+                            null,
+                            0
+                        ));
                     }
 
                     if (IsFooterPartitionPresent())
                     {
-                        retval.Add(new MXFValidationResult
-                        {
-                            Category = CATEGORY_NAME,
-                            Object = this.File.GetPartitions().Last(),
-                            Severity = MXFValidationSeverity.Success,
-                            Message = ValidationMessages.ID_0708
-                        });
+                        var lastPartition = this.File.GetPartitions().Last();
+                        retval.Add(ValidationRules.CreateValidationResult(
+                            ValidationRuleIDs.ID_0708,
+                            lastPartition,
+                            lastPartition.Offset
+                        ));
 
                         if (FooterPartitionContainsIndexTableSegments())
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = this.File.GetPartitions().Last(),
-                                Severity = MXFValidationSeverity.Success,
-                                Message = ValidationMessages.ID_0053
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0053,
+                                lastPartition,
+                                lastPartition.Offset
+                            ));
                         }
 
                         // If there is a footer then it must be closed
                         var footer = File.GetFooterPartition();
-                        if (IsOpen(footer))
+                        if (footer.IsOpen())
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = footer,
-                                Severity = MXFValidationSeverity.Success,
-                                Message = ValidationMessages.ID_0709
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0060,
+                                footer,
+                                footer.Offset
+                            ));
                         }
                     }
+
 
                     // *****************************************************
                     // checks for all partitions 
@@ -396,24 +391,22 @@ namespace Myriadbits.MXF
                     {
                         if (!IsThisPartitionValueCorrect(p))
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = p,
-                                Severity = MXFValidationSeverity.Error,
-                                Message = string.Format(ValidationMessages.ID_0095, p.PartitionNumber)
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0095,
+                                p,
+                                p.Offset,
+                                p.PartitionNumber
+                            ));
                         }
 
                         if (!IsPreviousPartitionValueCorrect(p))
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = p,
-                                Severity = MXFValidationSeverity.Error,
-                                Message = string.Format(ValidationMessages.ID_0096, p.PartitionNumber)
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0096,
+                                p,
+                                p.Offset,
+                                p.PartitionNumber
+                            ));
                         }
 
                         if (IsFooterPartitionPresent() && IsFooterPartitionUnique())
@@ -421,81 +414,85 @@ namespace Myriadbits.MXF
                             // TODO Consider if Partition is open
                             if (!IsFooterPartitionValueCorrect(p))
                             {
-                                retval.Add(new MXFValidationResult
-                                {
-                                    Category = CATEGORY_NAME,
-                                    Object = p,
-                                    Severity = MXFValidationSeverity.Error,
-                                    Message = string.Format(ValidationMessages.ID_0097, p.PartitionNumber)
-                                });
+                                retval.Add(ValidationRules.CreateValidationResult(
+                                    ValidationRuleIDs.ID_0097,
+                                    p,
+                                    p.Offset,
+                                    p.PartitionNumber
+                                ));
                             }
                         }
                         else if (!IsFooterPartitionPresent() && p.FooterPartition != 0)
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = p,
-                                Severity = MXFValidationSeverity.Error,
-                                Message = string.Format(ValidationMessages.ID_0710, p.PartitionNumber)
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0710,
+                                p,
+                                p.Offset,
+                                p.PartitionNumber
+                            ));
                         }
 
                         if (!IsPartitionStatusValid(p))
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = p,
-                                Severity = MXFValidationSeverity.Error,
-                                Message = string.Format(ValidationMessages.ID_0114, p.PartitionNumber, (byte)p.Status)
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0114,
+                                p,
+                                p.Offset,
+                                p.PartitionNumber,
+                                (byte)p.Status
+                            ));
                         }
 
-                        if (!IsMajorVersionCorrect(p))
+                        if (!MajorVersinEqualsTo(p, MAJOR_VERSION))
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = p,
-                                Severity = MXFValidationSeverity.Warning,
-                                Message = string.Format(ValidationMessages.ID_0107, p.PartitionNumber, p.MajorVersion)
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0107,
+                                p,
+                                p.Offset,
+                                p.PartitionNumber,
+                                p.MajorVersion
+                            ));
                         }
 
-                        if (!IsMinorVersionCorrect(p))
+                        if (!MinorVersionEqualsTo(p, MINOR_VERSION_SMPTE377M_2011))
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = p,
-                                Severity = MXFValidationSeverity.Warning,
-                                Message = string.Format(ValidationMessages.ID_0107, p.PartitionNumber, p.MinorVersion)
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0108,
+                                p,
+                                p.Offset,
+                                p.PartitionNumber,
+                                p.MinorVersion
+                            ));
                         }
 
                         if (!IsHeaderByteCountCorrect(p))
                         {
-                            retval.Add(new MXFValidationResult
-                            {
-                                Category = CATEGORY_NAME,
-                                Object = p,
-                                Severity = MXFValidationSeverity.Error,
-                                Message = string.Format(ValidationMessages.ID_0098, p.PartitionNumber)
-                            });
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0098,
+                                p,
+                                p.Offset,
+                                p.PartitionNumber
+                            ));
+                        }
+
+                        if (!IsHeaderByteCountCorrect(p))
+                        {
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0098,
+                                p,
+                                p.Offset,
+                                p.PartitionNumber
+                            ));
                         }
                     }
                 }
                 else
                 {
-                    retval.Add(new MXFValidationResult
-                    {
-                        Category = CATEGORY_NAME,
-                        // TODO make Offset nullable?
-                        Offset = 0,
-                        Severity = MXFValidationSeverity.Error,
-                        Message = ValidationMessages.ID_0711
-                    });
+                    retval.Add(ValidationRules.CreateValidationResult(
+                        ValidationRuleIDs.ID_0711,
+                        null,
+                        null
+                    ));
                 }
 
                 Log.ForContext<MXFValidatorPartitions>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");

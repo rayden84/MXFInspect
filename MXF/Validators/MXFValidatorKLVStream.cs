@@ -24,13 +24,12 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace Myriadbits.MXF
+namespace Myriadbits.MXF.Validators
 {
     public class MXFValidatorKLVStream : MXFValidator
     {
@@ -42,12 +41,8 @@ namespace Myriadbits.MXF
         /// <summary>
         /// Check if klv stream contains errors
         /// </summary>
-        /// <param name="this.File"></param>
-        /// <param name="results"></param>
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)
         {
-            const string CATEGORY_NAME = "KLV Stream";
-
             List<MXFValidationResult> result = await Task.Run(() =>
             {
                 var retval = new List<MXFValidationResult>();
@@ -60,26 +55,14 @@ namespace Myriadbits.MXF
                 var nonKLVs = File.Descendants().OfType<MXFNonKLV>();
                 foreach (var nonKLV in nonKLVs)
                 {
-                    retval.Add(new MXFValidationResult
-                    {
-                        Category = CATEGORY_NAME,
-                        Object = nonKLV,
-                        Severity = MXFValidationSeverity.Error,
-                        Message = $"Non-KLV chunk of data from {nonKLV.Offset} to {nonKLV.Offset + nonKLV.TotalLength}"
-                    });
+                    retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0066, nonKLV, nonKLV.Offset, nonKLV.Offset, nonKLV.Offset + nonKLV.TotalLength));
                 }
 
                 // get Run-In
                 var runIn = File.Descendants().OfType<MXFRunIn>().SingleOrDefault();
                 if (runIn != null)
                 {
-                    retval.Add(new MXFValidationResult
-                    {
-                        Category = CATEGORY_NAME,
-                        Object = runIn,
-                        Severity = MXFValidationSeverity.Error,
-                        Message = $"Run-In present which is not allowed for Generic Operational Pattern and Operational Pattern Atom files"
-                    });
+                    retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0070, runIn, runIn.Offset));
                 }
 
 
@@ -87,15 +70,10 @@ namespace Myriadbits.MXF
                 var indefiniteKLVs = File.Descendants().OfType<MXFPack>().Where(p => p.Length.BERForm == KLVBERLength.BERForms.Indefinite);
                 foreach (var iKLV in indefiniteKLVs)
                 {
-                    retval.Add(new MXFValidationResult
-                    {
-                        Category = CATEGORY_NAME,
-                        Object = iKLV,
-                        Severity = MXFValidationSeverity.Error,
-                        Message = $"KLV triplet with indefinite BER length"
-                    });
+                    retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0716, iKLV, iKLV.Offset));
                 }
 
+                // TODO catch two consecutive fill items
                 Log.ForContext<MXFValidatorKLVStream>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");
                 return retval;
 

@@ -28,11 +28,9 @@ using System.Threading.Tasks;
 using System.Threading;
 using Serilog;
 using System.Diagnostics;
-using Myriadbits.MXF.Identifiers;
-using System.Text;
 using Myriadbits.MXF.Extensions;
 
-namespace Myriadbits.MXF
+namespace Myriadbits.MXF.Validators
 {
     public class MXFValidatorInfo : MXFValidator
     {
@@ -56,55 +54,21 @@ namespace Myriadbits.MXF
                 {
                     int n = tracks.IndexOf(t);
                     progress?.Report(new TaskReport(n * 100 / tracks.Count, ""));
-                    retval.Add(new MXFValidationResult
-                    {
-                        Category = "Track Info",
-                        Severity = MXFValidationSeverity.Info,
-                        Object = t,
-                        Message = GetTrackInfo(t)
-                    });
+
+                    retval.Add(new MXFValidationResult(
+                        MXFValidationCategory.TrackInfo, 
+                        MXFValidationSeverity.Info,
+                        t,
+                        t.Offset, 
+                        t.GetTrackInfo()
+                    ));
+
                 }
                 Log.ForContext<MXFValidatorInfo>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");
                 return retval;
             }, ct);
 
             return result;
-        }
-
-        /// <summary>
-        /// Return info for a generic track packet
-        /// </summary>
-        /// <returns>A string representing information about a generic track</returns>
-        public static string GetTrackInfo(MXFTrack genericTrack)
-        {
-            try
-            {
-                if (genericTrack != null)
-                {
-                    StringBuilder sb = new StringBuilder();
-                    MXFSequence seq = genericTrack.GetFirstMXFSequence();
-                    if (seq != null && seq.DataDefinition != null && seq.DataDefinition is UL ul)
-                    {
-                        sb.Append((seq.DataDefinition as UL)?.Name);
-                    }
-
-                    if (genericTrack is MXFTimelineTrack timeLineTrack)
-                    {
-                        sb.Append($" @ {timeLineTrack.EditRate.ToString(true)}");
-                    }
-                    if (!string.IsNullOrEmpty(genericTrack.TrackName))
-                    {
-                        sb.Append($" {{{genericTrack.TrackName}}}");
-                    }
-                    return sb.ToString();
-
-                }
-                return "";
-            }
-            catch (Exception)
-            {
-                return "Unable to retrieve track info. See error log for more details";
-            }
         }
     }
 }

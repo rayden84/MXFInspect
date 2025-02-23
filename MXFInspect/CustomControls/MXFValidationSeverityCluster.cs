@@ -1,7 +1,5 @@
 ﻿using BrightIdeasSoftware;
-using Myriadbits.MXF;
-using System;
-using System.Diagnostics.Metrics;
+using Myriadbits.MXF.Validators;
 
 
 namespace Myriadbits.MXFInspect.CustomControls

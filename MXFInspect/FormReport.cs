@@ -22,6 +22,7 @@
 #endregion
 
 using Myriadbits.MXF;
+using Myriadbits.MXF.Validators;
 using Myriadbits.MXFInspect.CustomControls;
 using Serilog;
 using System;
@@ -177,6 +178,7 @@ namespace Myriadbits.MXFInspect
                 // create test list (TODO implement test suite class)
                 List<MXFValidator> validatorList = new List<MXFValidator>
                 {
+                    new MXFValidatorFile(mxfFile),
                     new MXFValidatorKLVStream(mxfFile),
                     new MXFValidatorPartitions(mxfFile),
                     new MXFValidatorRIP(mxfFile),
@@ -184,7 +186,7 @@ namespace Myriadbits.MXFInspect
                     new MXFValidatorInfo(mxfFile),
                 };
 
-                var results = await MXFFileValidationEngine.Validate(mxfFile, validatorList, progressHandler, cts.Token);
+                var results = await MXFFileValidationEngine.Validate(validatorList, progressHandler, cts.Token);
 
                 // display the one with biggest offset first, then autoresize columns executes
                 // correctly and finally reverse order, i.e. lowest offset first
