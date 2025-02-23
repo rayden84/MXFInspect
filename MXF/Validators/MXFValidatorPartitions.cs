@@ -474,16 +474,6 @@ namespace Myriadbits.MXF.Validators
                                 p.PartitionNumber
                             ));
                         }
-
-                        if (!IsHeaderByteCountCorrect(p))
-                        {
-                            retval.Add(ValidationRules.CreateValidationResult(
-                                ValidationRuleIDs.ID_0098,
-                                p,
-                                p.Offset,
-                                p.PartitionNumber
-                            ));
-                        }
                     }
                 }
                 else
