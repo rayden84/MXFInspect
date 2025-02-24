@@ -41,7 +41,14 @@ namespace Myriadbits.MXF.Validators
             foreach (MXFValidator validator in validators)
             {   
                 ct.ThrowIfCancellationRequested();
-                resultsList.AddRange(await validator.Validate(progress, ct));
+                try
+                {
+                    resultsList.AddRange(await validator.Validate(progress, ct));
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Validator {validator} threw an exception: {ex.Message}", ex);
+                }
             }
 
             return resultsList;

@@ -82,7 +82,7 @@ namespace Myriadbits.MXF.Validators
 
                         default:
                             retval.Add(new MXFValidationResult(
-                                (MXFValidationCategory)Enum.Parse(typeof(MXFValidationCategory), ex.GetType().Name),
+                                MXFValidationCategory.General,
                                 MXFValidationSeverity.Error,
                                 null,
                                 null,

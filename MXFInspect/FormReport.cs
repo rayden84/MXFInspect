@@ -175,7 +175,8 @@ namespace Myriadbits.MXFInspect
 
                 var progressHandler = new Progress<TaskReport>(this.ReportProgress);
 
-                // create test list (TODO implement test suite class)
+                // create test list
+                // TODO implement test suite class
                 List<MXFValidator> validatorList = new List<MXFValidator>
                 {
                     new MXFValidatorFile(mxfFile),

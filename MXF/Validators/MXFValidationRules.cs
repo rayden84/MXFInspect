@@ -29,6 +29,7 @@ namespace Myriadbits.MXF.Validators
 {
     public enum ValidationRuleIDs
     {
+        ID_0000, // reserved, used for throwing exception when rule is not found
         ID_0051,
         ID_0052,
         ID_0053,
@@ -152,7 +153,7 @@ namespace Myriadbits.MXF.Validators
             }
             else
             {
-                throw new ArgumentException($"Validation rule {rule} not found.");
+                throw new ArgumentException($"Validation rule {ruleId} not found.");
             }
         }
     }
