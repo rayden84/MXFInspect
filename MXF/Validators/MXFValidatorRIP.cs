@@ -38,6 +38,7 @@ namespace Myriadbits.MXF.Validators
 
         public MXFValidatorRIP(MXFFile file) : base(file)
         {
+            // TODO probably it is wrong to consider the Run-In for the RIP
             // if there is a RunIn consider it for the partition offsets
             var runIn = File.Descendants().OfType<MXFRunIn>().SingleOrDefault();
             if (runIn != null)
