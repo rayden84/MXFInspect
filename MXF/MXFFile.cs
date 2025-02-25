@@ -31,6 +31,7 @@ using System.Threading.Tasks;
 using Serilog;
 using Myriadbits.MXF.Exceptions;
 using Myriadbits.MXF.Extensions;
+using Myriadbits.MXF.KLV;
 
 namespace Myriadbits.MXF
 {
@@ -175,7 +176,9 @@ namespace Myriadbits.MXF
                     if (ex.InnerException is EndOfKLVStreamException eosEx)
                     {
                         // truncated at K or L part of KLV, but not even a single KLV yet encoded -> consider as not an MXF File
-                        throw new NotAnMXFFileException($"No partition key found within the first {RUN_IN_THRESHOLD} bytes.", 0, eosEx);
+                        var notAnMXFEx = new NotAnMXFFileException($"No partition key found within the first {RUN_IN_THRESHOLD} bytes.", 0, eosEx);
+                        Exceptions.Add(notAnMXFEx);
+                        throw notAnMXFEx;
                     }
 
                     // error at K part of KLV, but not even a single KLV yet encoded -> possible Run-In found
@@ -185,7 +188,9 @@ namespace Myriadbits.MXF
                     if (!parser.SeekToPotentialPartitionKey(out long newOffset, RUN_IN_THRESHOLD + 1, ct)) //+1 for tolerance
                     {
                         // we have reached end of file and not found a partition key
-                        throw new NotAnMXFFileException($"No partition key found within the first {RUN_IN_THRESHOLD} bytes.", 0, ex);
+                        var notAnMXFEx = new NotAnMXFFileException($"No partition key found within the first {RUN_IN_THRESHOLD} bytes.", 0, ex);
+                        Exceptions.Add(notAnMXFEx);
+                        throw notAnMXFEx;
                     }
                     continue;
                 }
@@ -225,9 +230,9 @@ namespace Myriadbits.MXF
                             case KLVLengthParsingException exLEngth:
                                 // TODO maybe add the UL 
                                 var truncatedObject = new MXFNamedObject("Truncated Object/NON-KLV area", lastgoodPos, parser.RemainingBytesCount);
-                                var exEOF = new EndOfKLVStreamException("Premature end of file: Not enough bytes to read KLV Length.", parser.Current?.Offset ?? 0 + parser.RemainingBytesCount, truncatedObject, null);
-                                Exceptions.Add(exEOF);
-                                mxfPacks.Add(exEOF.TruncatedObject);
+                                var eof_Len_Ex = new EndOfKLVStreamException("Premature end of file: Not enough bytes to read KLV Length.", parser.Current?.Offset ?? 0 + parser.RemainingBytesCount, truncatedObject, exLEngth);
+                                Exceptions.Add(eof_Len_Ex);
+                                mxfPacks.Add(truncatedObject);
                                 break;
                             default:
                                 break;

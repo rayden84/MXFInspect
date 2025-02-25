@@ -178,11 +178,6 @@ namespace Myriadbits.MXFInspect
                 }
 
                 ParentMainForm.EnableUI(true);
-
-                if (this.File?.Exceptions.Any() ?? false)
-                {
-                    MessageBox.Show("Error(s) occured during parsing of the file. See the log (Settings -> Logging...) for more information", "Parsing Error(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
             }
         }
 
