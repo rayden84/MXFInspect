@@ -385,6 +385,24 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Partition #{0} contains essences, although BodySID = 0 signals no essences.
+        /// </summary>
+        internal static string ID_0102 {
+            get {
+                return ResourceManager.GetString("ID_0102", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Partition #{0} contains no essences, although BodySID &gt; 0 signals essences.
+        /// </summary>
+        internal static string ID_0103 {
+            get {
+                return ResourceManager.GetString("ID_0103", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to KAG.
         /// </summary>
         internal static string ID_0106 {
@@ -520,7 +538,7 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unknown Universal Label: {0}.
+        ///   Looks up a localized string similar to Unrecognized key: {0}.
         /// </summary>
         internal static string ID_0717 {
             get {
@@ -529,7 +547,7 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Privately registered UL: {0}.
+        ///   Looks up a localized string similar to Privately registered key: {0}.
         /// </summary>
         internal static string ID_0718 {
             get {

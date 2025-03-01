@@ -288,6 +288,11 @@ namespace Myriadbits.MXF.Validators
             return read == expected;
         }
 
+        public bool IsBodySIDCorrect(MXFPartition p)
+        {
+            return p.ContainsEssences() ? p.BodySID > 0 : p.BodySID == 0;
+        }
+
 
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)
         {
@@ -582,6 +587,28 @@ namespace Myriadbits.MXF.Validators
             }
 
             // TODO Check body SID
+            if (!IsBodySIDCorrect(p))
+            {
+                if (p.BodySID > 0)
+                {
+                    retval.Add(ValidationRules.CreateValidationResult(
+                    ValidationRuleIDs.ID_0103,
+                    p,
+                    p.Offset,
+                    p.PartitionNumber
+                    ));
+                }
+                else
+                {
+                    retval.Add(ValidationRules.CreateValidationResult(
+                    ValidationRuleIDs.ID_0102,
+                    p,
+                    p.Offset,
+                    p.PartitionNumber
+                    ));
+                }
+
+            }
 
             // TODO Check index SID
 

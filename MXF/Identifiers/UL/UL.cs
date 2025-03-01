@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Security.Cryptography;
 
 namespace Myriadbits.MXF.Identifiers
 {
@@ -193,20 +194,15 @@ namespace Myriadbits.MXF.Identifiers
 
         public string ToString(bool shortFormat)
         {
+            string sName = string.IsNullOrWhiteSpace(Name) ? "Unknown" : Name;
+
             if (shortFormat)
             {
-                if (Name == null)
-                {
-                    return base.ToString();
-                }
-                else
-                {
-                    return $"{Name}";
-                }
+                return base.ToString();
             }
             else
             {
-                return $"{Name ?? "Unknown"} - {base.ToString()}";
+                return $"{sName} - {base.ToString()}";
             }
         }
 

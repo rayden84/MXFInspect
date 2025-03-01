@@ -47,24 +47,9 @@ namespace Myriadbits.MXF.Extensions
             return obj is MXFEssenceElement;
         }
 
-        public static bool IsFooterPartition(this MXFPartition p)
-        {
-            return p.PartitionType == PartitionType.Footer;
-        }
-
-        public static bool IsHeaderPartition(this MXFPartition p)
-        {
-            return p.PartitionType == PartitionType.Header;
-        }
-
         public static bool IsSystemMetaData(this MXFObject obj)
         {
             return obj is MXFSystemMetaDataPack;
-        }
-
-        public static bool ContainsIndexTableSegments(this MXFObject obj)
-        {
-            return obj.Children.Any(c => c is MXFIndexTableSegment);
         }
 
         public static bool IsIndexLike(this MXFObject obj)

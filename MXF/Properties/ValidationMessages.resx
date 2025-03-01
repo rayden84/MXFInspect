@@ -284,9 +284,15 @@
     <value>KLV triplet with indefinite BER length</value>
   </data>
   <data name="ID_0717" xml:space="preserve">
-    <value>Unknown Universal Label: {0}</value>
+    <value>Unrecognized key: {0}</value>
   </data>
   <data name="ID_0718" xml:space="preserve">
-    <value>Privately registered UL: {0}</value>
+    <value>Privately registered key: {0}</value>
+  </data>
+  <data name="ID_0102" xml:space="preserve">
+    <value>Partition #{0} contains essences, although BodySID = 0 signals no essences</value>
+  </data>
+  <data name="ID_0103" xml:space="preserve">
+    <value>Partition #{0} contains no essences, although BodySID &gt; 0 signals essences</value>
   </data>
 </root>

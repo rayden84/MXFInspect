@@ -68,7 +68,6 @@ namespace Myriadbits.MXF.Validators
                 Log.ForContext<MXFValidatorUL>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");
                 return retval;
             }, ct);
-
             return result;
         }
     }

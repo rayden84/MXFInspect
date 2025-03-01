@@ -103,37 +103,9 @@ namespace Myriadbits.MXF.Extensions
             return !file.GetHeaderPartition().IsClosedAndComplete();
         }
 
-        public static bool IsClosedAndComplete(this MXFPartition p)
-        {
-            return p.Status == PartitionStatus.ClosedComplete;
-        }
-
-        public static bool IsOpen(this MXFPartition p)
-        {
-            return
-                p.Status == PartitionStatus.OpenComplete ||
-                p.Status == PartitionStatus.OpenIncomplete;
-        }
-
-        public static bool IsClosed(this MXFPartition p)
-        {
-            return p.Status == PartitionStatus.ClosedComplete || p.Status == PartitionStatus.ClosedIncomplete;
-        }
-
         public static bool AreEssencesInHeader(this MXFFile file)
         {
             return !file.GetHeaderPartition().Children.OfType<MXFEssenceElement>().Any();
-        }
-
-        public static long CountPictureEssences(this MXFPartition p)
-        {
-            return p.Children.OfType<MXFEssenceElement>().Count(e => e.IsPicture);
-        }
-
-        public static bool IsPartitionDurationBetween(this MXFPartition partition, long min, long max)
-        {
-            return partition.CountPictureEssences() >= min &&
-                partition.CountPictureEssences() <= max;
         }
 
         public static bool IsDurationOfBodiesMax240Units(this MXFFile file)
