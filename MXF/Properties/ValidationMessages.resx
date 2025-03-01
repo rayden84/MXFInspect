@@ -207,30 +207,38 @@
     <value>KAG</value>
   </data>
   <data name="ID_0095" xml:space="preserve">
-    <value>Partition #{0} has incorrect value for ThisPartition</value>
+    <value>Partition #{0} has incorrect value for ThisPartition (expected: {1}, read: {2})</value>
     <comment>{0} = PartitionNumber</comment>
   </data>
   <data name="ID_0096" xml:space="preserve">
-    <value>Partition #{0} has incorrect value for PreviousPartition</value>
+    <value>Partition #{0} has incorrect value for PreviousPartition (expected: {1}, read: {2})</value>
     <comment>{0} = PartitionNumber</comment>
   </data>
   <data name="ID_0097" xml:space="preserve">
-    <value>Partition #{0} has incorrect value for FooterPartition</value>
+    <value>Partition #{0} has incorrect value for FooterPartition (expected: {1}, read: {2})</value>
     <comment>{0} = PartitionNumber</comment>
   </data>
   <data name="ID_0098" xml:space="preserve">
-    <value>Partition #{0} has incorrect value for HeaderByteCount</value>
+    <value>Partition #{0} has incorrect value for HeaderByteCount (expected: {1}, read: {2})</value>
+    <comment>{0} = PartitionNumber</comment>
+  </data>
+  <data name="ID_0099" xml:space="preserve">
+    <value>Partition #{0} has incorrect value for IndexByteCount (expected: {1}, read: {2})</value>
+    <comment>{0} = PartitionNumber</comment>
+  </data>
+  <data name="ID_0101" xml:space="preserve">
+    <value>Partition #{0} has incorrect value for BodyOffset (expected: {1}, read: {2})</value>
     <comment>{0} = PartitionNumber</comment>
   </data>
   <data name="ID_0106" xml:space="preserve">
     <value>KAG</value>
   </data>
   <data name="ID_0107" xml:space="preserve">
-    <value>Partition #{0} Major Version property has an invalid value (read: {1}, expected: 1)</value>
+    <value>Partition #{0} Major Version property has an invalid value (expected: {1}, read: {2})</value>
     <comment>{0} = PartitionNumber {1} = Major</comment>
   </data>
   <data name="ID_0108" xml:space="preserve">
-    <value>Partition #{0} Minor Version property has an invalid value (read: {1}, expected: 2 or 3)</value>
+    <value>Partition #{0} Minor Version property has an invalid value (expected: {1}, read: {2})</value>
     <comment>{0} = PartitionNumber {1} = Minor</comment>
   </data>
   <data name="ID_0110" xml:space="preserve">
@@ -262,8 +270,8 @@
     <value>The RIP contains extraneous (non RIP entries) elements</value>
   </data>
   <data name="ID_0713" xml:space="preserve">
-    <value>Number of RIP entries is not equal to the number of partitions ({0} vs {1})</value>
-    <comment>{0} = ripEntryCount {1}=PartitionCount</comment>
+    <value>Number of RIP entries is not equal to the number of partitions (expected: {1}, read: {2})</value>
+    <comment>{0}=PartitionCount, {1} = ripEntryCount </comment>
   </data>
   <data name="ID_0714" xml:space="preserve">
     <value>There is no RIP entry for Partition #{0}</value>

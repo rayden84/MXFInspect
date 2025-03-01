@@ -331,7 +331,7 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Partition #{0} has incorrect value for ThisPartition.
+        ///   Looks up a localized string similar to Partition #{0} has incorrect value for ThisPartition (expected: {1}, read: {2}).
         /// </summary>
         internal static string ID_0095 {
             get {
@@ -340,7 +340,7 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Partition #{0} has incorrect value for PreviousPartition.
+        ///   Looks up a localized string similar to Partition #{0} has incorrect value for PreviousPartition (expected: {1}, read: {2}).
         /// </summary>
         internal static string ID_0096 {
             get {
@@ -349,7 +349,7 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Partition #{0} has incorrect value for FooterPartition.
+        ///   Looks up a localized string similar to Partition #{0} has incorrect value for FooterPartition (expected: {1}, read: {2}).
         /// </summary>
         internal static string ID_0097 {
             get {
@@ -358,11 +358,29 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Partition #{0} has incorrect value for HeaderByteCount.
+        ///   Looks up a localized string similar to Partition #{0} has incorrect value for HeaderByteCount (expected: {1}, read: {2}).
         /// </summary>
         internal static string ID_0098 {
             get {
                 return ResourceManager.GetString("ID_0098", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Partition #{0} has incorrect value for IndexByteCount (expected: {1}, read: {2}).
+        /// </summary>
+        internal static string ID_0099 {
+            get {
+                return ResourceManager.GetString("ID_0099", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Partition #{0} has incorrect value for BodyOffset (expected: {1}, read: {2}).
+        /// </summary>
+        internal static string ID_0101 {
+            get {
+                return ResourceManager.GetString("ID_0101", resourceCulture);
             }
         }
         
@@ -376,7 +394,7 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Partition #{0} Major Version property has an invalid value (read: {1}, expected: 1).
+        ///   Looks up a localized string similar to Partition #{0} Major Version property has an invalid value (expected: {1}, read: {2}).
         /// </summary>
         internal static string ID_0107 {
             get {
@@ -385,7 +403,7 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Partition #{0} Minor Version property has an invalid value (read: {1}, expected: 2 or 3).
+        ///   Looks up a localized string similar to Partition #{0} Minor Version property has an invalid value (expected: {1}, read: {2}).
         /// </summary>
         internal static string ID_0108 {
             get {
@@ -466,7 +484,7 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Number of RIP entries is not equal to the number of partitions ({0} vs {1}).
+        ///   Looks up a localized string similar to Number of RIP entries is not equal to the number of partitions (expected: {1}, read: {2}).
         /// </summary>
         internal static string ID_0713 {
             get {

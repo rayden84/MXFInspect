@@ -35,9 +35,9 @@ namespace Myriadbits.MXF.Validators
     public class MXFValidatorPartitions : MXFValidator
     {
         private readonly ulong runInHeaderOffset = 0;
-        public static readonly int MAJOR_VERSION = 1;
-        public static readonly int MINOR_VERSION_SMPTE377M_2004 = 2;
-        public static readonly int MINOR_VERSION_SMPTE377M_2011 = 3;
+        public static readonly ushort MAJOR_VERSION = 1;
+        public static readonly ushort MINOR_VERSION_SMPTE377M_2004 = 2;
+        public static readonly ushort MINOR_VERSION_SMPTE377M_2011 = 3;
 
         public MXFValidatorPartitions(MXFFile file) : base(file)
         {
@@ -140,40 +140,54 @@ namespace Myriadbits.MXF.Validators
             }
             else return false;
         }
-        public bool IsThisPartitionValueCorrect(MXFPartition p)
+
+        public bool IsThisPartitionValueCorrect(MXFPartition p, out ulong expected, out ulong read)
         {
-            return p.ThisPartition + runInHeaderOffset == (ulong)p.Offset;
+            read = p.ThisPartition;
+            expected = (ulong)p.Offset - runInHeaderOffset;
+            return read == expected;
         }
 
-        public bool IsPreviousPartitionValueCorrect(MXFPartition p)
+        public bool IsPreviousPartitionValueCorrect(MXFPartition p, out ulong expected, out ulong read)
         {
+            read = p.PreviousPartition;
+
             if (p.PreviousSibling() is MXFPartition prev)
             {
-                return p.PreviousPartition + runInHeaderOffset == (ulong)prev.Offset;
-            }
-            // previous partition is/points to header partition
-            else return p.PreviousPartition == 0;
-        }
-
-        public bool IsFooterPartitionValueCorrect(MXFPartition p)
-        {
-            if (IsFooterPartitionPresent() && IsFooterPartitionUnique())
-            {
-                var footer = File.GetFooterPartition();
-
-                // In Open Partitions, the value shall be as defined in Section 7.1 or zero(0).
-                // If the Footer Partition is not present in the file then the value of this Property shall be zero(0).
-                if (p.IsOpen())
-                {
-                    return (p.FooterPartition + runInHeaderOffset == (ulong)footer.Offset) || p.FooterPartition == 0;
-                }
-                return p.FooterPartition + runInHeaderOffset == (ulong)footer.Offset;
+                expected = (ulong)prev.Offset - runInHeaderOffset;
             }
             else
             {
-                return p.FooterPartition == 0;
+                // previous partition points to header partition
+                expected = 0;
             }
+            return read == expected;
         }
+
+        public bool IsFooterPartitionValueCorrectWhenFooterPresent(MXFPartition p, out List<ulong> expected, out ulong read)
+        {
+            read = p.FooterPartition;
+            expected = new List<ulong>();
+
+            var footer = File.GetFooterPartition();
+            expected.Add((ulong)footer.Offset - runInHeaderOffset);
+
+            // In Open Partitions, the value shall be as defined in Section 7.1 or zero(0).
+            if (p.IsOpen())
+            {
+                expected.Add(0);
+
+            }
+            return expected.Contains(read);
+        }
+
+        public bool IsFooterPartitionValueCorrectWhenFooterNotPresent(MXFPartition p, out ulong expected, out ulong read)
+        {
+            read = p.FooterPartition;
+            expected = 0;
+            return read == expected;
+        }
+
 
         public bool IsPartitionStatusValid(MXFPartition p)
         {
@@ -184,24 +198,26 @@ namespace Myriadbits.MXF.Validators
                 p.Status == PartitionStatus.ClosedComplete;
         }
 
-        public bool MajorVersionEqualsTo(MXFPartition p, int versionNumber)
+        public bool MajorVersionEqualsTo(MXFPartition p, ushort expected, out ushort read)
         {
-            return p.MajorVersion == versionNumber;
+            read = p.MajorVersion;
+            return read == expected;
         }
 
-        public bool MinorVersionEqualsTo(MXFPartition p, int versionNumber)
+        public bool MinorVersionEqualsTo(MXFPartition p, ushort expected, out ushort read)
         {
-            // SMPTE 377:2011 requires Minor Version 1.3
-            return p.MinorVersion == versionNumber;
+            read = p.MinorVersion;
+            return read == expected;
         }
 
 
-        public bool IsHeaderByteCountCorrect(MXFPartition p)
+        public bool IsHeaderByteCountValueCorrect(MXFPartition p, out ulong expected, out ulong read)
         {
+            read = p.HeaderByteCount;
             // according to SMPTE 377:2011 this is the Count of Bytes used for Header Metadata and
             // Primer Pack. This starts at the first byte of the key of the Primer Pack and ends after
             // any trailing KLV Fill item which is included within this HeaderByteCount.
-            ulong headerByteCount = 0;
+            expected = 0;
 
             var primerPack = p.Children.FirstOrDefault(c => c is MXFPrimerPack);
             var lastHeaderMetadata = p.Children.TakeWhile(c => c.IsHeaderMetadataLike() && !c.IsIndexLike())?.LastOrDefault();
@@ -209,32 +225,70 @@ namespace Myriadbits.MXF.Validators
             // TODO: what if there are two or more consecutive filler?
             if (primerPack != null && lastHeaderMetadata != null)
             {
-                headerByteCount = (ulong)(lastHeaderMetadata.Offset + lastHeaderMetadata.TotalLength) - (ulong)primerPack.Offset;
+                expected = (ulong)(lastHeaderMetadata.Offset + lastHeaderMetadata.TotalLength) - (ulong)primerPack.Offset;
             }
 
-            return p.HeaderByteCount == headerByteCount;
+            return read == expected;
         }
 
-        public bool IsIndexByteCountCorrect(MXFPartition p)
+        public bool IsIndexByteCountValueCorrect(MXFPartition p, out ulong expected, out ulong read)
         {
-            ulong indexByteCount = 0;
+            read = p.IndexByteCount;
+            expected = 0;
 
-            var indexTableSegments = p.Children.TakeWhile(c => c is MXFIndexTableSegment);
-
-            if (indexTableSegments.Any())
+            MXFObject firstIndexTableSegment = p.Children.OfType<MXFIndexTableSegment>().FirstOrDefault();
+            MXFObject lastIndexTableSegment = firstIndexTableSegment;
+            if (firstIndexTableSegment != null)
             {
-                indexByteCount = (ulong)(indexTableSegments.Last().Offset + indexTableSegments.Last().TotalLength) - (ulong)indexTableSegments.First().Offset;
+                lastIndexTableSegment = firstIndexTableSegment;
+                while (lastIndexTableSegment is MXFIndexTableSegment)
+                {
+                    var nextElement = lastIndexTableSegment.NextSibling() as MXFIndexTableSegment;
+                    if (nextElement != null)
+                    {
+                        lastIndexTableSegment = nextElement;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                expected = (ulong)(lastIndexTableSegment.Offset + lastIndexTableSegment.TotalLength) - (ulong)firstIndexTableSegment.Offset;
+
+                // TODO what if there are two or more consecutive filler?
+                if (lastIndexTableSegment.NextSibling() is MXFFillerData filler)
+                {
+                    expected += (ulong)filler.TotalLength;
+                }
             }
 
-            if (indexTableSegments.Last().NextSibling() is MXFFillerData filler)
-            {
-                indexByteCount += indexByteCount + (ulong)filler.TotalLength;
-            }
-
-            // TODO what if there are two or more consecutive filler?
-
-            return p.IndexByteCount == indexByteCount;
+            return read == expected;
         }
+
+        private bool IsBodyOffsetValueCorrect(MXFPartition p, out ulong expected, out ulong read)
+        {
+            read = p.BodyOffset;
+            expected = 0;
+            uint BodySID = p.BodySID;
+            if (p.BodySID > 0)
+            {
+                var previousPartitionsList = File.GetPartitions().Where(partition => partition.BodySID == BodySID && partition.Offset < p.Offset);
+
+                foreach (var prevPartition in previousPartitionsList)
+                {
+                    var first = prevPartition.Children.Where(c => c is MXFEssenceElement || c is MXFSystemMetaDataPack).FirstOrDefault();
+                    var last = prevPartition.Children.Last();
+                    if (first != null)
+                    {
+                        expected += (ulong)(last.Offset + last.TotalLength - first.Offset);
+                    }
+                }
+            }
+            return read == expected;
+        }
+
+
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)
         {
             ct.ThrowIfCancellationRequested();
@@ -251,9 +305,9 @@ namespace Myriadbits.MXF.Validators
                     if (AreBodyPartitionsPresent())
                     {
                         retval.Add(ValidationRules.CreateValidationResult(
-                            ValidationRuleIDs.ID_0054, 
-                            File.GetPartitionRoot(), 
-                            File.GetPartitionRoot().Offset, 
+                            ValidationRuleIDs.ID_0054,
+                            File.GetPartitionRoot(),
+                            File.GetPartitionRoot().Offset,
                             this.File.GetBodyPartitions().Count()));
 
                         if (AreIndexTableSegmentsInBodyPartitions())
@@ -404,46 +458,55 @@ namespace Myriadbits.MXF.Validators
 
         private void CheckPartitionProperties(List<MXFValidationResult> retval, MXFPartition p)
         {
-            if (!IsThisPartitionValueCorrect(p))
+            if (!IsThisPartitionValueCorrect(p, out ulong expThisPartValue, out ulong readThisPartValue))
             {
                 retval.Add(ValidationRules.CreateValidationResult(
                     ValidationRuleIDs.ID_0095,
                     p,
                     p.Offset,
-                    p.PartitionNumber
+                    p.PartitionNumber,
+                    expThisPartValue,
+                    readThisPartValue
                 ));
             }
 
-            if (!IsPreviousPartitionValueCorrect(p))
+            if (!IsPreviousPartitionValueCorrect(p, out ulong expPrevPartValue, out ulong readPrevPartValue))
             {
                 retval.Add(ValidationRules.CreateValidationResult(
                     ValidationRuleIDs.ID_0096,
                     p,
                     p.Offset,
-                    p.PartitionNumber
+                    p.PartitionNumber,
+                    expPrevPartValue,
+                    readPrevPartValue
                 ));
             }
 
             if (IsFooterPartitionPresent() && IsFooterPartitionUnique())
             {
-                // TODO Consider if Partition is open
-                if (!IsFooterPartitionValueCorrect(p))
+                if (!IsFooterPartitionValueCorrectWhenFooterPresent(p, out List<ulong> expFooterPartValues, out ulong readFooterPartValue))
                 {
                     retval.Add(ValidationRules.CreateValidationResult(
                         ValidationRuleIDs.ID_0097,
                         p,
                         p.Offset,
-                        p.PartitionNumber
+                        p.PartitionNumber,
+                        string.Join(" ", expFooterPartValues.Select(v => v.ToString()).ToArray()),
+                        readFooterPartValue
                     ));
                 }
             }
-            else if (!IsFooterPartitionPresent() && p.FooterPartition != 0)
+            else if (!IsFooterPartitionValueCorrectWhenFooterNotPresent(p, out ulong expFooterPartValue1, out ulong readFooterPartValue1))
             {
+
+                // If the Footer Partition is not present in the file then the value of this Property shall be zero(0).
                 retval.Add(ValidationRules.CreateValidationResult(
                     ValidationRuleIDs.ID_0710,
                     p,
                     p.Offset,
-                    p.PartitionNumber
+                    p.PartitionNumber,
+                    expFooterPartValue1,
+                    readFooterPartValue1
                 ));
             }
 
@@ -458,41 +521,65 @@ namespace Myriadbits.MXF.Validators
                 ));
             }
 
-            if (!MajorVersionEqualsTo(p, MAJOR_VERSION))
+            if (!MajorVersionEqualsTo(p, MAJOR_VERSION, out ushort readMajorVersion))
             {
                 retval.Add(ValidationRules.CreateValidationResult(
                     ValidationRuleIDs.ID_0107,
                     p,
                     p.Offset,
                     p.PartitionNumber,
-                    p.MajorVersion
+                    MAJOR_VERSION,
+                    readMajorVersion
                 ));
             }
 
-            if (!MinorVersionEqualsTo(p, MINOR_VERSION_SMPTE377M_2011))
+            if (!MinorVersionEqualsTo(p, MINOR_VERSION_SMPTE377M_2011, out ushort readMinorVersion))
             {
                 retval.Add(ValidationRules.CreateValidationResult(
                     ValidationRuleIDs.ID_0108,
                     p,
                     p.Offset,
                     p.PartitionNumber,
-                    p.MinorVersion
+                    MINOR_VERSION_SMPTE377M_2011,
+                    readMinorVersion
                 ));
             }
 
-            if (!IsHeaderByteCountCorrect(p))
+            if (!IsHeaderByteCountValueCorrect(p, out ulong expHeaderByteCount, out ulong readHeaderByteCount))
             {
                 retval.Add(ValidationRules.CreateValidationResult(
                     ValidationRuleIDs.ID_0098,
                     p,
                     p.Offset,
-                    p.PartitionNumber
+                    p.PartitionNumber,
+                    expHeaderByteCount,
+                    readHeaderByteCount
                 ));
             }
 
-            // TODO Check Index byte count
+            if (!IsIndexByteCountValueCorrect(p, out ulong expIndexByteCount, out ulong readIndexByteCount))
+            {
+                retval.Add(ValidationRules.CreateValidationResult(
+                    ValidationRuleIDs.ID_0099,
+                    p,
+                    p.Offset,
+                    p.PartitionNumber,
+                    expIndexByteCount,
+                    readIndexByteCount
+                ));
+            }
 
-            // TODO Check body offset
+            if (!IsBodyOffsetValueCorrect(p, out ulong expBodyOffset, out ulong readBodyOffset))
+            {
+                retval.Add(ValidationRules.CreateValidationResult(
+                ValidationRuleIDs.ID_0101,
+                p,
+                p.Offset,
+                p.PartitionNumber,
+                expBodyOffset,
+                readBodyOffset
+                ));
+            }
 
             // TODO Check body SID
 
