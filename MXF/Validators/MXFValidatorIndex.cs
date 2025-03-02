@@ -38,7 +38,7 @@ namespace Myriadbits.MXF.Validators
 
         public MXFValidatorIndex(MXFFile file) : base(file)
         {
-
+            Description = "Index Tables";
         }
 
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)
@@ -359,7 +359,7 @@ namespace Myriadbits.MXF.Validators
         private void FindIndexTablesSystemItemsEssenceElements()
         {
             // Find all index tables, system items and essence elements
-            this.Description = "Locating index tables, essence";
+            // this.Description = "Locating index tables, essence";
 
             m_indexTables = this.File.Descendants().OfType<MXFIndexTableSegment>().ToList();
             m_systemItems = this.File.Descendants().OfType<MXFSystemMetaDataPack>().ToList();

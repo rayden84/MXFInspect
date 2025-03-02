@@ -35,14 +35,15 @@ namespace Myriadbits.MXF.Validators
 
         public MXFValidatorFile(MXFFile file) : base(file)
         {
+            Description = "General/File";
         }
 
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)
         {
-            var retval = new List<MXFValidationResult>();
-
             List<MXFValidationResult> resultList = await Task.Run(() =>
             {
+                var retval = new List<MXFValidationResult>();
+
                 // add exceptions as validation results
                 foreach (var ex in File.Exceptions)
                 {

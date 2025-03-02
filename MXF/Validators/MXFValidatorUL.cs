@@ -35,24 +35,20 @@ namespace Myriadbits.MXF.Validators
     {
         public MXFValidatorUL(MXFFile file) : base(file)
         {
-
+            Description = "SMPTE Registers/UL";
         }
 
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)
         {
             List<MXFValidationResult> result = await Task.Run(() =>
             {
-                this.Description = "Checking MXF Keys";
-                var retval = new List<MXFValidationResult>();
-                Stopwatch sw = Stopwatch.StartNew();
 
+                var retval = new List<MXFValidationResult>();
                 var klvsWithUnknownUL = this.File.Descendants()
                                                 .OfType<MXFPack>()
-                                                .Where(klv => klv.Key.SMPTEInformation == null);
-
-                klvsWithUnknownUL = klvsWithUnknownUL
-                                        .Except(klvsWithUnknownUL.OfType<MXFPackageMetaData>())
-                                        .Except(klvsWithUnknownUL.OfType<MXFSystemMetaDataPack>());
+                                                .Where(klv => klv.Key.SMPTEInformation == null
+                                                    && klv is not MXFPackageMetaData
+                                                    && klv is not MXFSystemMetaDataPack);
 
                 foreach (var klv in klvsWithUnknownUL)
                 {
@@ -65,7 +61,6 @@ namespace Myriadbits.MXF.Validators
                         retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0717, klv, klv.Offset, klv.Key));
                     }
                 }
-                Log.ForContext<MXFValidatorUL>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");
                 return retval;
             }, ct);
             return result;

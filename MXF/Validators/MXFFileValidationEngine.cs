@@ -21,36 +21,39 @@
 //
 #endregion
 
-using Myriadbits.MXF.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Linq;
+using System.Diagnostics;
+using Serilog;
 
 namespace Myriadbits.MXF.Validators
 {
     public class MXFFileValidationEngine
     {
-        public static async Task<List<MXFValidationResult>> Validate(IEnumerable<MXFValidator> validators, IProgress<TaskReport> progress = null, CancellationToken ct = default)
+        public static async Task<List<MXFValidationResult>> Validate(IList<MXFValidator> validators, IProgress<TaskReport> progress = null, CancellationToken ct = default)
         {
             List<MXFValidationResult> resultsList = new List<MXFValidationResult>();
-            
-            // execute validators
 
+            // execute validators
+            var sw = Stopwatch.StartNew();
             foreach (MXFValidator validator in validators)
-            {   
+            {
                 ct.ThrowIfCancellationRequested();
                 try
                 {
+                    int currentPercentage = (int)(validators.IndexOf(validator) * 100.0 / validators.Count);
+
                     resultsList.AddRange(await validator.Validate(progress, ct));
+                    progress.Report(new TaskReport(currentPercentage, $"Validating {validator.Description}"));
                 }
                 catch (Exception ex)
                 {
                     throw new Exception($"Validator {validator} threw an exception: {ex.Message}", ex);
                 }
             }
-
+            Log.ForContext<MXFValidatorInfo>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");
             return resultsList;
         }
     }

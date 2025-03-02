@@ -36,7 +36,7 @@ namespace Myriadbits.MXF.Validators
     {
         public MXFValidatorInfo(MXFFile file) : base(file)
         {
-
+            Description = "Track Info";
         }
 
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)
@@ -44,9 +44,7 @@ namespace Myriadbits.MXF.Validators
             List<MXFValidationResult> result = await Task.Run(() =>
             {
                 var retval = new List<MXFValidationResult>();
-                Stopwatch sw = Stopwatch.StartNew();
-
-                this.Description = "Track Info";
+                
                 MXFMaterialPackage mp = File.GetFirstMaterialPackage();
                 List<MXFTrack> tracks = mp.GetTracks().ToList();
 
@@ -64,7 +62,7 @@ namespace Myriadbits.MXF.Validators
                     ));
 
                 }
-                Log.ForContext<MXFValidatorInfo>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");
+                
                 return retval;
             }, ct);
 

@@ -21,6 +21,7 @@
 //
 #endregion
 
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,7 +33,7 @@ namespace Myriadbits.MXF.Validators
     public abstract class MXFValidator
     {
         public MXFFile File { get; init; }
-        public string Description { get; set; }
+        public string Description { get; init; }
         protected List<MXFValidationResult> Results { get; set; }
 
         public MXFValidator(MXFFile file)
@@ -44,7 +45,7 @@ namespace Myriadbits.MXF.Validators
         {
             Stopwatch sw = Stopwatch.StartNew();
             Results = await OnValidate(progress, ct);
-            Debug.WriteLine("Validation test run in {0} ms", sw.ElapsedMilliseconds);
+            Log.ForContext<MXFValidatorInfo>().Information($"Validator {this.Description} completed in {sw.ElapsedMilliseconds} ms");
             return Results;
         }
 

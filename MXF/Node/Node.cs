@@ -185,41 +185,73 @@ namespace Myriadbits.MXF.Node
         public T NextSibling()
         {
             var siblings = Parent?.Children?.ToList();
-            if (siblings != null)
+            if (siblings == null)
             {
-                return siblings.SingleOrDefault(s => siblings.IndexOf(s) == siblings.IndexOf((T)this) + 1);
+                return null;
             }
-            else return null;
+            else
+            {
+                int indexOfCurrent = siblings.IndexOf((T)this);
+                if (indexOfCurrent < siblings.Count - 1)
+                {
+                    return siblings[indexOfCurrent + 1];
+                }
+                else return null;
+            }
         }
 
         public T NextLogicalSibling()
         {
             var siblings = LogicalParent?.LogicalChildren?.ToList();
-            if (siblings != null)
+            if (siblings == null)
             {
-                return siblings.SingleOrDefault(s => siblings.IndexOf(s) == siblings.IndexOf((T)this) + 1);
+                return null;
             }
-            else return null;
+            else
+            {
+                int indexOfCurrent = siblings.IndexOf((T)this);
+                if (indexOfCurrent < siblings.Count - 1)
+                {
+                    return siblings[indexOfCurrent + 1];
+                }
+                else return null;
+            }
         }
 
         public T PreviousSibling()
         {
             var siblings = Parent?.Children?.ToList();
-            if (siblings != null)
+            if (siblings == null)
             {
-                return siblings.SingleOrDefault(s => siblings.IndexOf(s) == siblings.IndexOf((T)this) - 1);
+                return null;
             }
-            else return null;
+            else
+            {
+                int indexOfCurrent = siblings.IndexOf((T)this);
+                if (indexOfCurrent > 0)
+                {
+                    return siblings[indexOfCurrent - 1];
+                }
+                else return null;
+            }
         }
 
         public T PreviousLogicalSibling()
         {
             var siblings = LogicalParent?.LogicalChildren?.ToList();
-            if (siblings != null)
+            if (siblings == null)
             {
-                return siblings.SingleOrDefault(s => siblings.IndexOf(s) == siblings.IndexOf((T)this) - 1);
+                return null;
             }
-            else return null;
+            else
+            {
+                int indexOfCurrent = siblings.IndexOf((T)this);
+                if (indexOfCurrent > 0)
+                {
+                    return siblings[indexOfCurrent - 1];
+                }
+                else return null;
+            }
         }
 
     }

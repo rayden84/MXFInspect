@@ -41,6 +41,8 @@ namespace Myriadbits.MXF.Validators
 
         public MXFValidatorPartitions(MXFFile file) : base(file)
         {
+            Description = "Partition Structure";
+
             // if there is a RunIn consider it for the partition offsets
             var runIn = File.Descendants().OfType<MXFRunIn>().SingleOrDefault();
             if (runIn != null)
@@ -241,21 +243,22 @@ namespace Myriadbits.MXF.Validators
             // any trailing KLV Fill item which is included within this HeaderByteCount.
             expected = 0;
 
-            var primerPack = p.Children.FirstOrDefault(c => c is MXFPrimerPack);
-            var lastHeaderMetadata = p.Children.TakeWhile(c => c.IsHeaderMetadataLike() && !c.IsIndexLike())?.LastOrDefault();
+            var primerPack = p.Children.OfType<MXFPrimerPack>().FirstOrDefault();
 
-           
-            if (primerPack != null && lastHeaderMetadata != null)
+            if (primerPack != null)
             {
-                expected = (ulong)(lastHeaderMetadata.Offset + lastHeaderMetadata.TotalLength) - (ulong)primerPack.Offset;
-            }
+                var lastHeaderMetadata = p.Children.LastOrDefault(c => c.IsHeaderMetadataLike() && !c.IsIndexLike());
+                if (lastHeaderMetadata != null)
+                {
+                    expected = (ulong)(lastHeaderMetadata.Offset + lastHeaderMetadata.TotalLength) - (ulong)primerPack.Offset;
 
-            // TODO: what if there are two or more consecutive filler?
-            if (lastHeaderMetadata.NextSibling() is MXFFillerData filler)
-            {
-                expected += (ulong)filler.TotalLength;
+                    // TODO: what if there are two or more consecutive filler?
+                    if (lastHeaderMetadata.NextSibling() is MXFFillerData filler)
+                    {
+                        expected += (ulong)filler.TotalLength;
+                    }
+                }
             }
-
             return read == expected;
         }
 
@@ -266,6 +269,8 @@ namespace Myriadbits.MXF.Validators
 
             MXFObject firstIndexTableSegment = p.Children.OfType<MXFIndexTableSegment>().FirstOrDefault();
             MXFObject lastIndexTableSegment = firstIndexTableSegment;
+            
+            // TODO potential for performance improvement
             if (firstIndexTableSegment != null)
             {
                 lastIndexTableSegment = firstIndexTableSegment;
@@ -329,9 +334,6 @@ namespace Myriadbits.MXF.Validators
             List<MXFValidationResult> result = await Task.Run(() =>
             {
                 var retval = new List<MXFValidationResult>();
-                Stopwatch sw = Stopwatch.StartNew();
-
-                this.Description = "Validating partitions";
 
                 if (AnyPartitionsPresent())
                 {
@@ -506,9 +508,6 @@ namespace Myriadbits.MXF.Validators
                         null
                     ));
                 }
-
-                Log.ForContext<MXFValidatorPartitions>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");
-
                 return retval;
             }, ct);
             return result;

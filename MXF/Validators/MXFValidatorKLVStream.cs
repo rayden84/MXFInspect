@@ -21,10 +21,8 @@
 //
 #endregion
 
-using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
@@ -36,6 +34,7 @@ namespace Myriadbits.MXF.Validators
 
         public MXFValidatorKLVStream(MXFFile file) : base(file)
         {
+            Description = "KLV Stream";
         }
 
         /// <summary>
@@ -46,20 +45,17 @@ namespace Myriadbits.MXF.Validators
             List<MXFValidationResult> result = await Task.Run(() =>
             {
                 var retval = new List<MXFValidationResult>();
-                Stopwatch sw = Stopwatch.StartNew();
-
-                this.Description = "Validating KLV Stream";
-
+                var descendants = File.Descendants().ToList();
 
                 // get Non-KLV areas
-                var nonKLVs = File.Descendants().OfType<MXFNonKLV>();
+                var nonKLVs = descendants.OfType<MXFNonKLV>();
                 foreach (var nonKLV in nonKLVs)
                 {
                     retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0066, nonKLV, nonKLV.Offset, nonKLV.Offset, nonKLV.Offset + nonKLV.TotalLength));
                 }
 
                 // get Run-In
-                var runIn = File.Descendants().OfType<MXFRunIn>().SingleOrDefault();
+                var runIn = descendants.OfType<MXFRunIn>().SingleOrDefault();
                 if (runIn != null)
                 {
                     retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0070, runIn, runIn.Offset));
@@ -67,14 +63,13 @@ namespace Myriadbits.MXF.Validators
 
 
                 // get KLV triplets with BER length: indefinite 
-                var indefiniteKLVs = File.Descendants().OfType<MXFPack>().Where(p => p.Length.BERForm == KLVBERLength.BERForms.Indefinite);
+                var indefiniteKLVs = descendants.OfType<MXFPack>().Where(p => p.Length.BERForm == KLVBERLength.BERForms.Indefinite);
                 foreach (var iKLV in indefiniteKLVs)
                 {
                     retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0716, iKLV, iKLV.Offset));
                 }
 
                 // TODO catch two consecutive fill items
-                Log.ForContext<MXFValidatorKLVStream>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");
                 return retval;
 
             }, ct);

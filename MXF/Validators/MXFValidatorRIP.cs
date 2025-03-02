@@ -21,10 +21,8 @@
 //
 #endregion
 
-using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
@@ -34,10 +32,14 @@ namespace Myriadbits.MXF.Validators
 {
     public class MXFValidatorRIP : MXFValidator
     {
-        private ulong runInHeaderOffset = 0;
+        private readonly ulong runInHeaderOffset = 0;
+        private readonly MXFRIP rip;
+        private readonly IEnumerable<MXFEntryRIP> ripEntries;
+        private readonly List<MXFPartition> partitions;
 
         public MXFValidatorRIP(MXFFile file) : base(file)
         {
+            Description = "RIP";
             // TODO probably it is wrong to consider the Run-In for the RIP
             // if there is a RunIn consider it for the partition offsets
             var runIn = File.Descendants().OfType<MXFRunIn>().SingleOrDefault();
@@ -45,6 +47,10 @@ namespace Myriadbits.MXF.Validators
             {
                 runInHeaderOffset = (ulong)runIn.TotalLength;
             }
+
+            rip = File.GetRIP();
+            ripEntries = rip?.Children.OfType<MXFEntryRIP>();
+            partitions = this.File.GetPartitions().ToList();
         }
 
         /// <summary>
@@ -57,13 +63,6 @@ namespace Myriadbits.MXF.Validators
             List<MXFValidationResult> result = await Task.Run(() =>
             {
                 var retval = new List<MXFValidationResult>();
-                Stopwatch sw = Stopwatch.StartNew();
-
-                this.Description = "Validating RIP";
-
-                MXFRIP rip = this.File.GetRIP();
-
-                IEnumerable<MXFEntryRIP> ripEntries = rip?.Children.OfType<MXFEntryRIP>();
 
                 // TODO check if RIP is unique
 
@@ -79,7 +78,6 @@ namespace Myriadbits.MXF.Validators
 
                     // for every partition there must be a RIP entry
                     int ripEntryCount = rip.Children.Count;
-                    List<MXFPartition> partitions = this.File.GetPartitions().ToList();
                     int partitionCount = partitions.Count;
 
                     if (!RIPEntryCountEqualsPartitionCount(rip))
@@ -120,7 +118,6 @@ namespace Myriadbits.MXF.Validators
                 {
                     retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0075, null, null));
                 }
-                Log.ForContext<MXFValidatorRIP>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");
                 return retval;
 
             }, ct);
@@ -143,14 +140,12 @@ namespace Myriadbits.MXF.Validators
         // The pairs shall be stored in ascending Byte Offset order
         public bool AreAllRIPEntriesAscending(MXFRIP rip)
         {
-            var ripEntries = GetRIPEntries(rip);
             var orderedRipEntries = ripEntries.OrderBy(e => e.PartitionOffset);
             return Enumerable.SequenceEqual(ripEntries, orderedRipEntries);
         }
 
         public bool HasPartitionRIPEntry(MXFPartition p, MXFRIP rip)
         {
-            var ripEntries = GetRIPEntries(rip);
             return ripEntries.Any(e => e.PartitionOffset == (ulong)p.Offset);
         }
 
@@ -158,19 +153,8 @@ namespace Myriadbits.MXF.Validators
         public bool RIPEntryCountEqualsPartitionCount(MXFRIP rip)
         {
             int ripEntryCount = rip.Children.Count;
-            int partitionCount = this.File.GetPartitions().Count();
+            int partitionCount = partitions.Count();
             return ripEntryCount == partitionCount;
-        }
-
-        public IEnumerable<MXFEntryRIP> GetRIPEntries(MXFRIP rip)
-        {
-            return rip.Children.OfType<MXFEntryRIP>();
-        }
-
-        public bool IsRIPPresent()
-        {
-            // TODO beware of SingleOrDefault inside GetRip()
-            return File.GetRIP() != null;
         }
     }
 }
