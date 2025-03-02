@@ -93,14 +93,18 @@ namespace Myriadbits.MXF.Validators
 
         public bool AreIndexTableSegmentsInBodyPartitions()
         {
-            return this.File.GetBodyPartitions()?.Where(p => p.ContainsIndexTableSegments()).Any() ?? false;
+            if (AreBodyPartitionsPresent())
+            {
+                return this.File.GetBodyPartitions().Where(p => p.ContainsIndexTableSegments()).Any();
+            }
+            return false;
         }
 
         public bool HeaderPartitionContainsIndexTableSegments()
         {
             if (IsHeaderPartitionPresent() && IsHeaderPartitionUnique())
             {
-                return this.File.GetPartitions()?.First().ContainsIndexTableSegments() ?? false;
+                return this.File.GetPartitions().First().ContainsIndexTableSegments();
             }
             else return false;
         }
@@ -109,7 +113,16 @@ namespace Myriadbits.MXF.Validators
         {
             if (IsFooterPartitionPresent() && IsFooterPartitionUnique())
             {
-                return this.File.GetPartitions()?.Last().Children.Where(c => c is MXFIndexTableSegment).Any() ?? false;
+                return this.File.GetPartitions().Last().ContainsIndexTableSegments();
+            }
+            else return false;
+        }
+
+        public bool FooterPartitionContainsEssenceData()
+        {
+            if (IsFooterPartitionPresent() && IsFooterPartitionUnique())
+            {
+                return this.File.GetPartitions().Last().ContainsEssences();
             }
             else return false;
         }
@@ -119,6 +132,15 @@ namespace Myriadbits.MXF.Validators
             if (IsHeaderPartitionPresent() && IsHeaderPartitionUnique())
             {
                 return this.File.GetPartitions()?.First().Children.Any(c => c.IsMetadataLike()) ?? false;
+            }
+            else return false;
+        }
+
+        public bool HeaderPartitionContainsEssenceData()
+        {
+            if (IsHeaderPartitionPresent() && IsHeaderPartitionUnique())
+            {
+                return this.File.GetPartitions().First().ContainsEssences();
             }
             else return false;
         }
@@ -222,10 +244,16 @@ namespace Myriadbits.MXF.Validators
             var primerPack = p.Children.FirstOrDefault(c => c is MXFPrimerPack);
             var lastHeaderMetadata = p.Children.TakeWhile(c => c.IsHeaderMetadataLike() && !c.IsIndexLike())?.LastOrDefault();
 
-            // TODO: what if there are two or more consecutive filler?
+           
             if (primerPack != null && lastHeaderMetadata != null)
             {
                 expected = (ulong)(lastHeaderMetadata.Offset + lastHeaderMetadata.TotalLength) - (ulong)primerPack.Offset;
+            }
+
+            // TODO: what if there are two or more consecutive filler?
+            if (lastHeaderMetadata.NextSibling() is MXFFillerData filler)
+            {
+                expected += (ulong)filler.TotalLength;
             }
 
             return read == expected;
@@ -365,13 +393,13 @@ namespace Myriadbits.MXF.Validators
                     }
                     else
                     {
-                        var firstPartition = this.File.GetPartitions()?.First();
+                        var headerPartition = this.File.GetPartitions()?.First();
                         if (IsHeaderPartitionOpen())
                         {
                             retval.Add(ValidationRules.CreateValidationResult(
                                 ValidationRuleIDs.ID_0092,
-                                firstPartition,
-                                firstPartition?.Offset
+                                headerPartition,
+                                headerPartition.Offset
                             ));
                         }
 
@@ -379,8 +407,17 @@ namespace Myriadbits.MXF.Validators
                         {
                             retval.Add(ValidationRules.CreateValidationResult(
                                 ValidationRuleIDs.ID_0058,
-                                firstPartition,
-                                firstPartition?.Offset
+                                headerPartition,
+                                headerPartition.Offset
+                            ));
+                        }
+
+                        if (HeaderPartitionContainsEssenceData())
+                        {
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0080,
+                                headerPartition,
+                                headerPartition.Offset
                             ));
                         }
 
@@ -388,8 +425,8 @@ namespace Myriadbits.MXF.Validators
                         {
                             retval.Add(ValidationRules.CreateValidationResult(
                                 ValidationRuleIDs.ID_0051,
-                                firstPartition,
-                                firstPartition?.Offset
+                                headerPartition,
+                                headerPartition.Offset
                             ));
                         }
                     }
@@ -408,19 +445,29 @@ namespace Myriadbits.MXF.Validators
 
                     if (IsFooterPartitionPresent())
                     {
-                        var lastPartition = this.File.GetPartitions().Last();
+                        var footerPartition = this.File.GetPartitions().Last();
                         retval.Add(ValidationRules.CreateValidationResult(
                             ValidationRuleIDs.ID_0708,
-                            lastPartition,
-                            lastPartition.Offset
+                            footerPartition,
+                            footerPartition.Offset
                         ));
 
                         if (FooterPartitionContainsIndexTableSegments())
                         {
                             retval.Add(ValidationRules.CreateValidationResult(
                                 ValidationRuleIDs.ID_0053,
-                                lastPartition,
-                                lastPartition.Offset
+                                footerPartition,
+                                footerPartition.Offset
+                            ));
+                        }
+
+                        // The Footer Partition shall not have Essence Container data
+                        if (FooterPartitionContainsEssenceData())
+                        {
+                            retval.Add(ValidationRules.CreateValidationResult(
+                                ValidationRuleIDs.ID_0719,
+                                footerPartition,
+                                footerPartition.Offset
                             ));
                         }
 
@@ -433,6 +480,12 @@ namespace Myriadbits.MXF.Validators
                                 footer,
                                 footer.Offset
                             ));
+                        }
+
+                        // TODO The footer shall not contain essence data
+                        if (footer.ContainsEssences())
+                        {
+
                         }
                     }
 
@@ -586,7 +639,7 @@ namespace Myriadbits.MXF.Validators
                 ));
             }
 
-            // TODO Check body SID
+            // TODO Check body SID (but not for the footer)
             if (!IsBodySIDCorrect(p))
             {
                 if (p.BodySID > 0)
@@ -607,7 +660,6 @@ namespace Myriadbits.MXF.Validators
                     p.PartitionNumber
                     ));
                 }
-
             }
 
             // TODO Check index SID

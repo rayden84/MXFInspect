@@ -268,6 +268,15 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Header Partition contains essence data.
+        /// </summary>
+        internal static string ID_0080 {
+            get {
+                return ResourceManager.GetString("ID_0080", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to KAG.
         /// </summary>
         internal static string ID_0084 {
@@ -552,6 +561,15 @@ namespace Myriadbits.MXF.Properties {
         internal static string ID_0718 {
             get {
                 return ResourceManager.GetString("ID_0718", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Footer Partition shall not contain essence data.
+        /// </summary>
+        internal static string ID_0719 {
+            get {
+                return ResourceManager.GetString("ID_0719", resourceCulture);
             }
         }
     }

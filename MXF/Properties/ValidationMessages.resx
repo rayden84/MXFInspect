@@ -295,4 +295,10 @@
   <data name="ID_0103" xml:space="preserve">
     <value>Partition #{0} contains no essences, although BodySID &gt; 0 signals essences</value>
   </data>
+  <data name="ID_0080" xml:space="preserve">
+    <value>The Header Partition contains essence data</value>
+  </data>
+  <data name="ID_0719" xml:space="preserve">
+    <value>The Footer Partition shall not contain essence data</value>
+  </data>
 </root>
