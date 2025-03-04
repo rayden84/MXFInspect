@@ -75,8 +75,9 @@ namespace Myriadbits.MXF
         public UInt32? ColorRange { get; set; }
 
         public MXFCDCIDescriptor(MXFPack pack)
-            : base(pack, "CDCI Descriptor")
+            : base(pack)
         {
+            MetaDataName = "CDCI Descriptor";
         }
 
         protected override bool ReadLocalTagValue(IKLVStreamReader reader, MXFLocalTag localTag)

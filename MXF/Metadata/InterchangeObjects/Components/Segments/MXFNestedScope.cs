@@ -28,10 +28,11 @@ namespace Myriadbits.MXF
     [ULGroup("urn:smpte:ul:060e2b34.027f0101.0d010101.01010b00")]
 	public class MXFNestedScope : MXFSegment
 	{
-		public MXFNestedScope(MXFPack pack, string metadataName)
-			: base(pack, metadataName)
+		public MXFNestedScope(MXFPack pack)
+			: base(pack)
 		{
-		}
+            MetaDataName = "NestedScope";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

@@ -72,8 +72,9 @@ namespace Myriadbits.MXF
 
 
         public MXFPreface(MXFPack pack)
-            : base(pack, "Preface")
+            : base(pack)
         {
+            MetaDataName = "Preface";
         }
 
         /// <summary>

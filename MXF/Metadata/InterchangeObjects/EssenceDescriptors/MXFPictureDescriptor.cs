@@ -194,18 +194,9 @@ namespace Myriadbits.MXF
         /// <param name="reader"></param>
         /// <param name="pack"></param>
         public MXFPictureDescriptor(MXFPack pack)
-            : base(pack, "Picture Descriptor")
+            : base(pack)
         {
-        }
-
-        /// <summary>
-        /// Constructor, set the correct descriptor name
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="pack"></param>
-        public MXFPictureDescriptor(MXFPack pack, string metadataName)
-            : base(pack, metadataName)
-        {
+            MetaDataName = "Picture Descriptor";
         }
 
         /// <summary>

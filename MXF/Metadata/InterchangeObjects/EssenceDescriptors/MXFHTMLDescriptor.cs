@@ -30,8 +30,9 @@ namespace Myriadbits.MXF
     {
         
         public MXFHTMLDescriptor(MXFPack pack)
-            : base(pack, "HTMLDescriptor")
+            : base(pack)
         {
+            MetaDataName = "MXFHTMLDescriptor";
         }
     }
 }

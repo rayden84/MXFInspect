@@ -61,9 +61,10 @@ namespace Myriadbits.MXF
         public MXFPosition? PackageMarkOutPosition { get; set; }
 
 		public MXFTimelineTrack(MXFPack pack)
-			: base(pack, "Timeline Track")
+			: base(pack)
 		{
-		}
+			MetaDataName = "Timeline Track";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

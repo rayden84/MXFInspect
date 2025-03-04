@@ -39,10 +39,9 @@ namespace Myriadbits.MXF
         [Browsable(false)]
         public string MetaDataName { get; protected set; }
 
-        public MXFMetadataBaseclass(MXFPack pack, string metaDataName)
+        public MXFMetadataBaseclass(MXFPack pack)
             : base(pack)
         {
-            MetaDataName = metaDataName;
         }
 
         public override string ToString()

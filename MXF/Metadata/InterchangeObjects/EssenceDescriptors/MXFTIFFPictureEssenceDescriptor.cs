@@ -36,8 +36,9 @@ namespace Myriadbits.MXF
 		/// <param name="reader"></param>
 		/// <param name="pack"></param>
 		public MXFTIFFPictureEssenceDescriptor(MXFPack pack)
-			: base(pack, "TIFFEssenceDescriptor")
+			: base(pack)
 		{
-		}
+			MetaDataName = "TIFFPictureEssenceDescriptor";
+        }
 	}
 }

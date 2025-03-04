@@ -70,8 +70,9 @@ namespace Myriadbits.MXF
         /// <param name="reader"></param>
         /// <param name="pack"></param>
         public MXFAES3PCMDescriptor(MXFPack pack)
-            : base(pack, "AES3 PCM Descriptor")
+            : base(pack)
         {
+            MetaDataName = "AES3 PCM Descriptor";
         }
 
 

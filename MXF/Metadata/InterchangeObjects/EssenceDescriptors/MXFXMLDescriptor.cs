@@ -44,7 +44,7 @@ namespace Myriadbits.MXF
         public string[] NamespacePrefixes { get; set; }
 
         public MXFXMLDescriptor(MXFPack pack)
-            : base(pack, "XML Descriptor")
+            : base(pack)
         {
             MetaDataName = "XML Descriptor";
         }

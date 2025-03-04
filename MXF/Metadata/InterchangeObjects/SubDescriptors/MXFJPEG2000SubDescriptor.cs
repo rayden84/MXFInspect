@@ -130,8 +130,9 @@ namespace Myriadbits.MXF
 
 
         public MXFJPEG2000SubDescriptor(MXFPack pack)
-            : base(pack, "JPEG2000SubDescriptor")
+            : base(pack)
         {
+            MetaDataName = "JPEG2000SubDescriptor";
         }
 
         /// <summary>

@@ -30,10 +30,11 @@ namespace Myriadbits.MXF
 	public class MXFEssenceDescriptor : MXFInterchangeObject
 	{
 		private readonly UL subDescriptorKey = new UL(0x06,0x0E,0x2B,0x34,0x01,0x01,0x01,0x09,0x06,0x01,0x01,0x04,0x06,0x10,0x00,0x00);
-		public MXFEssenceDescriptor(MXFPack pack, string metadataName)
-			: base(pack, metadataName)
+		public MXFEssenceDescriptor(MXFPack pack)
+			: base(pack)
 		{
-		}
+			MetaDataName = "EssenceDescriptor";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

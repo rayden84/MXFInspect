@@ -51,8 +51,9 @@ namespace Myriadbits.MXF
         public UInt32[] MonoSourceTrackIDs { get; set; }
 
         public MXFSourceReference(MXFPack pack)
-            : base(pack, "SourceReference")
+            : base(pack)
         {
+            MetaDataName = "SourceReference";
         }
 
         /// <summary>

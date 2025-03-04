@@ -49,8 +49,9 @@ namespace Myriadbits.MXF
         public MXFFilm? EdgeCodeFilmFormat { get; set; }
 
         public MXFEdgeCode(MXFPack pack)
-            : base(pack, "EdgeCode")
+            : base(pack)
         {
+            MetaDataName = "EdgeCode";
         }
 
         /// <summary>

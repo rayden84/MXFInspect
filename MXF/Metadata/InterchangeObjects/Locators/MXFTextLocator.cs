@@ -36,8 +36,9 @@ namespace Myriadbits.MXF
         public string LocationName { get; set; }
 
         public MXFTextLocator(MXFPack pack)
-            : base(pack, "Text Locator")
+            : base(pack)
         {
+            MetaDataName = "Text Locator";
         }
 
         /// <summary>

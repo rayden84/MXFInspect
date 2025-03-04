@@ -29,8 +29,9 @@ namespace Myriadbits.MXF
     public class MXFEssenceGroup : MXFSegment
     {
         public MXFEssenceGroup(MXFPack pack)
-            : base(pack, "EssenceGroup")
+            : base(pack)
         {
+            MetaDataName = "EssenceGroup";
         }
 
         /// <summary>

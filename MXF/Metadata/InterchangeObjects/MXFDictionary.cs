@@ -31,8 +31,9 @@ namespace Myriadbits.MXF
     public class MXFDictionary : MXFInterchangeObject
     {
         public MXFDictionary(MXFPack pack)
-            : base(pack, "Dictionary")
+            : base(pack)
         {
+            MetaDataName = "Dictionary";
         }
 
         /// <summary>

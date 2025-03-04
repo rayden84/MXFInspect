@@ -26,9 +26,10 @@ namespace Myriadbits.MXF
     [ULGroup("urn:smpte:ul:060e2b34.027f0101.0d010101.01015300")]
 	public class MXFSGMLDescriptor : MXFSoundEssenceDescriptor
 	{
-		public MXFSGMLDescriptor(MXFPack pack, string name)
-			: base(pack, "SGML Descriptor")
+		public MXFSGMLDescriptor(MXFPack pack)
+			: base(pack)
 		{
-		}
+            MetaDataName = "SGML Descriptor";
+        }
 	}
 }

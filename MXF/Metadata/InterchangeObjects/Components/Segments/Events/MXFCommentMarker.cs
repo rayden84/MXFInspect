@@ -30,8 +30,9 @@ namespace Myriadbits.MXF
     {
 
         public MXFCommentMarker(MXFPack pack)
-            : base(pack, "Comment Marker")
+            : base(pack)
         {
+            MetaDataName = "Comment Marker";
         }
 
         /// <summary>

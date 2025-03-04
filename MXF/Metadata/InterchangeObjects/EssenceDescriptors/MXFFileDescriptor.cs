@@ -57,9 +57,10 @@ namespace Myriadbits.MXF
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="pack"></param>
-        public MXFFileDescriptor(MXFPack pack, string metadataName)
-            : base(pack, metadataName)
+        public MXFFileDescriptor(MXFPack pack)
+            : base(pack)
         {
+            MetaDataName = "MXFFileDescriptor";
         }
 
         /// <summary>

@@ -30,8 +30,9 @@ namespace Myriadbits.MXF
     {
         
         public MXFPhysicalDescriptor(MXFPack pack)
-            : base(pack, "Physical Descriptor")
+            : base(pack)
         {
+            MetaDataName = "Physical Descriptor";
         }
     }
 }

@@ -51,8 +51,9 @@ namespace Myriadbits.MXF
         /// <param name="reader"></param>
         /// <param name="pack"></param>
         public MXFMPEGAudioDescriptor(MXFPack pack)
-            : base(pack, "MPEG AudioDescriptor")
+            : base(pack)
         {
+            MetaDataName = "MPEG AudioDescriptor";
         }
 
         protected override bool ReadLocalTagValue(IKLVStreamReader reader, MXFLocalTag localTag)

@@ -37,8 +37,9 @@ namespace Myriadbits.MXF
         public UInt32 BypassOverride { get; private set; }
 
         public MXFOperationGroup(MXFPack pack)
-            : base(pack, "OperationGroup")
+            : base(pack)
         {
+            MetaDataName = "OperationGroup";
         }
 
         /// <summary>

@@ -30,9 +30,9 @@ namespace Myriadbits.MXF
     {
 
         public MXFTypeDefinition(MXFPack pack)
-            : base(pack, "TypeDefinition")
+            : base(pack)
         {
-            this.MetaDataName = "TypeDefinition";
+            MetaDataName = "TypeDefinition";
         }
     }
 }

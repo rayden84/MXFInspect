@@ -35,9 +35,10 @@ namespace Myriadbits.MXF
         [ULElement("urn:smpte:ul:060e2b34.01010108.04090401.00000000")]
         public string MIMEEncoding { get; set; }
         
-        public MXFParsedTextDescriptor(MXFPack pack, string metadataName)
-            : base(pack, metadataName)
+        public MXFParsedTextDescriptor(MXFPack pack)
+            : base(pack)
         {
+            MetaDataName = "ParsedTextDescriptor";
         }
 
         protected override bool ReadLocalTagValue(IKLVStreamReader reader, MXFLocalTag localTag)

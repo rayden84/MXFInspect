@@ -37,8 +37,9 @@ namespace Myriadbits.MXF
 
 
         public MXFParameter(MXFPack pack)
-            : base(pack, "Parameter")
+            : base(pack)
         {
+            MetaDataName = "Parameter";
         }
 
         /// <summary>

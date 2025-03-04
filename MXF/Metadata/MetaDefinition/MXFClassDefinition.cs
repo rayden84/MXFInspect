@@ -37,7 +37,7 @@ namespace Myriadbits.MXF
         public bool IsConcrete { get; set; }
 
         public MXFClassDefinition(MXFPack pack)
-            : base(pack, "ClassDefinition")
+            : base(pack)
         {
             this.MetaDataName = "ClassDefinition";
         }

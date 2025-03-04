@@ -28,10 +28,11 @@ namespace Myriadbits.MXF
     [ULGroup("urn:smpte:ul:060e2b34.027f0101.0d010101.01013100")]
 	public class MXFLocator : MXFInterchangeObject
 	{
-		public MXFLocator(MXFPack pack, string metadataName)
-			: base(pack, "Locator")
+		public MXFLocator(MXFPack pack)
+			: base(pack)
 		{
-		}
+            MetaDataName = "Locator";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

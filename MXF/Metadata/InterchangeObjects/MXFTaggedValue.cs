@@ -40,8 +40,9 @@ namespace Myriadbits.MXF
         public object IndirectValue { get; set; }
 
         public MXFTaggedValue(MXFPack pack)
-            : base(pack, "TaggedValue")
+            : base(pack)
         {
+            MetaDataName = "TaggedValue";
         }
 
         protected override bool ReadLocalTagValue(IKLVStreamReader reader, MXFLocalTag localTag)

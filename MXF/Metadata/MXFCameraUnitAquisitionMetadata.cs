@@ -139,8 +139,9 @@ namespace Myriadbits.MXF
 
 
         public MXFCameraUnitAquisitionMetadata(MXFPack pack)
-            : base(pack, "CameraUnitAquisitionMetadata")
+            : base(pack)
         {
+            MetaDataName = "CameraUnitAquisitionMetadata";
         }
 
 

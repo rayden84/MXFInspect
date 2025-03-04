@@ -37,8 +37,9 @@ namespace Myriadbits.MXF
         public byte[] WaveSummary { get; set; }
         
         public MXFWAVEDescriptor(MXFPack pack)
-            : base(pack, "WAVEDescriptor")
+            : base(pack)
         {
+            MetaDataName = "WAVEDescriptor";
         }
 
         protected override bool ReadLocalTagValue(IKLVStreamReader reader, MXFLocalTag localTag)

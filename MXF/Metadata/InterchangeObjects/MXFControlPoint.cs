@@ -45,9 +45,10 @@ namespace Myriadbits.MXF
 
 
 		public MXFControlPoint(MXFPack pack)
-			: base(pack, "ControlPoint")
+			: base(pack)
 		{
-		}
+            MetaDataName = "ControlPoint";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

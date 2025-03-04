@@ -75,23 +75,9 @@ namespace Myriadbits.MXF
         /// <param name="reader"></param>
         /// <param name="pack"></param>
         public MXFDCTimedTextDescriptor(MXFPack pack)
-            : base(pack, "DC Timed Text Descriptor")
+            : base(pack)
         {
             this.MetaDataName = this.Key.Name;
-        }
-
-        /// <summary>
-        /// Constructor, set the correct descriptor name
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="pack"></param>
-        public MXFDCTimedTextDescriptor(MXFPack pack, string metadataName)
-            : base(pack, metadataName)
-        {
-
-
-
-
         }
 
         protected override bool ReadLocalTagValue(IKLVStreamReader reader, MXFLocalTag localTag)

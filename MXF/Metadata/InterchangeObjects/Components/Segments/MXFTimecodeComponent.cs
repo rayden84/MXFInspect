@@ -45,13 +45,9 @@ namespace Myriadbits.MXF
         public bool? DropFrame { get; set; }
 
         public MXFTimecodeComponent(MXFPack pack)
-            : base(pack, "TimeCodeComponent")
+            : base(pack)
         {
-        }
-
-        public MXFTimecodeComponent(MXFPack pack, string metadataName)
-            : base(pack, metadataName)
-        {
+            MetaDataName = "TimecodeComponent";
         }
 
         /// <summary>

@@ -37,8 +37,9 @@ namespace Myriadbits.MXF
         public UUID InstanceId { get; set; }
 
         public MXFMetaDictionary(MXFPack pack)
-            : base(pack, "MetaDictionary")
+            : base(pack)
         {
+            MetaDataName = "MetaDictionary";
         }
 
 
