@@ -142,7 +142,7 @@ namespace Myriadbits.MXF.Identifiers
 
         public IEnumerable<byte> LastBytesQuadruple()
         {
-            return this.GetRange(12, 4);
+            return GetRange(12, 4).ToArray();
         }
 
         public bool IdentifiesLocalSet()

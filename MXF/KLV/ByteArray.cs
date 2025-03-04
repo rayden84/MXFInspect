@@ -31,12 +31,12 @@ namespace Myriadbits.MXF
 {
     public class ByteArray : IEquatable<ByteArray>, IArrayLength
     {
-        private readonly ImmutableArray<byte> theBytes;
+        private readonly ReadOnlyMemory<byte> theBytes;
 
         [Browsable(false)]
         public int ArrayLength => theBytes.Length;
 
-        public byte this[int index] => theBytes[index];
+        public byte this[int index] => theBytes.Span[index];
 
         public ByteArray(params byte[] bytes)
         {
@@ -44,14 +44,11 @@ namespace Myriadbits.MXF
             {
                 throw new ArgumentNullException(nameof(bytes), "bytes cannot be null");
             }
-            else if (bytes.Length == 0)
+            if (bytes.Length == 0)
             {
                 throw new ArgumentException("There must at least be one byte", nameof(bytes));
             }
-            else
-            {
-                theBytes = ImmutableArray.Create(bytes);
-            }
+            theBytes = new ReadOnlyMemory<byte>(bytes);
         }
 
         public bool HasSameBeginning(ByteArray other)
@@ -66,33 +63,31 @@ namespace Myriadbits.MXF
                 }
             }
             return true;
-
         }
 
-        public ImmutableArray<byte> GetRange(int start, int length)
+        public ReadOnlyMemory<byte> GetRange(int start, int length)
         {
-            return ImmutableArray.CreateRange(theBytes, start, length, (b => b));
+            return theBytes.Slice(start, length);
         }
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            for (int n = 0; n < this.ArrayLength; n++)
+            int length = Math.Min(this.ArrayLength, 16);
+            for (int n = 0; n < length; n++)
             {
-                if (n > 0 && n < 16)
+                if (n > 0)
                 {
                     sb.Append('.');
                 }
-                if (n >= 16)
-                {
-                    sb.Append("...");
-                    break;
-                }
-                sb.Append(string.Format("{0:x2}", this[n]));
+                sb.AppendFormat("{0:x2}", this[n]);
+            }
+            if (this.ArrayLength > 16)
+            {
+                sb.Append("...");
             }
             return sb.ToString();
         }
-
 
         #region Equals
         public bool Equals(ByteArray other)
@@ -100,7 +95,7 @@ namespace Myriadbits.MXF
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return this.theBytes.SequenceEqual(other.theBytes);
+            return this.theBytes.Span.SequenceEqual(other.theBytes.Span);
         }
 
         public override bool Equals(object obj)
@@ -110,6 +105,7 @@ namespace Myriadbits.MXF
             if (obj is not ByteArray) return false;
             return Equals((ByteArray)obj);
         }
+
 
         //see https://stackoverflow.com/a/468084 and https://stackoverflow.com/a/53316768
         public override int GetHashCode()
@@ -126,7 +122,7 @@ namespace Myriadbits.MXF
                 int hash = (int)2166136261;
 
                 for (int i = 0; i < arrayLength; i++)
-                    hash = (hash ^ theBytes[i]) * p;
+                    hash = (hash ^ theBytes.Span[i]) * p;
 
                 hash += hash << 13;
                 hash ^= hash >> 7;
@@ -137,8 +133,8 @@ namespace Myriadbits.MXF
             }
         }
 
-        public static bool operator ==(ByteArray x, ByteArray y) { return Equals(x, y); }
-        public static bool operator !=(ByteArray x, ByteArray y) { return !Equals(x, y); }
+        public static bool operator ==(ByteArray x, ByteArray y) => Equals(x, y);
+        public static bool operator !=(ByteArray x, ByteArray y) => !Equals(x, y);
         #endregion
     }
 
