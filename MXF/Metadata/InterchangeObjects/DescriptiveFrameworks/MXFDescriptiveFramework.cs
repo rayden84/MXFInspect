@@ -33,9 +33,10 @@ namespace Myriadbits.MXF
 		public readonly UL linkedDMPluginID_Key = new UL(0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x0c, 0x05, 0x20, 0x07, 0x01, 0x0c, 0x00, 0x00, 0x00);
 
 		public MXFDescriptiveFramework(MXFPack pack)
-			: base(pack, "DescriptiveFramework")
+			: base(pack)
 		{
-		}
+			MetaDataName = "DescriptiveFramework";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

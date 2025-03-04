@@ -29,8 +29,9 @@ namespace Myriadbits.MXF
 	public class MXFContainerConstraintsSubDescriptor : MXFSubDescriptor
 	{
 		public MXFContainerConstraintsSubDescriptor(MXFPack pack)
-			: base(pack, "ContainerConstraintsSubDescriptor")
+			: base(pack)
 		{
-		}
+			MetaDataName = "ContainerConstraintsSubDescriptor";
+        }
 	}
 }

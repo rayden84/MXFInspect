@@ -78,8 +78,9 @@ namespace Myriadbits.MXF
 
 
         public MXFEssenceContainerData(MXFPack pack)
-            : base(pack, "EssenceContainerData")
+            : base(pack)
         {
+            MetaDataName = "EssenceContainerData";
         }
 
         /// <summary>

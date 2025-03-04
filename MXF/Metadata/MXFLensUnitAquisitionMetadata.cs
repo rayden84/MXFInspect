@@ -84,8 +84,9 @@ namespace Myriadbits.MXF
 
 
         public MXFLensUnitAquisitionMetadata(MXFPack pack)
-            : base(pack, "LensUnitAquisitionMetadata")
+            : base(pack)
         {
+            MetaDataName = "LensUnitAquisitionMetadata";
         }
 
 

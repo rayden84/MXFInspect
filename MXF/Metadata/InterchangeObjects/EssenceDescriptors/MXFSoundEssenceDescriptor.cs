@@ -82,18 +82,9 @@ namespace Myriadbits.MXF
         /// <param name="reader"></param>
         /// <param name="pack"></param>
         public MXFSoundEssenceDescriptor(MXFPack pack)
-            : base(pack, "Sound Essence Descriptor")
+            : base(pack)
         {
-        }
-
-        /// <summary>
-        /// Constructor, set the correct descriptor name
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="pack"></param>
-        public MXFSoundEssenceDescriptor(MXFPack pack, string metadataName)
-            : base(pack, metadataName)
-        {
+            MetaDataName = "Sound Essence Descriptor";
         }
 
         /// <summary>

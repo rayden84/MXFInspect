@@ -46,8 +46,9 @@ namespace Myriadbits.MXF
         public string DefinitionObjectDescription { get; set; }
 
         public MXFDefinitionObject(MXFPack pack)
-            : base(pack, "DefinitionObject")
+            : base(pack)
         {
+            MetaDataName = "DefinitionObject";
         }
 
         /// <summary>

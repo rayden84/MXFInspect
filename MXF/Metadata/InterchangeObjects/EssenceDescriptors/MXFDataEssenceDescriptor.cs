@@ -42,7 +42,7 @@ namespace Myriadbits.MXF
         /// <param name="reader"></param>
         /// <param name="pack"></param>
         public MXFDataEssenceDescriptor(MXFPack pack)
-            : base(pack, "Data Essence Descriptor")
+            : base(pack)
         {
             // TODO remove code, once implemented the subclasses
             if (pack.Key[14] == 0x5B)
@@ -50,16 +50,6 @@ namespace Myriadbits.MXF
             if (pack.Key[14] == 0x5C)
                 this.Key.Name = "ANC Data Descriptor";
             this.MetaDataName = this.Key.Name;
-        }
-
-        /// <summary>
-        /// Constructor, set the correct descriptor name
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="pack"></param>
-        public MXFDataEssenceDescriptor(MXFPack pack, string metadataName)
-            : base(pack, metadataName)
-        {
         }
 
         /// <summary>

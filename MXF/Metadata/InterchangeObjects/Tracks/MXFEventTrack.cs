@@ -40,9 +40,10 @@ namespace Myriadbits.MXF
 		public MXFPosition? EventTrackOrigin { get; set; }
 
 		public MXFEventTrack(MXFPack pack)
-			: base(pack, "Event Track")
+			: base(pack)
 		{
-		}
+			MetaDataName = "Event Track";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

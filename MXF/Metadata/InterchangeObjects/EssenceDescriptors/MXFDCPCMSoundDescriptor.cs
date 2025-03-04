@@ -28,8 +28,9 @@ namespace Myriadbits.MXF
 
     {
         public MXFDCPCMSoundDescriptor(MXFPack pack)
-			: base(pack, "DC PCM Descriptor")
+			: base(pack)
 		{
-		}
+			MetaDataName = "DC PCM Sound Descriptor";
+        }
 	}
 }

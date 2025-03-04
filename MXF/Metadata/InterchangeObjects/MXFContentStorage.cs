@@ -29,9 +29,10 @@ namespace Myriadbits.MXF
 	public class MXFContentStorage : MXFInterchangeObject
 	{
 		public MXFContentStorage(MXFPack pack)
-			: base(pack, "ContentStorage")
+			: base(pack)
 		{
-		}
+            MetaDataName = "ContentStorage";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

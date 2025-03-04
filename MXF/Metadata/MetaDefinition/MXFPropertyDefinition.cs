@@ -50,9 +50,9 @@ namespace Myriadbits.MXF
         public bool IsUniqueIdentifier { get; set; }
 
         public MXFPropertyDefinition(MXFPack pack)
-            : base(pack, "PropertyDefinition")
+            : base(pack)
         {
-            this.MetaDataName = "PropertyDefinition";
+            MetaDataName = "PropertyDefinition";
         }
 
 

@@ -75,9 +75,10 @@ namespace Myriadbits.MXF
 		/// <param name="reader"></param>
 		/// <param name="pack"></param>
 		public MXFRGBAPictureEssenceDescriptor(MXFPack pack)
-			: base(pack, "RGBA Picture Essence Descriptor")
+			: base(pack)
 		{
-		}
+			MetaDataName = "RGBA Picture Essence Descriptor";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

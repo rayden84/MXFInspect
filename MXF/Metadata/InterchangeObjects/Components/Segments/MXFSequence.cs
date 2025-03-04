@@ -29,9 +29,9 @@ namespace Myriadbits.MXF
 	public class MXFSequence : MXFSegment
 	{
 		public MXFSequence(MXFPack pack)
-			: base(pack, "Sequence")
+			: base(pack)
 		{
-			this.MetaDataName = "Sequence";
+			MetaDataName = "Sequence";
 		}
 
 		/// <summary>

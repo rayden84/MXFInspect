@@ -58,8 +58,9 @@ namespace Myriadbits.MXF
         public bool IsContiguous { get; set; }
 
         public MXFTIFFDescriptor(MXFPack pack)
-            : base(pack, "TIFFDescriptor")
+            : base(pack)
         {
+            MetaDataName = "TIFFDescriptor";
         }
 
         protected override bool ReadLocalTagValue(IKLVStreamReader reader, MXFLocalTag localTag)

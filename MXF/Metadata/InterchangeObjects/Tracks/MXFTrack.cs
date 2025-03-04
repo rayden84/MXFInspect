@@ -47,15 +47,10 @@ namespace Myriadbits.MXF
 
 
 		public MXFTrack(MXFPack pack)
-			: base(pack, "Generic Track")
+			: base(pack)
 		{
-		}
-
-
-		public MXFTrack(MXFPack pack, string metadataName)
-			: base(pack, metadataName)
-		{
-		}
+            MetaDataName = "Track";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

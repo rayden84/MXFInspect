@@ -61,8 +61,9 @@ namespace Myriadbits.MXF
         public UInt32? ACESMasteringDisplayMinimumLuminance { get; set; }
 
         public MXFACESPictureSubDescriptor(MXFPack pack)
-            : base(pack, "ACESPictureSubDescriptor")
+            : base(pack)
         {
+            MetaDataName = "ACESPictureSubDescriptor";
         }
 
         /// <summary>

@@ -35,9 +35,10 @@ namespace Myriadbits.MXF
         /// </summary>
 
         public MXFFiller(MXFPack pack)
-			: base(pack, "Filler")
+			: base(pack)
 		{
-		}
+            MetaDataName = "Filler";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

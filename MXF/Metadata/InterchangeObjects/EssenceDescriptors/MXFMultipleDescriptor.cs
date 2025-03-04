@@ -34,9 +34,10 @@ namespace Myriadbits.MXF
 		/// <param name="reader"></param>
 		/// <param name="pack"></param>
 		public MXFMultipleDescriptor(MXFPack pack)
-			: base(pack, "Multiple Descriptor")
+			: base(pack)
 		{
-		}
+            MetaDataName = "Multiple Descriptor";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

@@ -77,8 +77,9 @@ namespace Myriadbits.MXF
 
 
         public MXFJPEGXSSubDescriptor(MXFPack pack)
-            : base(pack, "JPEGXS SubDescriptor")
+            : base(pack)
         {
+            MetaDataName = "JPEGXS SubDescriptor";
         }
 
         /// <summary>

@@ -112,8 +112,9 @@ namespace Myriadbits.MXF
 
 
         public MXFAVCSubDescriptor(MXFPack pack)
-            : base(pack, "AVCSubDescriptor")
+            : base(pack)
         {
+            MetaDataName = "AVCSubDescriptor";
         }
 
         /// <summary>

@@ -36,9 +36,9 @@ namespace Myriadbits.MXF
 		public string URLString { get; set; }
 
 		public MXFNetworkLocator(MXFPack pack)
-			: base(pack, "Network Locator")
+			: base(pack)
 		{
-			this.MetaDataName = "Network Locator";
+			MetaDataName = "Network Locator";
 		}
 
 		/// <summary>

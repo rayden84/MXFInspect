@@ -91,8 +91,9 @@ namespace Myriadbits.MXF
 
 
         public MXFIndexTableSegment(MXFPack pack)
-            : base(pack, "IndexTableSegment") //base(pack, "IndexTableSegment", KeyType.IndexSegment)
+            : base(pack) //base(pack, "IndexTableSegment", KeyType.IndexSegment)
         {
+            MetaDataName = "IndexTableSegment";
         }
 
 

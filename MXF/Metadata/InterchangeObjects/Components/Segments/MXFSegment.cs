@@ -28,10 +28,11 @@ namespace Myriadbits.MXF
     [ULGroup("urn:smpte:ul:060e2b34.027f0101.0d010101.01010300")]
 	public class MXFSegment : MXFStructuralComponent
 	{
-		public MXFSegment(MXFPack pack, string metadataName)
-			: base(pack, metadataName)
+		public MXFSegment(MXFPack pack)
+			: base(pack)
 		{
-		}
+            MetaDataName = "Segment";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

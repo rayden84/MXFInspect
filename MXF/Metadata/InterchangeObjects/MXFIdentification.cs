@@ -71,9 +71,10 @@ namespace Myriadbits.MXF
         public AUID GenerationID { get; set; }
 
 		public MXFIdentification(MXFPack pack)
-			: base(pack, "Identification")
+			: base(pack)
 		{
-		}
+			MetaDataName = "Identification";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

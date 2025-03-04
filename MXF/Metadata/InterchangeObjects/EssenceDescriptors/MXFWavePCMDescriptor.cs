@@ -94,18 +94,9 @@ namespace Myriadbits.MXF
         /// <param name="reader"></param>
         /// <param name="pack"></param>
         public MXFWAVEPCMDescriptor(MXFPack pack)
-            : base(pack, "WAVE PCM Descriptor")
+            : base(pack)
         {
-        }
-
-        /// <summary>
-        /// Constructor, set the correct descriptor name
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="pack"></param>
-        public MXFWAVEPCMDescriptor(MXFPack pack, string metadataName)
-            : base(pack, metadataName)
-        {
+            MetaDataName = "WAVE PCM Descriptor";
         }
 
         /// <summary>

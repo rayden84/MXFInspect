@@ -43,8 +43,9 @@ namespace Myriadbits.MXF
         /// <param name="reader"></param>
         /// <param name="pack"></param>
         public MXFAIFCDescriptor(MXFPack pack)
-            : base(pack, "AIFCDescriptor")
+            : base(pack)
         {
+            MetaDataName = "AIFCDescriptor";
         }
 
         /// <summary>

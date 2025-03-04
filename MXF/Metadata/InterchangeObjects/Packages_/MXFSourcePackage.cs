@@ -30,9 +30,10 @@ namespace Myriadbits.MXF
 	public class MXFSourcePackage : MXFPackage
 	{
 		public MXFSourcePackage(MXFPack pack)
-			: base(pack, "Source Package")
+			: base(pack)
 		{
-		}
+			MetaDataName = "Source Package";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

@@ -36,10 +36,11 @@ namespace Myriadbits.MXF
 		[ULElement("urn:smpte:ul:060e2b34.01010102.07020103.01060000")]
 		public MXFPosition? CutPoint { get; set; }
 		
-		public MXFTransition(MXFPack pack, string metadataName)
-			: base(pack, "Transition")
+		public MXFTransition(MXFPack pack)
+			: base(pack)
 		{
-		}
+			MetaDataName = " Transition";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

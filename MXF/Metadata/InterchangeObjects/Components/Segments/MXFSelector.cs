@@ -29,9 +29,10 @@ namespace Myriadbits.MXF
     public class MXFSelector : MXFSegment
     {
 
-        public MXFSelector(MXFPack pack, string metadataName)
-            : base(pack, "Selector")
+        public MXFSelector(MXFPack pack)
+            : base(pack)
         {
+            MetaDataName = "Selector";
         }
 
         /// <summary>

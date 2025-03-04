@@ -29,9 +29,10 @@ namespace Myriadbits.MXF
 	public class MXFMCALabelSubDescriptor : MXFSubDescriptor
     {
 		public MXFMCALabelSubDescriptor(MXFPack pack)
-			: base(pack, "MCALabelSubDescriptor")
+			: base(pack)
 		{
-		}
+			MetaDataName = "MCALabelSubDescriptor";
+        }
 
 	}
 }

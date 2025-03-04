@@ -35,10 +35,11 @@ namespace Myriadbits.MXF
 		[ULElement("urn:smpte:ul:060e2b34.01010101.05300401.00000000")]
 		public bool? ActiveState { get; set; }
 
-		public MXFGPITrigger(MXFPack pack, string metadataName)
-			: base(pack, "GPITrigger")
+		public MXFGPITrigger(MXFPack pack)
+			: base(pack)
 		{
-		}
+			MetaDataName = "GPITrigger";
+        }
 
 		/// <summary>
 		/// Overridden method to process local tags

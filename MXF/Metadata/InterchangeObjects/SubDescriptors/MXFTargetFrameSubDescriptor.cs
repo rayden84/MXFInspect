@@ -29,8 +29,9 @@ namespace Myriadbits.MXF
 	public class MXFTargetFrameSubDescriptor : MXFSubDescriptor
 	{
 		public MXFTargetFrameSubDescriptor(MXFPack pack)
-			: base(pack, "TargetFrameSubDescriptor")
+			: base(pack)
 		{
-		}
+			MetaDataName = "TargetFrameSubDescriptor";
+        }
 	}
 }
