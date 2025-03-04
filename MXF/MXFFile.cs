@@ -120,8 +120,9 @@ namespace Myriadbits.MXF
                     CreateLogicalTree();
                     Log.ForContext<MXFFile>().Information($"Logical tree created in {sw.ElapsedMilliseconds} ms");
 
-                    // Set property description by reading the description attribute (for all types)
-                    MXFPackFactory.SetDescriptionFromAttributeForAllTypes();
+                    // Set property description by reading the description attribute (for all types of the parsed pack)
+                    var typesOfAllPacks = this.Descendants().Select(pack => pack.GetType()).Distinct();
+                    MXFPackFactory.SetDescriptionFromAttributeForTypes(typesOfAllPacks);
 
                     // Finished, return this (MXFFile)
                     overallProgress?.Report(new TaskReport(100, "Done"));
