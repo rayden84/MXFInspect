@@ -32,6 +32,7 @@ using Serilog;
 using Myriadbits.MXF.Exceptions;
 using Myriadbits.MXF.Extensions;
 using Myriadbits.MXF.KLV;
+using System.IO.MemoryMappedFiles;
 
 namespace Myriadbits.MXF
 {
@@ -75,7 +76,11 @@ namespace Myriadbits.MXF
             {
                 Stopwatch sw = Stopwatch.StartNew();
 
-                using (var fileStream = new FileStream(File.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, 10240))
+
+                using var mm = MemoryMappedFile.CreateFromFile(File.FullName, FileMode.Open);
+                using var fileStream = mm.CreateViewStream(0, File.Length, MemoryMappedFileAccess.Read);
+
+                //using (var fileStream = new FileStream(File.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, 10240))
                 {
                     // Parse file and obtain a list of mxf packs
 
@@ -139,7 +144,7 @@ namespace Myriadbits.MXF
         }
 
         #region private methods
-        private List<MXFObject> ParseMXFPacks(FileStream fileStream, IProgress<TaskReport> overallProgress, IProgress<TaskReport> singleProgress, CancellationToken ct = default)
+        private List<MXFObject> ParseMXFPacks(Stream fileStream, IProgress<TaskReport> overallProgress, IProgress<TaskReport> singleProgress, CancellationToken ct = default)
         {
             const int RUN_IN_THRESHOLD = 65536;
             int currentPercentage;
