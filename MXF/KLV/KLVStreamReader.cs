@@ -11,6 +11,8 @@ namespace Myriadbits.MXF.KLV
     public class KLVStreamReader : BinaryReader, IKLVStreamReader
     {
         private readonly Stream klvStream;
+        private readonly byte[] buffer16Byte = new byte[(int)KLVKey.KeyLengths.SixteenBytes];
+        private readonly byte[] buffer32Byte = new byte[32];
 
         #region Properties
 
@@ -87,36 +89,33 @@ namespace Myriadbits.MXF.KLV
 
         public AUID ReadAUID()
         {
-            byte[] bytes = this.ReadBytes((int)KLVKey.KeyLengths.SixteenBytes);
-            if (UL.HasValidULPrefix(bytes))
+            this.Read(buffer16Byte, 0, buffer16Byte.Length);
+            if (UL.HasValidULPrefix(buffer16Byte))
             {
-                return new UL(bytes);
+                return new UL(buffer16Byte);
             }
-            return new AUID(bytes);
+            return new AUID(buffer16Byte);
         }
 
 
         public UL ReadUL()
         {
-            byte[] buffer = new byte[(int)KLVKey.KeyLengths.SixteenBytes];
-            this.Read(buffer, 0, buffer.Length);
-            return new UL(buffer);
+            this.Read(buffer16Byte, 0, buffer16Byte.Length);
+            return new UL(buffer16Byte);
         }
 
         public UMID ReadUMIDKey()
         {
             // Always read 32 bytes for UMID's 
-            byte[] buffer = new byte[32];
-            this.Read(buffer, 0, buffer.Length);
-            return new UMID(buffer);
+            this.Read(buffer32Byte, 0, buffer32Byte.Length);
+            return new UMID(buffer32Byte);
         }
 
         public UUID ReadUUID()
         {
             // Always read 16 bytes for UUIDs
-            byte[] buffer = new byte[(int)KLVKey.KeyLengths.SixteenBytes];
-            this.Read(buffer, 0, buffer.Length);
-            return new UUID(buffer);
+            this.Read(buffer16Byte, 0, buffer16Byte.Length);
+            return new UUID(buffer16Byte);
         }
 
         // TODO AUIDSet offset bug
