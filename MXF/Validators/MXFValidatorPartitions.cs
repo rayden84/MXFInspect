@@ -269,31 +269,13 @@ namespace Myriadbits.MXF.Validators
 
             MXFObject firstIndexTableSegment = p.Children.OfType<MXFIndexTableSegment>().FirstOrDefault();
             MXFObject lastIndexTableSegment = firstIndexTableSegment;
-            
+
             // TODO potential for performance improvement
             if (firstIndexTableSegment != null)
             {
-                lastIndexTableSegment = firstIndexTableSegment;
-                while (lastIndexTableSegment is MXFIndexTableSegment)
-                {
-                    var nextElement = lastIndexTableSegment.NextSibling() as MXFIndexTableSegment;
-                    if (nextElement != null)
-                    {
-                        lastIndexTableSegment = nextElement;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
+                var remainder = p.Children.SkipWhile(c => c == firstIndexTableSegment);
+                lastIndexTableSegment = remainder.TakeWhile(c => c is MXFIndexTableSegment || c is MXFFillerData).LastOrDefault();
                 expected = (ulong)(lastIndexTableSegment.Offset + lastIndexTableSegment.TotalLength) - (ulong)firstIndexTableSegment.Offset;
-
-                // TODO what if there are two or more consecutive filler?
-                if (lastIndexTableSegment.NextSibling() is MXFFillerData filler)
-                {
-                    expected += (ulong)filler.TotalLength;
-                }
             }
 
             return read == expected;
