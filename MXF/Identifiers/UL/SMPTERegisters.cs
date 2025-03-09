@@ -24,8 +24,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Xml.Linq;
-using Microsoft.Win32;
 using Serilog;
 
 namespace Myriadbits.MXF.Identifiers
@@ -37,64 +37,59 @@ namespace Myriadbits.MXF.Identifiers
         private static Dictionary<ByteArray, ULDescription> ElementsDictionary { get; set; }
         private static Dictionary<ByteArray, ULDescription> GroupsDictionary { get; set; }
         private static Dictionary<ByteArray, ULDescription> EssencesDictionary { get; set; }
+        private static Dictionary<ByteArray, ULDescription> CombinedDictionary { get; set; }
+
         private static Dictionary<(byte, byte), DIDDescription> DIDDictionary { get; set; }
+
 
         public static int TotalEntriesCount { get; private set; } = 0;
 
         public static void Initialize()
         {
-            if (!Initialized)
-            {
-                LabelsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
-                ElementsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
-                GroupsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
-                EssencesDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTEEssenceRegisterComparer());
+            if (Initialized) return;
 
-                FillDictionary(Properties.Resources.Labels, LabelsDictionary);
-                Log.ForContext(typeof(SMPTERegisters)).Information($"A total of {LabelsDictionary.Count} SMPTE labels register entries added to SMPTE dictionary");
+            LabelsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
+            ElementsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
+            GroupsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
+            EssencesDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTEEssenceRegisterComparer());
 
-                FillDictionary(Properties.Resources.Elements, ElementsDictionary);
-                Log.ForContext(typeof(SMPTERegisters)).Information($"A total of {ElementsDictionary.Count} SMPTE elements register entries added to SMPTE dictionary");
+            FillDictionary(Properties.Resources.Labels, LabelsDictionary);
+            Log.ForContext(typeof(SMPTERegisters)).Information($"A total of {LabelsDictionary.Count} SMPTE labels register entries added to SMPTE dictionary");
 
-                FillDictionary(Properties.Resources.Groups, GroupsDictionary);
-                Log.ForContext(typeof(SMPTERegisters)).Information($"A total of {GroupsDictionary.Count} SMPTE groups register entries added to SMPTE dictionary");
+            FillDictionary(Properties.Resources.Elements, ElementsDictionary);
+            Log.ForContext(typeof(SMPTERegisters)).Information($"A total of {ElementsDictionary.Count} SMPTE elements register entries added to SMPTE dictionary");
 
-                FillDictionary(Properties.Resources.Essence, EssencesDictionary);
-                Log.ForContext(typeof(SMPTERegisters)).Information($"A total of {EssencesDictionary.Count} SMPTE essences register entries added to SMPTE dictionary");
+            FillDictionary(Properties.Resources.Groups, GroupsDictionary);
+            Log.ForContext(typeof(SMPTERegisters)).Information($"A total of {GroupsDictionary.Count} SMPTE groups register entries added to SMPTE dictionary");
 
-                TotalEntriesCount = LabelsDictionary.Count + ElementsDictionary.Count + GroupsDictionary.Count + EssencesDictionary.Count;
-                Log.ForContext(typeof(SMPTERegisters)).Information($"SMPTE Dictionary with a total of {TotalEntriesCount} entries loaded");
+            FillDictionary(Properties.Resources.Essence, EssencesDictionary);
+            Log.ForContext(typeof(SMPTERegisters)).Information($"A total of {EssencesDictionary.Count} SMPTE essences register entries added to SMPTE dictionary");
 
-                FillDIDDictionary();
-                Log.ForContext(typeof(SMPTERegisters)).Information($"A total of {DIDDictionary.Count} ANC Identifier Descriptions added to dictionary");
+            TotalEntriesCount = LabelsDictionary.Count + ElementsDictionary.Count + GroupsDictionary.Count + EssencesDictionary.Count;
+            Log.ForContext(typeof(SMPTERegisters)).Information($"SMPTE Dictionary with a total of {TotalEntriesCount} entries loaded");
 
-                Initialized = true;
-            }
+            FillDIDDictionary();
+            Log.ForContext(typeof(SMPTERegisters)).Information($"A total of {DIDDictionary.Count} ANC Identifier Descriptions added to dictionary");
+
+            CombinedDictionary = LabelsDictionary
+                                .Concat(ElementsDictionary)
+                                .Concat(GroupsDictionary)
+                                .Concat(EssencesDictionary)
+                                .ToDictionary(e => e.Key, e => e.Value);
+
+            Initialized = true;
+
         }
 
         public static ULDescription GetULDescription(ByteArray array)
         {
-
             Initialize();
 
-            if (LabelsDictionary.TryGetValue(array, out var smpteDescription))
+            if (CombinedDictionary.TryGetValue(array, out ULDescription smpteDescription))
             {
                 return smpteDescription;
             }
-            else if (ElementsDictionary.TryGetValue(array, out smpteDescription))
-            {
-                return smpteDescription;
-            }
-            else if (GroupsDictionary.TryGetValue(array, out smpteDescription))
-            {
-                return smpteDescription;
-            }
-            else if (EssencesDictionary.TryGetValue(array, out smpteDescription))
-            {
-                return smpteDescription;
-            }
-            else return null;
-
+            return null;
         }
 
 
@@ -138,7 +133,7 @@ namespace Myriadbits.MXF.Identifiers
                     Log.ForContext(typeof(SMPTERegisters)).Verbose($"Details of SMPTE entry: {@e}", entry);
                 }
                 else
-                {           
+                {
                     Log.ForContext(typeof(SMPTERegisters)).Warning($"Unable to parse SMPTE entry {e}: {@e}", e);
                 }
             }
@@ -196,7 +191,7 @@ namespace Myriadbits.MXF.Identifiers
                         try
                         {
                             Byte.TryParse(parts[0].Trim(' '), out byte dataType);
-                            Byte.TryParse(parts[1].Trim(' ', 'h'), NumberStyles.HexNumber,null, out byte did);
+                            Byte.TryParse(parts[1].Trim(' ', 'h'), NumberStyles.HexNumber, null, out byte did);
                             Byte.TryParse(parts[2].Trim(' ', 'h'), NumberStyles.HexNumber, null, out byte sdid);
 
                             var description = new DIDDescription
