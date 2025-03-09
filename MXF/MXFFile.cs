@@ -31,7 +31,6 @@ using System.Threading.Tasks;
 using Serilog;
 using Myriadbits.MXF.Exceptions;
 using Myriadbits.MXF.Extensions;
-using Myriadbits.MXF.KLV;
 using System.IO.MemoryMappedFiles;
 
 namespace Myriadbits.MXF
@@ -79,8 +78,6 @@ namespace Myriadbits.MXF
 
                 using var mm = MemoryMappedFile.CreateFromFile(File.FullName, FileMode.Open);
                 using var fileStream = mm.CreateViewStream(0, File.Length, MemoryMappedFileAccess.Read);
-
-                //using (var fileStream = new FileStream(File.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, 10240))
                 {
                     // Parse file and obtain a list of mxf packs
 
@@ -101,15 +98,8 @@ namespace Myriadbits.MXF
 
                     overallProgress?.Report(new TaskReport(MAX_PARSER_PERCENTAGE, "Process packs"));
                     sw.Restart();
-                    PartitionAndPostProcessMXFPacks(mxfPacks);
+                    PartitionAndPostProcessMXFPacks(mxfPacks, overallProgress, singleProgress, ct);
                     Log.ForContext<MXFFile>().Information($"Finished processing MXF packs [{mxfPacks.Count} items] in {sw.ElapsedMilliseconds} ms");
-
-                    // Reparse all local tags, as now we know the primerpackage aliases
-
-                    sw.Restart();
-                    overallProgress?.Report(new TaskReport(MIN_LOCALTAG_PERCENTAGE, "Resolving tags"));
-                    ResolveAndReadLocalTags(overallProgress, singleProgress, ct);
-                    Log.ForContext<MXFFile>().Information($"Finished resolving local tags in {sw.ElapsedMilliseconds} ms");
 
                     // Resolve the references
 
@@ -146,9 +136,10 @@ namespace Myriadbits.MXF
         #region private methods
         private List<MXFObject> ParseMXFPacks(Stream fileStream, IProgress<TaskReport> overallProgress, IProgress<TaskReport> singleProgress, CancellationToken ct = default)
         {
+            long percentile = this.File.Length / 100;
+            int percentile_multiple = 1;
+
             const int RUN_IN_THRESHOLD = 65536;
-            int currentPercentage;
-            int previousPercentage = 0;
             long lastgoodPos = 0;
             bool streambroken = false;
             MXFPackParser parser = new MXFPackParser(fileStream);
@@ -157,11 +148,12 @@ namespace Myriadbits.MXF
 
             while (parser.HasNext())
             {
+                ct.ThrowIfCancellationRequested();
+
                 try
                 {
                     var pack = parser.GetNext();
                     mxfPacks.Add(pack);
-                    ct.ThrowIfCancellationRequested();
 
                     // if klv stream was broken due to exception add "non-klv-data object"
                     if (streambroken == true)
@@ -262,17 +254,16 @@ namespace Myriadbits.MXF
 
 
                 // Only report progress when the percentage has changed
-                currentPercentage = (int)((parser.Current.Offset + parser.Current.TotalLength) * 100 / this.File.Length);
-                if (currentPercentage > previousPercentage)
+                if (parser.Current.Offset >= percentile * percentile_multiple)
                 {
-                    // TODO really need to check this?
-                    if (currentPercentage < 100)
+                    int currentPercentage = (int)((parser.Current.Offset + parser.Current.TotalLength) * 100 / this.File.Length);
+                    if (currentPercentage <= 100)
                     {
                         int overallPercentage = MIN_PARSER_PERCENTAGE + currentPercentage * (MAX_PARSER_PERCENTAGE - MIN_PARSER_PERCENTAGE) / 100;
                         overallProgress?.Report(new TaskReport(overallPercentage, "Reading KLV stream"));
                         singleProgress?.Report(new TaskReport(currentPercentage, "Parsing packs..."));
-                        previousPercentage = currentPercentage;
                     }
+                    percentile_multiple++;
                 }
             }
 
@@ -280,17 +271,20 @@ namespace Myriadbits.MXF
 
         }
 
-        private void PartitionAndPostProcessMXFPacks(IEnumerable<MXFObject> packList, CancellationToken ct = default)
+        private void PartitionAndPostProcessMXFPacks(IList<MXFObject> packList, IProgress<TaskReport> overallProgress = null, IProgress<TaskReport> singleProgress = null, CancellationToken ct = default)
         {
+            long percentile = this.File.Length / 100;
+            int percentile_multiple = 1;
+
             MXFPartition currentPartition = null;
             int partitionNumber = 0;
             MXFObject partitionRoot = null;
 
-            foreach (var obj in packList)
+            for (int i = 0; i < packList.Count; i++)
             {
                 ct.ThrowIfCancellationRequested();
-
-                switch (obj)
+                var pack = packList[i];
+                switch (pack)
                 {
                     case MXFPartition partition:
                         if (partitionRoot == null)
@@ -304,20 +298,23 @@ namespace Myriadbits.MXF
                         partitionRoot.AddChild(currentPartition);
                         break;
 
+
                     case MXFRIP rip:
                         this.AddChild(rip);
                         break;
 
                     case MXFPreface preface:
-                        this.AddLogicalChild(preface);
                         if (currentPartition != null)
                         {
-                            currentPartition.AddChild(obj);
+                            currentPartition.AddChild(pack);
                         }
                         else
                         {
-                            this.AddChild(obj);
+                            this.AddChild(pack);
                         }
+                        this.AddLogicalChild(preface);
+                        preface.LookUpLocalTagKeys();
+                        preface.ReadLocalTagValues();
                         break;
 
                     case MXFSystemMetaDataPack si:
@@ -340,6 +337,18 @@ namespace Myriadbits.MXF
                         this.LastSystemItem = si;
                         break;
 
+                    case MXFLocalSet ls:
+                        if (currentPartition != null)
+                        {
+                            currentPartition.AddChild(pack);
+                        }
+                        else
+                        {
+                            this.AddChild(pack);
+                        }
+                        ls.LookUpLocalTagKeys();
+                        ls.ReadLocalTagValues();
+                        break;
 
                     case MXFEssenceElement el:
                         if (currentPartition != null)
@@ -361,50 +370,23 @@ namespace Myriadbits.MXF
                     default:
                         // Normal
                         if (currentPartition != null)
-                            currentPartition.AddChild(obj);
+                            currentPartition.AddChild(pack);
                         else
-                            this.AddChild(obj);
+                            this.AddChild(pack);
                         break;
 
                 }
-            }
-        }
 
-        private void ResolveAndReadLocalTags(IProgress<TaskReport> overallProgress = null, IProgress<TaskReport> singleProgress = null, CancellationToken ct = default)
-        {
-            int currentPercentage = 0;
-            int previousPercentage = 0;
-
-            var localSetList = this.Descendants().OfType<MXFLocalSet>().Where(ls => ls.Children.OfType<MXFLocalTag>().Any());
-            int localSetListCount = localSetList.Count();
-
-            var collection = localSetList.ToList();
-
-            for (int index = 0; index < collection.Count; index++)
-            {
-                var ls = collection[index];
-
-                // link local tag keys to primer entry keys
-                // TODO do this just once!
-                ls.LookUpLocalTagKeys();
-
-                ct.ThrowIfCancellationRequested();
-
-                // now parse tags
-                ls.ReadLocalTagValues();
-
-                // update progress
-                currentPercentage = (int)(index * 100.0 / localSetListCount);
-                if (currentPercentage > previousPercentage)
+                if (pack.Offset >= percentile * percentile_multiple)
                 {
-                    // TODO really need to check this?
-                    if (currentPercentage < 100)
+                    int currentPercentage = (int)(pack.Offset * 100.0 / this.File.Length);
+                    if (currentPercentage <= 100)
                     {
                         int overallPercentage = MIN_LOCALTAG_PERCENTAGE + currentPercentage * (MAX_LOCALTAG_PERCENTAGE - MIN_LOCALTAG_PERCENTAGE) / 100;
-                        overallProgress?.Report(new TaskReport(overallPercentage, "Resolving tags"));
-                        singleProgress?.Report(new TaskReport(currentPercentage, $"Resolving tag {index}/{localSetListCount}"));
-                        previousPercentage = currentPercentage;
+                        overallProgress?.Report(new TaskReport(overallPercentage, "Processing packs"));
+                        singleProgress?.Report(new TaskReport(currentPercentage, $"Processing pack"));
                     }
+                    percentile_multiple++;
                 }
             }
         }
