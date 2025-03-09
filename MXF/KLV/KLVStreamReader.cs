@@ -98,19 +98,25 @@ namespace Myriadbits.MXF.KLV
 
         public UL ReadUL()
         {
-            return new UL(this.ReadBytes((int)KLVKey.KeyLengths.SixteenBytes));
+            byte[] buffer = new byte[(int)KLVKey.KeyLengths.SixteenBytes];
+            this.Read(buffer, 0, buffer.Length);
+            return new UL(buffer);
         }
 
         public UMID ReadUMIDKey()
         {
             // Always read 32 bytes for UMID's 
-            return new UMID(this.ReadBytes(2 * (int)KLVKey.KeyLengths.SixteenBytes));
+            byte[] buffer = new byte[32];
+            this.Read(buffer, 0, buffer.Length);
+            return new UMID(buffer);
         }
 
         public UUID ReadUUID()
         {
             // Always read 16 bytes for UUIDs
-            return new UUID(this.ReadBytes((int)KLVKey.KeyLengths.SixteenBytes));
+            byte[] buffer = new byte[(int)KLVKey.KeyLengths.SixteenBytes];
+            this.Read(buffer, 0, buffer.Length);
+            return new UUID(buffer);
         }
 
         // TODO AUIDSet offset bug
