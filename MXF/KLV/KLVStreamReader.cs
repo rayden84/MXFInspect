@@ -98,7 +98,8 @@ namespace Myriadbits.MXF.KLV
 
         public UL ReadUL()
         {
-            return new UL(this.ReadBytes((int)KLVKey.KeyLengths.SixteenBytes));
+            return new UL(klvStream);
+            //return new UL(this.ReadBytes((int)KLVKey.KeyLengths.SixteenBytes));
         }
 
         public UMID ReadUMIDKey()

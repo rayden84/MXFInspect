@@ -24,14 +24,16 @@
 using System;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
+using static Myriadbits.MXF.KLVKey;
 
 namespace Myriadbits.MXF
 {
     public class ByteArray : IEquatable<ByteArray>, IArrayLength
     {
-        private readonly ReadOnlyMemory<byte> theBytes;
+        private readonly ReadOnlyMemory<byte> theBytes = new ReadOnlyMemory<byte>();
 
         [Browsable(false)]
         public int ArrayLength => theBytes.Length;
@@ -49,6 +51,13 @@ namespace Myriadbits.MXF
                 throw new ArgumentException("There must at least be one byte", nameof(bytes));
             }
             theBytes = new ReadOnlyMemory<byte>(bytes);
+        }
+
+        public ByteArray(KeyLengths keyLength, Stream stream)
+        {
+            Span<byte> memory = new Span<byte>(new byte[(int)keyLength]);
+            stream.Read(memory);
+            theBytes = memory.ToArray();
         }
 
         public bool HasSameBeginning(ByteArray other)

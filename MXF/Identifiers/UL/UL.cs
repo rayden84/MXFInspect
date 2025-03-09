@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.IO;
 using System.Security.Cryptography;
 
 namespace Myriadbits.MXF.Identifiers
@@ -100,6 +101,12 @@ namespace Myriadbits.MXF.Identifiers
         [Browsable(false)]
         [Description("Universal Label Name")]
         public string Name { get; set; }
+
+
+        public UL(Stream stream) : base(stream)
+        {
+              
+        }
 
         public UL(params byte[] bytes) : base(bytes)
         {

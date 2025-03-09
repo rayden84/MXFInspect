@@ -21,6 +21,8 @@
 //
 #endregion
 
+using System.IO;
+
 namespace Myriadbits.MXF.Identifiers
 {
     public class AUID : KLVKey
@@ -33,6 +35,11 @@ namespace Myriadbits.MXF.Identifiers
         public AUID(byte[] bytes) : base(KeyLengths.SixteenBytes, bytes)
         {
 
+        }
+
+        public AUID(Stream stream) : base(KeyLengths.SixteenBytes, stream)
+        {
+                
         }
     }
 }

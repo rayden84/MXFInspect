@@ -23,6 +23,7 @@
 
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Text;
 
 namespace Myriadbits.MXF
@@ -48,6 +49,16 @@ namespace Myriadbits.MXF
             {
                 throw new ArgumentException($"Key length of {bytes.Length} is not a valid key length");
             }
+            KeyLength = keyLength;
+        }
+
+        public KLVKey(KeyLengths keyLength, Stream stream) : base(keyLength, stream)
+        {
+            //// check if passed array length matches with passed key length
+            //if ((int)keyLength != bytes.Length)
+            //{
+            //    throw new ArgumentException($"Key length of {bytes.Length} is not a valid key length");
+            //}
             KeyLength = keyLength;
         }
 
