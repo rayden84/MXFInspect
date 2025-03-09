@@ -27,7 +27,7 @@ namespace Myriadbits.MXF.Identifiers
 {
     public class SMPTERegisterComparer : IEqualityComparer<ByteArray>
     {
-        //TOO bypassing of version byte shall be a settable property
+        // TODO bypassing of version byte shall be a settable property
         public bool Equals(ByteArray x, ByteArray y)
         {
             for (int i = 0; i < x.ArrayLength; i++)
