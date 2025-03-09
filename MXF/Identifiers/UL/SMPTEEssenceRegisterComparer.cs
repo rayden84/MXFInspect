@@ -44,19 +44,20 @@ namespace Myriadbits.MXF.Identifiers
         private bool IsWildCardEqual(ByteArray b1, ByteArray b2)
         {
             int smallerLength = Math.Min(b1.ArrayLength, b2.ArrayLength);
+            byte wildcard = WILDCARD_BYTE;
 
             for (int i = 0; i < smallerLength; i++)
             {
-                if (b1[i] == WILDCARD_BYTE || b2[i] == WILDCARD_BYTE)
-                {
-                    continue;
-                }
-                else if (b1[i] != b2[i])
+                byte b1Byte = b1[i];
+                byte b2Byte = b2[i];
+
+                if (b1Byte != wildcard && b2Byte != wildcard && b1Byte != b2Byte)
                 {
                     return false;
                 }
             }
             return true;
         }
+
     }
 }
