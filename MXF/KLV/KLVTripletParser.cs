@@ -124,18 +124,15 @@ namespace Myriadbits.MXF
             // check if substream not longer than the parent stream
             if (RemainingBytesCount < length.Value)
             {
-                // TODO klvstream is always a filestream, right?
-                // this check does not make sense!
-                if (klvStream is FileStream)
-                {
-                    Log.ForContext<KLVTripletParser<T>>().Error($"Substream length longer than parent stream, i.e. file finishes before last klv triplet.\r\nFile finishes @{klvStream.Length} while last KLV triplet with length {subStreamLength} should finish @{offset + subStreamLength}");
 
-                    long truncatedLength = klvStream.Length - offset;
-                    Stream truncatedStream = new SubStream(klvStream, offset, truncatedLength);
-                    var truncatedKLV = new TruncatedKLV(key, length, baseOffset + currentOffset, truncatedStream);
+                Log.ForContext<KLVTripletParser<T>>().Error($"Substream length longer than parent stream, i.e. file finishes before last klv triplet.\r\nFile finishes @{klvStream.Length} while last KLV triplet with length {subStreamLength} should finish @{offset + subStreamLength}");
 
-                    throw new EndOfKLVStreamException("Premature end of file: Last KLV triplet is shorter than declared.", currentOffset, truncatedKLV, null);
-                }
+                long truncatedLength = klvStream.Length - offset;
+                Stream truncatedStream = new SubStream(klvStream, offset, truncatedLength);
+                var truncatedKLV = new TruncatedKLV(key, length, baseOffset + currentOffset, truncatedStream);
+
+                throw new EndOfKLVStreamException("Premature end of file: Last KLV triplet is shorter than declared.", currentOffset, truncatedKLV, null);
+
             }
 
             Stream ss = new SubStream(klvStream, offset, subStreamLength);
