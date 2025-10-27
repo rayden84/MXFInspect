@@ -24,6 +24,7 @@
 using Myriadbits.MXF.Exceptions;
 using Myriadbits.MXF.Identifiers;
 using Myriadbits.MXF.KLV;
+using Myriadbits.MXF;
 using Serilog;
 using System;
 using System.Collections.Immutable;
@@ -48,7 +49,7 @@ namespace Myriadbits.MXF
         //public long Offset { get { return currentOffset; } }
 
         public long RemainingBytesCount { get { return klvStream.Length - klvStream.Position; } }
-        
+
         public KLVTripletParser(Stream stream)
         {
             klvStream = stream;
@@ -132,7 +133,7 @@ namespace Myriadbits.MXF
                     long truncatedLength = klvStream.Length - offset;
                     Stream truncatedStream = new SubStream(klvStream, offset, truncatedLength);
                     var truncatedKLV = new TruncatedKLV(key, length, baseOffset + currentOffset, truncatedStream);
-                    
+
                     throw new EndOfKLVStreamException("Premature end of file: Last KLV triplet is shorter than declared.", currentOffset, truncatedKLV, null);
                 }
             }
@@ -141,20 +142,37 @@ namespace Myriadbits.MXF
             return InstantiateKLV(key, length, baseOffset + currentOffset, ss);
         }
 
-        public bool SeekToNextPotentialKey(out long newOffset, long seekThresholdInBytes = 0, CancellationToken ct = default)
+
+        public bool SeekToNextPotentialKey(
+            out long newOffset,
+            long seekThresholdInBytes = 0,
+            CancellationToken ct = default,
+            IProgress<TaskReport> progress = default)
         {
-            return SeekToBytePattern(out newOffset, UL.ValidULPrefix, seekThresholdInBytes, ct);
+            return SeekToBytePattern(out newOffset, UL.ValidULPrefix, seekThresholdInBytes, ct, progress);
         }
 
-        public bool SeekToPotentialPartitionKey(out long newOffset, long seekThresholdInBytes = 0, CancellationToken ct = default)
+        public bool SeekToPotentialPartitionKey(
+            out long newOffset,
+            long seekThresholdInBytes = 0,
+            CancellationToken ct = default,
+            IProgress<TaskReport> progress = default)
         {
-            return SeekToBytePattern(out newOffset, UL.ValidPartitionPrefix, seekThresholdInBytes, ct);
+            return SeekToBytePattern(out newOffset, UL.ValidPartitionPrefix, seekThresholdInBytes, ct, progress);
         }
 
-        public bool SeekToBytePattern(out long newOffset, ImmutableArray<byte> bytePattern, long seekThresholdInBytes = 0, CancellationToken ct = default)
+        public bool SeekToBytePattern(
+            out long newOffset,
+            ImmutableArray<byte> bytePattern,
+            long seekThresholdInBytes = 0,
+            CancellationToken ct = default,
+            IProgress<TaskReport> progress = default)
         {
             int foundBytes = 0;
             int bytesRead = 0;
+
+            int percentile = 1;
+            progress?.Report(new TaskReport(percentile, $"Seeking for byte pattern..."));
 
             // TODO consider Boyer-Moore search algorithm
             while (!reader.EOF && (seekThresholdInBytes == 0 || bytesRead <= seekThresholdInBytes))
@@ -176,11 +194,16 @@ namespace Myriadbits.MXF
                     foundBytes = 0;
                 }
 
+                if (percentile <= 100 && bytesRead > percentile * (seekThresholdInBytes / 100))
+                {
+                    progress?.Report(new TaskReport(percentile, $"Seeking for byte pattern..."));
+                    percentile++;
+                }
+
                 ct.ThrowIfCancellationRequested();
                 bytesRead++;
             }
 
-            // TODO what does the caller have to do in this case?
             newOffset = reader.Position;
             return false;
         }

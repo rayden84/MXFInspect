@@ -110,7 +110,7 @@ namespace Myriadbits.MXF
 
                     sw.Restart();
                     overallProgress?.Report(new TaskReport(REFERENCE_PERCENTAGE, "Resolving references"));
-                    int numOfResolved = ResolveReferences();
+                    int numOfResolved = ResolveReferences(singleProgress);
                     Log.ForContext<MXFFile>().Information($"{numOfResolved} references resolved in {sw.ElapsedMilliseconds} ms");
 
                     // Create the logical tree
@@ -141,7 +141,8 @@ namespace Myriadbits.MXF
         private List<MXFObject> ParseMXFPacks(FileStream fileStream, IProgress<TaskReport> overallProgress, IProgress<TaskReport> singleProgress, CancellationToken ct = default)
         {
             const int RUN_IN_THRESHOLD = 65536;
-            int currentPercentage;
+            int currentPercentage = 0;
+            int overallPercentage = MIN_PARSER_PERCENTAGE + currentPercentage * (MAX_PARSER_PERCENTAGE - MIN_PARSER_PERCENTAGE) / 100;
             int previousPercentage = 0;
             long lastgoodPos = 0;
             bool streambroken = false;
@@ -196,6 +197,8 @@ namespace Myriadbits.MXF
                 }
                 catch (KLVParsingException ex) when (ex is KLVKeyParsingException || ex is KLVLengthParsingException)
                 {
+                    overallProgress?.Report(new TaskReport(overallPercentage, "KLV stream broken. Trying to recover..."));
+
                     if (ex.InnerException is EndOfKLVStreamException eosEx)
                     {
                         // error at K or L part of KLV at end of file -> last KLV truncated
@@ -213,7 +216,7 @@ namespace Myriadbits.MXF
                     streambroken = true;
                     lastgoodPos = parser.Current?.Offset + parser.Current?.TotalLength ?? 0;
                     parser.SeekToEndOfCurrentKLV();
-                    if (!parser.SeekToNextPotentialKey(out long newOffset, 0, ct))
+                    if (!parser.SeekToNextPotentialKey(out long newOffset, 10000 * RUN_IN_THRESHOLD, ct, singleProgress))
                     {
 
                         parser.SeekToEndOfCurrentKLV();
@@ -262,9 +265,9 @@ namespace Myriadbits.MXF
                     // TODO really need to check this?
                     if (currentPercentage < 100)
                     {
-                        int overallPercentage = MIN_PARSER_PERCENTAGE + currentPercentage * (MAX_PARSER_PERCENTAGE - MIN_PARSER_PERCENTAGE) / 100;
+                        overallPercentage = MIN_PARSER_PERCENTAGE + currentPercentage * (MAX_PARSER_PERCENTAGE - MIN_PARSER_PERCENTAGE) / 100;
                         overallProgress?.Report(new TaskReport(overallPercentage, "Reading KLV stream"));
-                        singleProgress?.Report(new TaskReport(currentPercentage, "Parsing packs..."));
+                        singleProgress?.Report(new TaskReport(currentPercentage, $"Parsing packs, {parser.Current.Number:N0} done so far..."));
                         previousPercentage = currentPercentage;
                     }
                 }
@@ -396,7 +399,7 @@ namespace Myriadbits.MXF
                     {
                         int overallPercentage = MIN_LOCALTAG_PERCENTAGE + currentPercentage * (MAX_LOCALTAG_PERCENTAGE - MIN_LOCALTAG_PERCENTAGE) / 100;
                         overallProgress?.Report(new TaskReport(overallPercentage, "Resolving tags"));
-                        singleProgress?.Report(new TaskReport(currentPercentage, $"Resolving tag {index}/{localSetListCount}"));
+                        singleProgress?.Report(new TaskReport(currentPercentage, $"Resolving tag {index:N0}/{localSetListCount:N0}"));
                         previousPercentage = currentPercentage;
                     }
                 }
@@ -474,14 +477,17 @@ namespace Myriadbits.MXF
         /// Loop through all resolvable items and try to find the object with a matching UUID 
         /// </summary>
         /// <returns>the number of successfully resolved references</returns>  
-        private int ResolveReferences()
+        private int ResolveReferences(IProgress<TaskReport> progress = default)
         {
             // TODO optimize further, rethink solution
-            var refs = this.Descendants().OfType<IResolvable>().ToList();
+            var referencesToResolve = this.Descendants().OfType<IResolvable>().ToList();
             var uuidObjs = this.Descendants().OfType<IUUIDIdentifiable>().ToList();
             int numOfResolved = 0;
 
-            foreach (var r in refs)
+            int percentile = 1;
+            progress?.Report(new TaskReport(percentile, $"Resolving..."));
+
+            foreach (var r in referencesToResolve)
             {
                 foreach (var o in uuidObjs)
                 {
@@ -490,6 +496,12 @@ namespace Myriadbits.MXF
                     {
                         numOfResolved++;
                     }
+                }
+
+                if (percentile <= 100 && numOfResolved * 10 > (percentile * referencesToResolve.Count) / 10)
+                {
+                    progress?.Report(new TaskReport(percentile, $"Resolving {numOfResolved:N0}/{referencesToResolve.Count:N0}"));
+                    percentile+=10;
                 }
             }
             return numOfResolved;
