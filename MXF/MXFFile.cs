@@ -75,7 +75,7 @@ namespace Myriadbits.MXF
             {
                 Stopwatch sw = Stopwatch.StartNew();
 
-                using (var fileStream = new FileStream(File.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, 10240))
+                using (var fileStream = new FileStream(File.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, 10240, FileOptions.SequentialScan))
                 {
                     // Parse file and obtain a list of mxf packs
 
@@ -502,7 +502,7 @@ namespace Myriadbits.MXF
                 if (percentile <= 100 && numOfResolved * 10 > (percentile * referencesToResolve.Count) / 10)
                 {
                     progress?.Report(new TaskReport(percentile, $"Resolving {numOfResolved:N0}/{referencesToResolve.Count:N0}"));
-                    percentile+=10;
+                    percentile += 10;
                 }
             }
             return numOfResolved;
