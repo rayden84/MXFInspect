@@ -290,7 +290,7 @@ namespace Myriadbits.MXF
 
             if (dict.TryGetValue(pack.Key, out Func<MXFPack,MXFPack> generatorFunction))
             {
-                return (MXFPack)generatorFunction(pack);
+                return generatorFunction(pack);
             }
             else if (pack.Key.IdentifiesLocalSet_2BytesLength2BytesTag())
             {
