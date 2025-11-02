@@ -52,12 +52,12 @@ namespace Myriadbits.MXF
         public MXFPartition Partition { get; set; }
 
         // don't remove, implicitly called via Activator in MXFParser
-        public MXFPack(UL key, KLVBERLength length, long offset, Stream stream) : base(key, length, offset, stream)
+        public MXFPack(UL key, KLVBERLength length, long offset) : base(key, length, offset)
         {
         }
 
         // copy ctor
-        public MXFPack(MXFPack pack) : base(pack.Key, pack.Length, pack.Offset, pack.Stream)
+        public MXFPack(MXFPack pack) : base(pack.Key, pack.Length, pack.Offset)
         {
         }
 

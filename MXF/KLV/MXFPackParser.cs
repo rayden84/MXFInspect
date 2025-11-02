@@ -145,9 +145,9 @@ namespace Myriadbits.MXF
 
         }
 
-        protected override MXFPack InstantiateKLV(KLVKey key, ILength length, long offset, Stream stream)
+        protected override MXFPack InstantiateKLV(KLVKey key, ILength length, long offset)
         {
-            return new MXFPack((UL)key, (KLVBERLength)length, offset, stream);
+            return new MXFPack((UL)key, (KLVBERLength)length, offset);
         }
     }
 }

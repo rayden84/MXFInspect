@@ -35,7 +35,7 @@ namespace Myriadbits.MXF
         private const int CATEGORYPOS = 1;
 
         // Substream from klv offset (thus including key and length enc) to klv end (=its total length)
-        protected Stream Stream { get; }
+        //protected Stream Stream { get; }
 
         [SortedCategory(CATEGORYNAME, CATEGORYPOS)]
         [Description("Key part of KLV triplet")]
@@ -63,7 +63,7 @@ namespace Myriadbits.MXF
         public long RelativeValueOffset { get; }
 
 
-        public KLVTriplet(KLVKey key, ILength length, long offset, Stream stream) : base(offset)
+        public KLVTriplet(KLVKey key, ILength length, long offset) : base(offset)
         {
             Key = key;
             Length = length;
@@ -79,12 +79,12 @@ namespace Myriadbits.MXF
                 TotalLength = (int)key.KeyLength + length.ArrayLength + length.Value;
             }
 
-            Stream = stream;
+            //Stream = stream;
         }
 
         public IKLVStreamReader GetReader()
         {
-            return new KLVStreamReader(this.Stream);
+            return new KLVStreamReader(GetKLVStream());
         }
 
         //// TODO this should not be the responsibility of the class to read its content
@@ -107,6 +107,13 @@ namespace Myriadbits.MXF
             MXFFile mxfFile = GetFile();
             FileStream fs = new FileStream(mxfFile.File.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, 10240);
             return new SubStream(fs, ValueOffset, Length.Value); 
+        }
+
+        public SubStream GetKLVStream()
+        {
+            MXFFile mxfFile = GetFile();
+            FileStream fs = new FileStream(mxfFile.File.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, 10240);
+            return new SubStream(fs, this.Offset, Length.Value);
         }
     }
 
