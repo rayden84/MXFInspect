@@ -59,7 +59,7 @@ namespace Myriadbits.MXF
         [Description("Value of local tag")]
         public object Value { get; set; }
 
-        public MXFLocalTag(KLVKey key, KLVLength length, long offset, Stream stream) : base(key, length, offset, stream)
+        public MXFLocalTag(KLVKey key, KLVLength length, long offset) : base(key, length, offset)
         {
             //// check passed parameters 
             if (Key.KeyLength == KeyLengths.TwoBytes)

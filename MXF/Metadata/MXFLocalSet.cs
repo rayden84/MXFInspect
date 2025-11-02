@@ -59,7 +59,7 @@ namespace Myriadbits.MXF
         public void AttachTags(IKLVStreamReader reader)
         {
             reader.Seek(this.RelativeValueOffset);
-            SubStream ss = new SubStream(this.Stream, this.RelativeValueOffset, this.Length.Value);
+            SubStream ss = new SubStream(this.GetKLVStream(), this.RelativeValueOffset, this.Length.Value);
 
             var localTagParser = InitializeLocalTagParser(ss, this.ValueOffset);
 

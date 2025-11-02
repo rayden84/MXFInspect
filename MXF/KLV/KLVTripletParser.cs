@@ -42,7 +42,7 @@ namespace Myriadbits.MXF
         protected readonly Stream klvStream;
         protected abstract KLVKey ParseKLVKey();
         protected abstract ILength ParseKLVLength();
-        protected abstract T InstantiateKLV(KLVKey key, ILength length, long offset, Stream stream);
+        protected abstract T InstantiateKLV(KLVKey key, ILength length, long offset);
 
         public T Current { get; protected set; }
 
@@ -129,14 +129,14 @@ namespace Myriadbits.MXF
 
                 long truncatedLength = klvStream.Length - offset;
                 Stream truncatedStream = new SubStream(klvStream, offset, truncatedLength);
-                var truncatedKLV = new TruncatedKLV(key, length, baseOffset + currentOffset, truncatedStream);
+                var truncatedKLV = new TruncatedKLV(key, length, baseOffset + currentOffset, truncatedStream.Length);
 
                 throw new EndOfKLVStreamException("Premature end of file: Last KLV triplet is shorter than declared.", currentOffset, truncatedKLV, null);
 
             }
 
             Stream ss = new SubStream(klvStream, offset, subStreamLength);
-            return InstantiateKLV(key, length, baseOffset + currentOffset, ss);
+            return InstantiateKLV(key, length, baseOffset + currentOffset);
         }
 
 

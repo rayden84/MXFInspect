@@ -21,11 +21,8 @@
 //
 #endregion
 
-using Myriadbits.MXF.Identifiers;
 using Myriadbits.MXF.KLV;
-using System;
 using System.IO;
-using System.Linq;
 using static Myriadbits.MXF.KLV.KLVLength;
 using static Myriadbits.MXF.KLVKey;
 
@@ -56,9 +53,9 @@ namespace Myriadbits.MXF
             return new KLVLength(LengthEncoding, reader.ReadBytes((int)LengthEncoding));
         }
 
-        protected override MXFLocalTag InstantiateKLV(KLVKey key, ILength length, long offset, Stream stream)
+        protected override MXFLocalTag InstantiateKLV(KLVKey key, ILength length, long offset)
         {
-            return new MXFLocalTag(key, (KLVLength)length, offset, stream);
+            return new MXFLocalTag(key, (KLVLength)length, offset);
         }
     }
 }
