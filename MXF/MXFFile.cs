@@ -75,11 +75,14 @@ namespace Myriadbits.MXF
             {
                 Stopwatch sw = Stopwatch.StartNew();
 
-                using (var fileStream = new FileStream(File.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, 10240, FileOptions.SequentialScan))
+                using (var fileStream = new FileStream(File.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, 64 * 1024, FileOptions.SequentialScan))
                 {
+                    // wrap in the cached window stream that reads 64KB windows aligned to 512 bytes
+                    using var cached = new CachedWindowStream(fileStream, windowSize: 128 * 1024, alignment: 512, leaveOpen: false);
+
                     // Parse file and obtain a list of mxf packs
 
-                    List<MXFObject> mxfPacks = ParseMXFPacks(fileStream, overallProgress, singleProgress, ct);
+                    List<MXFObject> mxfPacks = ParseMXFPacks(cached, overallProgress, singleProgress, ct);
                     if (!mxfPacks.Any())
                     {
                         throw new NotAnMXFFileException("No MXF packs found. Probably this is not an MXF file.", 0, null);
@@ -139,7 +142,7 @@ namespace Myriadbits.MXF
         }
 
         #region private methods
-        private List<MXFObject> ParseMXFPacks(FileStream fileStream, IProgress<TaskReport> overallProgress, IProgress<TaskReport> singleProgress, CancellationToken ct = default)
+        private List<MXFObject> ParseMXFPacks(Stream fileStream, IProgress<TaskReport> overallProgress, IProgress<TaskReport> singleProgress, CancellationToken ct = default)
         {
             const int RUN_IN_THRESHOLD = 65536;
             int currentPercentage = 0;
