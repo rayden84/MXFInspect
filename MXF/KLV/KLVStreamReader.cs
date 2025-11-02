@@ -100,7 +100,16 @@ namespace Myriadbits.MXF.KLV
 
         public UL ReadUL()
         {
-            this.Read(buffer16Byte, 0, buffer16Byte.Length);
+            int needed = buffer16Byte.Length;
+            int offset = 0;
+            while (offset < needed)
+            {
+                int read = klvStream.Read(buffer16Byte, offset, needed - offset);
+                if (read == 0)
+                    throw new EndOfStreamException("Unable to read full 16-byte UL from stream.");
+                offset += read;
+            }
+
             return new UL(buffer16Byte);
         }
 
