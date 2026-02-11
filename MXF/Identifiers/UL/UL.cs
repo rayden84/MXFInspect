@@ -118,7 +118,7 @@ namespace Myriadbits.MXF.Identifiers
             SMPTEInformation = SMPTERegisters.GetULDescription(this);
             Name = SMPTEInformation?.Name;
 
-            if (this.IdentifiesPrivatelyRegisteredUL())
+            if (SMPTEInformation == null && this.IdentifiesPrivatelyRegisteredUL())
             {
                 if (privateOrganizationsIdentifiers.TryGetValue(this[9], out string organization))
                 {
