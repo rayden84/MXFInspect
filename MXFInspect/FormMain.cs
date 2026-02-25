@@ -26,6 +26,7 @@ using Myriadbits.MXF.Identifiers;
 using System;
 using System.Collections.Specialized;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -56,6 +57,7 @@ namespace Myriadbits.MXFInspect
             this.m_mru = Properties.Settings.Default.MRU;
             FillMRU();
             this.UpdateMenu();
+            var version = Assembly.GetEntryAssembly()?.GetName().Version;
             this.tslVersion.Text = $"Version: {typeof(FormMain).Assembly.GetName().Version.ToString(3)}";
             this.tslNetRuntimeVersion.Text = $"{System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}";
 

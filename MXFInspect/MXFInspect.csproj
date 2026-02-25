@@ -4,21 +4,18 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <RootNamespace>Myriadbits.MXFInspect</RootNamespace>
     <AssemblyName>MXFInspect</AssemblyName>
     <StartupObject>Myriadbits.MXFInspect.Program</StartupObject> 
-    <ApplicationIcon>MXFInspect.ico</ApplicationIcon> 
+    <ApplicationIcon>MXFInspect.ico</ApplicationIcon>
+	<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+	<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+	<Version>4.3.0</Version>
+	<AssemblyVersion>4.3.0</AssemblyVersion> <!-- this version number is shown in the main window status strip -->
+	<Deterministic>false</Deterministic>
+	<FileVersion>4.3.0</FileVersion>
   </PropertyGroup>
-
-	<PropertyGroup>
-		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-		<Version>4.2.5</Version>
-		<AssemblyVersion>4.2.5</AssemblyVersion>
-		<Deterministic>false</Deterministic>
-		<FileVersion>4.2.5</FileVersion>
-	</PropertyGroup>
-  
+ 
   <ItemGroup>
     <ProjectReference Include="..\MXF\MXF.csproj">
       <Project>{b01e7474-6a0c-4815-9c33-28b70df95b2e}</Project>
