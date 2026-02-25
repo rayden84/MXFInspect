@@ -42,8 +42,8 @@
             // 
             // btnCancel
             // 
-            btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-            btnCancel.Location = new System.Drawing.Point(319, 140);
+            btnCancel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            btnCancel.Location = new System.Drawing.Point(319, 153);
             btnCancel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new System.Drawing.Size(113, 27);
@@ -112,9 +112,9 @@
             // 
             // lblTime
             // 
-            lblTime.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            lblTime.Anchor = System.Windows.Forms.AnchorStyles.None;
             lblTime.BackColor = System.Drawing.Color.Transparent;
-            lblTime.Location = new System.Drawing.Point(14, 120);
+            lblTime.Location = new System.Drawing.Point(14, 133);
             lblTime.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             lblTime.Name = "lblTime";
             lblTime.Size = new System.Drawing.Size(418, 17);
@@ -131,7 +131,7 @@
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             AutoSize = true;
-            ClientSize = new System.Drawing.Size(462, 189);
+            ClientSize = new System.Drawing.Size(450, 192);
             ControlBox = false;
             Controls.Add(lblTime);
             Controls.Add(lblSingleDesc);
@@ -143,7 +143,6 @@
             Controls.Add(btnCancel);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            MinimumSize = new System.Drawing.Size(468, 228);
             Name = "FormProgress";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             Text = "Progress";
