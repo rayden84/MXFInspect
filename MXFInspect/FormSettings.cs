@@ -204,7 +204,7 @@ namespace Myriadbits.MXFInspect
             {
                 VisitLogPath();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 MessageBox.Show("Unable to open link that was clicked.", "Unknown Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

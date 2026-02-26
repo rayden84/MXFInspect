@@ -319,7 +319,7 @@ namespace Myriadbits.MXFInspect
                 {
                     fr.ShowDialog(this);
                 }
-                catch (OperationCanceledException ex)
+                catch (OperationCanceledException)
                 {
                     //Log.ForContext<MXFView>().Warning(ex, $"File opening aborted by user:");
                     //this.ParentMainForm.SetActivityText("File opening aborted by user");

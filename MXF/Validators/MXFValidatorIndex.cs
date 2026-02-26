@@ -413,7 +413,7 @@ namespace Myriadbits.MXF.Validators
                         dict.Add((bodySID.Value, essenceOffset.Value), el);
                         //Debug.WriteLine(dict.Last());
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
 
                     }
