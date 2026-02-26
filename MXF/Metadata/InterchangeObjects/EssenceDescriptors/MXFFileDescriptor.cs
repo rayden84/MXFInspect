@@ -25,8 +25,6 @@ using Myriadbits.MXF.Identifiers;
 using Myriadbits.MXF.KLV;
 using Myriadbits.MXF.Utils;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace Myriadbits.MXF
 {
@@ -42,7 +40,7 @@ namespace Myriadbits.MXF
 
         [SortedCategory(CATEGORYNAME, CATEGORYPOS)]
         [ULElement("urn:smpte:ul:060e2b34.01010101.04060101.00000000")]
-        public MXFRational? SampleRate { get; set; }
+        public MXFRational SampleRate { get; set; }
 
         [SortedCategory(CATEGORYNAME, CATEGORYPOS)]
         [ULElement("urn:smpte:ul:060e2b34.01010101.04060102.00000000")]
