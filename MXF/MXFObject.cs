@@ -49,7 +49,7 @@ namespace Myriadbits.MXF
             }
             private set
             {
-                if (_offset < 0)
+                if (value < 0)
                 {
                     throw new ArgumentOutOfRangeException(nameof(Offset), $"{nameof(Offset)} must be non-negative.");
                 }
@@ -111,30 +111,37 @@ namespace Myriadbits.MXF
         #region Equals
         public bool Equals(MXFObject other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return this.Offset.Equals(other.Offset);
+            // Make equality type-sensitive to avoid different subclasses being equal just
+            // because they share the same Offset.
+            if (this.GetType() != other.GetType()) return false;
+
+            return this.Offset == other.Offset;
         }
 
-        //public override bool Equals(object obj)
-        //{
-        //    if (ReferenceEquals(null, obj)) return false;
-        //    if (ReferenceEquals(this, obj)) return true;
-        //    if (obj is not MXFObject) return false;
-        //    return Equals((MXFObject)obj);
-        //}
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj is not MXFObject) return false;
+            return Equals((MXFObject)obj);
+        }
 
-        ////see https://stackoverflow.com/a/468084 and https://stackoverflow.com/a/53316768
-        //public override int GetHashCode()
-        //{
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(this.GetType(), Offset);
+        }
 
-        //    return 0;
-        //}
+        public static bool operator ==(MXFObject x, MXFObject y)
+        {
+            if (ReferenceEquals(x, y)) return true;
+            if (x is null || y is null) return false;
+            return x.Equals(y);
+        }
 
-        public static bool operator ==(MXFObject x, MXFObject y) { return Equals(x, y); }
-        public static bool operator !=(MXFObject x, MXFObject y) { return !Equals(x, y); }
-
+        public static bool operator !=(MXFObject x, MXFObject y) => !(x == y);
         #endregion
     }
 }
