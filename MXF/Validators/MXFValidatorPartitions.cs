@@ -215,11 +215,7 @@ namespace Myriadbits.MXF.Validators
 
         public bool IsPartitionStatusValid(MXFPartition p)
         {
-            return
-                p.Status == PartitionStatus.OpenComplete ||
-                p.Status == PartitionStatus.OpenIncomplete ||
-                p.Status == PartitionStatus.ClosedIncomplete ||
-                p.Status == PartitionStatus.ClosedComplete;
+            return p.Status != PartitionStatus.Invalid;
         }
 
         public bool MajorVersionEqualsTo(MXFPartition p, ushort expected, out ushort read)
