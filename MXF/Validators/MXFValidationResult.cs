@@ -38,7 +38,7 @@ namespace Myriadbits.MXF.Validators
         General,
         KLVStream,
         PartitionStructure,
-                RIP,
+        RIP,
         IndexTables,
         Metadata,
         SMPTERegisters,

@@ -274,7 +274,11 @@ namespace Myriadbits.MXF.Validators
             if (firstIndexTableSegment != null)
             {
                 var remainder = p.Children.SkipWhile(c => c == firstIndexTableSegment);
-                lastIndexTableSegment = remainder.TakeWhile(c => c is MXFIndexTableSegment || c is MXFFillerData).LastOrDefault();
+                var potentialLastIndexTableSegment = remainder.TakeWhile(c => c is MXFIndexTableSegment || c is MXFFillerData).LastOrDefault();
+                if (potentialLastIndexTableSegment != null)
+                {
+                    lastIndexTableSegment = potentialLastIndexTableSegment;
+                }
                 expected = (ulong)(lastIndexTableSegment.Offset + lastIndexTableSegment.TotalLength) - (ulong)firstIndexTableSegment.Offset;
             }
 
