@@ -25,15 +25,29 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
-using System.Security.Cryptography;
 
 namespace Myriadbits.MXF.Identifiers
 {
     public class UL : AUID
     {
+
         private const string CATEGORYNAME = "Key";
+
+
+        #region public const's
+
+        public const int REGISTRY_CATEGORY_INDEX = 4;
+        public const int REGISTRY_DESIGNATOR_INDEX = 5;
+        public const int STRUCTURE_DESIGNATOR_INDEX = 6;
+        public const int VERSION_NUMBER_INDEX = 7;
+
+        public const byte WILDCARD_BYTE_VALUE = 0x7F;
+
         public static readonly ImmutableArray<byte> ValidULPrefix = ImmutableArray.Create<byte>(0x06, 0x0e, 0x2b, 0x34);
         public static readonly ImmutableArray<byte> ValidPartitionPrefix = ImmutableArray.Create<byte>(0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01, 0x0d, 0x01, 0x02);
+
+        #endregion
+
         private static readonly IReadOnlyDictionary<byte, string> privateOrganizationsIdentifiers = new Dictionary<byte, string>
         {
            {0x04,"Avid Technology, Inc." },
@@ -64,7 +78,10 @@ namespace Myriadbits.MXF.Identifiers
            {0x1e,"FLIR Systems, Inc."},
            {0x1f,"Barco"},
            {0x20,"Apple Inc."},
-           {0x21,"Fraunhofer"},
+           {0x21,"Fraunhofer IIS"},
+           {0x22,"RED"},
+           {0x23,"CRIFST"},
+           {0x24,"FUJIFILM"},
         };
 
         #region properties
@@ -111,8 +128,8 @@ namespace Myriadbits.MXF.Identifiers
             // set properties 
             SetCategoryAndRegistryDesignator();
 
-            StructureDesignator = this[6];
-            VersionNumber = this[7];
+            StructureDesignator = this[STRUCTURE_DESIGNATOR_INDEX];
+            VersionNumber = this[VERSION_NUMBER_INDEX];
             ItemDesignator = new byte[] { this[8], this[9], this[10], this[11], this[12], this[13], this[14], this[15] };
 
             SMPTEInformation = SMPTERegisters.GetULDescription(this);
@@ -142,7 +159,7 @@ namespace Myriadbits.MXF.Identifiers
 
         public IEnumerable<byte> LastBytesQuadruple()
         {
-            return this.GetRange(12, 4);
+            return this.GetBytes(12, 4);
         }
 
         public bool IdentifiesLocalSet()
@@ -208,11 +225,11 @@ namespace Myriadbits.MXF.Identifiers
 
         private void SetCategoryAndRegistryDesignator()
         {
-            switch (this[4])
+            switch (this[REGISTRY_CATEGORY_INDEX])
             {
                 case 0x01:
                     CategoryDesignator = ULCategories.Elements;
-                    switch (this[5])
+                    switch (this[REGISTRY_DESIGNATOR_INDEX])
                     {
                         case 0x01:
                             RegistryDesignator = ULRegistries.MetadataDictionaries;
@@ -234,7 +251,7 @@ namespace Myriadbits.MXF.Identifiers
 
                 case 0x02:
                     CategoryDesignator = ULCategories.Groups;
-                    switch (this[5])
+                    switch (this[REGISTRY_DESIGNATOR_INDEX])
                     {
                         // Universal sets
 
@@ -341,7 +358,7 @@ namespace Myriadbits.MXF.Identifiers
 
                 case 0x03:
                     CategoryDesignator = ULCategories.ContainersAndWrappers;
-                    switch (this[5])
+                    switch (this[REGISTRY_DESIGNATOR_INDEX])
                     {
                         case 0x01:
                             RegistryDesignator = ULRegistries.SimpleWrappersAndContainers;

@@ -547,7 +547,7 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unrecognized key: {0}.
+        ///   Looks up a localized string similar to Unknown UL: {0}. The most similar UL is {1}.
         /// </summary>
         internal static string ID_0717 {
             get {
@@ -556,7 +556,7 @@ namespace Myriadbits.MXF.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Privately registered key: {0}.
+        ///   Looks up a localized string similar to Privately registered UL: {0}.
         /// </summary>
         internal static string ID_0718 {
             get {
@@ -570,6 +570,15 @@ namespace Myriadbits.MXF.Properties {
         internal static string ID_0719 {
             get {
                 return ResourceManager.GetString("ID_0719", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown UL: {0}.
+        /// </summary>
+        internal static string ID_0720 {
+            get {
+                return ResourceManager.GetString("ID_0720", resourceCulture);
             }
         }
     }

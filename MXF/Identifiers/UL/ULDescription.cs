@@ -29,22 +29,27 @@ namespace Myriadbits.MXF.Identifiers
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class ULDescription
     {
-        public string Name { get; set; }
+        public ByteArray ByteSequence { get; init; }
 
-        public string Definition { get; set; }
+        public string Name { get; init; }
 
-        public string DefiningDocument { get; set; }
+        public string Symbol { get; init; }
 
-        public string Notes { get; set; }
+        public string Definition { get; init; }
 
-        public string IsDeprecated { get; set; }
+        public string DefiningDocument { get; init; }
 
-        public string IsConcrete { get; set; }
+        public string Notes { get; init; }
 
-        public string Kind { get; set; }
+        public string IsDeprecated { get; init; }
 
-        public string Applications { get; set; }
+        public string IsConcrete { get; init; }
 
+        public string Kind { get; init; }
+
+        public string Applications { get; init; }
+       
+        
 
         public override string ToString()
         {

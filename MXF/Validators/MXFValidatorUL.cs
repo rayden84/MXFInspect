@@ -21,10 +21,9 @@
 //
 #endregion
 
-using Serilog;
+using Myriadbits.MXF.Identifiers;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,21 +43,40 @@ namespace Myriadbits.MXF.Validators
             {
 
                 var retval = new List<MXFValidationResult>();
-                var klvsWithUnknownUL = this.File.Descendants()
+                var mxfPacksWithUnknownUL = this.File.Descendants()
                                                 .OfType<MXFPack>()
                                                 .Where(klv => klv.Key.SMPTEInformation == null
                                                     && klv is not MXFPackageMetaData
                                                     && klv is not MXFSystemMetaDataPack);
 
-                foreach (var klv in klvsWithUnknownUL)
+                // lookup dictionary for most similar ULs  
+
+                Dictionary<UL, UL> mostSimilarULDictionary = new Dictionary<UL, UL>();
+                foreach (var pack in mxfPacksWithUnknownUL)
                 {
-                    if (klv.Key.IdentifiesPrivatelyRegisteredUL())
+                    if (!mostSimilarULDictionary.ContainsKey(pack.Key))
                     {
-                        retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0718, klv, klv.Offset, klv.Key));
+                        var mostSimilarUL = SMPTERegisters.FindMostSimilarUL(pack.Key);
+                        mostSimilarULDictionary.Add(pack.Key, mostSimilarUL);
+                    }
+                }
+
+                foreach (var pack in mxfPacksWithUnknownUL)
+                {
+                    if (pack.Key.IdentifiesPrivatelyRegisteredUL())
+                    {
+                        retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0718, pack, pack.Offset, pack.Key));
                     }
                     else
                     {
-                        retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0717, klv, klv.Offset, klv.Key));
+                        if (mostSimilarULDictionary.TryGetValue(pack.Key, out UL mostSimilarUL))
+                        {
+                            retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0717, pack, pack.Offset, pack.Key, mostSimilarUL));
+                        }
+                        else
+                        {
+                            retval.Add(ValidationRules.CreateValidationResult(ValidationRuleIDs.ID_0720, pack, pack.Offset, pack.Key));
+                        }
                     }
                 }
                 return retval;

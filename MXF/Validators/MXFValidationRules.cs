@@ -86,7 +86,8 @@ namespace Myriadbits.MXF.Validators
         ID_0716,
         ID_0717,
         ID_0718,
-        ID_0719
+        ID_0719,
+        ID_0720
     }
 
 
@@ -151,6 +152,7 @@ namespace Myriadbits.MXF.Validators
             {ValidationRuleIDs.ID_0716, (MXFValidationCategory.KLVStream, MXFValidationSeverity.Error, ValidationMessages.ID_0716)},
             {ValidationRuleIDs.ID_0717, (MXFValidationCategory.SMPTERegisters, MXFValidationSeverity.Warning, ValidationMessages.ID_0717)},
             {ValidationRuleIDs.ID_0718, (MXFValidationCategory.SMPTERegisters, MXFValidationSeverity.Warning, ValidationMessages.ID_0718)},
+            {ValidationRuleIDs.ID_0720, (MXFValidationCategory.SMPTERegisters, MXFValidationSeverity.Warning, ValidationMessages.ID_0720)},
             {ValidationRuleIDs.ID_0719, (MXFValidationCategory.PartitionStructure, MXFValidationSeverity.Error, ValidationMessages.ID_0719)},
         };
 

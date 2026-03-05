@@ -28,7 +28,13 @@ namespace Myriadbits.MXF.Identifiers
 {
     public class SMPTEEssenceRegisterComparer : IEqualityComparer<ByteArray>
     {
-        private const byte WILDCARD_BYTE = 0x7f;
+        public bool IgnoreVersion { get; } = true;
+
+
+        public SMPTEEssenceRegisterComparer(bool ignoreVersion)
+        {
+            IgnoreVersion = ignoreVersion;
+        }
 
         public bool Equals(ByteArray x, ByteArray y)
         {
@@ -47,7 +53,11 @@ namespace Myriadbits.MXF.Identifiers
 
             for (int i = 0; i < smallerLength; i++)
             {
-                if (b1[i] == WILDCARD_BYTE || b2[i] == WILDCARD_BYTE)
+                if (b1[i] == UL.WILDCARD_BYTE_VALUE || b2[i] == UL.WILDCARD_BYTE_VALUE)
+                {
+                    continue;
+                }
+                else if (i == UL.VERSION_NUMBER_INDEX && IgnoreVersion)
                 {
                     continue;
                 }

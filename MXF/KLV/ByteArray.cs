@@ -69,9 +69,14 @@ namespace Myriadbits.MXF
 
         }
 
-        public ImmutableArray<byte> GetRange(int start, int length)
+        public ImmutableArray<byte> GetBytes(int start, int length)
         {
             return ImmutableArray.CreateRange(theBytes, start, length, (b => b));
+        }
+
+        public ImmutableArray<byte> GetBytes()
+        {
+            return ImmutableArray.CreateRange(theBytes);
         }
 
         public override string ToString()

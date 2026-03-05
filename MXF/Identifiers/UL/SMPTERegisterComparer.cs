@@ -27,14 +27,31 @@ namespace Myriadbits.MXF.Identifiers
 {
     public class SMPTERegisterComparer : IEqualityComparer<ByteArray>
     {
-        //TOO bypassing of version byte shall be a settable property
+
+        public bool IgnoreVersion { get; } = true;
+
+        public SMPTERegisterComparer(bool ignoreVeriosn)
+        {
+            IgnoreVersion = ignoreVeriosn;
+        }
+
         public bool Equals(ByteArray x, ByteArray y)
         {
+            //if (x.ArrayLength != y.ArrayLength)
+            //{
+            //    return false;
+            //}
+
             for (int i = 0; i < x.ArrayLength; i++)
             {
-                // bypass klv syntaxes (i.e. 0x7F == 0x06 or 0x53) which is the sixth byte of an UL
-                // bypass also version byte 
-                if (i == 5 || i == 7)
+                // from https://registry.smpte-ra.org/view/draft/docs/Register%20(Groups)/UL%20prefix/
+                // Note that Byte 6 of every Group UL in the Groups Register is 0x7f.
+                // This is a “wildcard” value that will not appear in implementations.
+                // In implementations Byte 6 is replaced with a value that indicates the kind of KLV coding being used,
+                // defined in SMPTE ST 336. So, for example, in Header Metadata in MXF files Byte 6 of most Group ULs is 0x53.
+                // Bypass version byte too if set via property
+                
+                if (i == 5 || (i == UL.VERSION_NUMBER_INDEX && IgnoreVersion))
                 {
                     continue;
                 }
@@ -55,12 +72,18 @@ namespace Myriadbits.MXF.Identifiers
 
                 for (int i = 0; i < theBytes.ArrayLength; i++)
                 {
-                    // bypass klv syntaxes (i.e. 0x7F == 0x06 or 0x53) which is the sixth byte of an UL
-                    // bypass also version byte 
-                    if (i == 5 || i == 7)
+                    // from https://registry.smpte-ra.org/view/draft/docs/Register%20(Groups)/UL%20prefix/
+                    // Note that Byte 6 of every Group UL in the Groups Register is 0x7f.
+                    // This is a “wildcard” value that will not appear in implementations.
+                    // In implementations Byte 6 is replaced with a value that indicates the kind of KLV coding being used,
+                    // defined in SMPTE ST 336. So, for example, in Header Metadata in MXF files Byte 6 of most Group ULs is 0x53.
+                    // Bypass version byte too if set via property
+
+                    if (i == 5 || (i == UL.VERSION_NUMBER_INDEX && IgnoreVersion))
                     {
                         continue;
                     }
+
                     else
                     {
                         hash = (hash ^ theBytes[i]) * p;

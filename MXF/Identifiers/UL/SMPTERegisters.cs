@@ -24,8 +24,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Xml.Linq;
-using Microsoft.Win32;
 using Serilog;
 
 namespace Myriadbits.MXF.Identifiers
@@ -37,6 +37,7 @@ namespace Myriadbits.MXF.Identifiers
         private static Dictionary<ByteArray, ULDescription> ElementsDictionary { get; set; }
         private static Dictionary<ByteArray, ULDescription> GroupsDictionary { get; set; }
         private static Dictionary<ByteArray, ULDescription> EssencesDictionary { get; set; }
+        private static Dictionary<ByteArray, ULDescription> CombinedDictionary { get; set; }
         private static Dictionary<(byte, byte), DIDDescription> DIDDictionary { get; set; }
 
         public static int TotalEntriesCount { get; private set; } = 0;
@@ -45,10 +46,10 @@ namespace Myriadbits.MXF.Identifiers
         {
             if (!Initialized)
             {
-                LabelsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
-                ElementsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
-                GroupsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer());
-                EssencesDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTEEssenceRegisterComparer());
+                LabelsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer(true));
+                ElementsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer(true));
+                GroupsDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTERegisterComparer(true));
+                EssencesDictionary = new Dictionary<ByteArray, ULDescription>(new SMPTEEssenceRegisterComparer(true));
 
                 FillDictionary(Properties.Resources.Labels, LabelsDictionary);
                 Log.ForContext(typeof(SMPTERegisters)).Information($"A total of {LabelsDictionary.Count} SMPTE labels register entries added to SMPTE dictionary");
@@ -110,6 +111,36 @@ namespace Myriadbits.MXF.Identifiers
         }
 
 
+        public static UL FindMostSimilarUL(UL ul)
+        {
+            Initialize();
+
+            var combined = LabelsDictionary.Concat(ElementsDictionary).Concat(GroupsDictionary).Concat(EssencesDictionary).ToList();
+
+            var bytes = new ByteArray(ul.GetBytes().ToArray());
+            ULDescription desc = null;
+            while (desc == null && bytes.ArrayLength > 4)
+            {
+                desc = combined.FirstOrDefault(kv => kv.Key.HasSameBeginning(bytes)).Value;
+
+                if (desc == null)
+                {
+                    bytes = new ByteArray(bytes.GetBytes(0, bytes.ArrayLength - 1).ToArray());
+                }
+                else
+                {
+                    return GetULFromDescription(desc);
+                }
+            }
+            return null;
+        }
+
+        public static UL GetULFromDescription(ULDescription desc)
+        {
+            return new UL(desc.ByteSequence.GetBytes().ToArray());
+        }
+
+
         public static ByteArray GetByteArrayFromSMPTEULString(string smpteString)
         {
             var bytes = GetBytesFromSMPTEULString(smpteString);
@@ -138,7 +169,7 @@ namespace Myriadbits.MXF.Identifiers
                     Log.ForContext(typeof(SMPTERegisters)).Verbose($"Details of SMPTE entry: {@e}", entry);
                 }
                 else
-                {           
+                {
                     Log.ForContext(typeof(SMPTERegisters)).Warning($"Unable to parse SMPTE entry {e}: {@e}", e);
                 }
             }
@@ -153,7 +184,9 @@ namespace Myriadbits.MXF.Identifiers
 
                 var keyDescription = new ULDescription
                 {
+                    ByteSequence = byteArray,
                     Name = e.Element(ns + "Name")?.Value ?? "",
+                    Symbol = e.Element(ns + "Symbol")?.Value ?? "",
                     Definition = e.Element(ns + "Definition")?.Value ?? "",
                     DefiningDocument = e.Element(ns + "DefiningDocument")?.Value ?? "",
                     IsDeprecated = e.Element(ns + "IsDeprecated")?.Value ?? "",
@@ -196,7 +229,7 @@ namespace Myriadbits.MXF.Identifiers
                         try
                         {
                             Byte.TryParse(parts[0].Trim(' '), out byte dataType);
-                            Byte.TryParse(parts[1].Trim(' ', 'h'), NumberStyles.HexNumber,null, out byte did);
+                            Byte.TryParse(parts[1].Trim(' ', 'h'), NumberStyles.HexNumber, null, out byte did);
                             Byte.TryParse(parts[2].Trim(' ', 'h'), NumberStyles.HexNumber, null, out byte sdid);
 
                             var description = new DIDDescription

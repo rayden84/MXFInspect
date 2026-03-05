@@ -284,10 +284,10 @@
     <value>KLV triplet with indefinite BER length</value>
   </data>
   <data name="ID_0717" xml:space="preserve">
-    <value>Unrecognized key: {0}</value>
+    <value>Unknown UL: {0}. The most similar UL is {1}</value>
   </data>
   <data name="ID_0718" xml:space="preserve">
-    <value>Privately registered key: {0}</value>
+    <value>Privately registered UL: {0}</value>
   </data>
   <data name="ID_0102" xml:space="preserve">
     <value>Partition #{0} contains essences, although BodySID = 0 signals no essences</value>
@@ -300,5 +300,8 @@
   </data>
   <data name="ID_0719" xml:space="preserve">
     <value>The Footer Partition shall not contain essence data</value>
+  </data>
+  <data name="ID_0720" xml:space="preserve">
+    <value>Unknown UL: {0}</value>
   </data>
 </root>
