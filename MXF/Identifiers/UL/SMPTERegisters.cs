@@ -37,7 +37,6 @@ namespace Myriadbits.MXF.Identifiers
         private static Dictionary<ByteArray, ULDescription> ElementsDictionary { get; set; }
         private static Dictionary<ByteArray, ULDescription> GroupsDictionary { get; set; }
         private static Dictionary<ByteArray, ULDescription> EssencesDictionary { get; set; }
-        private static Dictionary<ByteArray, ULDescription> CombinedDictionary { get; set; }
         private static Dictionary<(byte, byte), DIDDescription> DIDDictionary { get; set; }
 
         public static int TotalEntriesCount { get; private set; } = 0;
@@ -115,23 +114,35 @@ namespace Myriadbits.MXF.Identifiers
         {
             Initialize();
 
-            var combined = LabelsDictionary.Concat(ElementsDictionary).Concat(GroupsDictionary).Concat(EssencesDictionary).ToList();
+            var combinedRegisters = LabelsDictionary
+                .Concat(ElementsDictionary)
+                .Concat(GroupsDictionary)
+                .Concat(EssencesDictionary)
+                .ToList();
 
-            var bytes = new ByteArray(ul.GetBytes().ToArray());
-            ULDescription desc = null;
-            while (desc == null && bytes.ArrayLength > 4)
+            if (combinedRegisters.Count == 0 || ul == null)
             {
-                desc = combined.FirstOrDefault(kv => kv.Key.HasSameBeginning(bytes)).Value;
+                return null;
+            }
 
-                if (desc == null)
+            var sourceBytes = ul.GetBytes().ToArray();
+
+            // Try progressively shorter prefixes (stop when length <= 4)
+            for (int len = sourceBytes.Length; len > 4; len--)
+            {
+                var prefix = new byte[len];
+                Array.Copy(sourceBytes, 0, prefix, 0, len);
+                var prefixByteArray = new ByteArray(prefix);
+
+                foreach (var kv in combinedRegisters)
                 {
-                    bytes = new ByteArray(bytes.GetBytes(0, bytes.ArrayLength - 1).ToArray());
-                }
-                else
-                {
-                    return GetULFromDescription(desc);
+                    if (kv.Key.HasSameBeginning(prefixByteArray) && kv.Value != null)
+                    {
+                        return GetULFromDescription(kv.Value);
+                    }
                 }
             }
+
             return null;
         }
 
