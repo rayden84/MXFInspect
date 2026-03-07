@@ -90,7 +90,7 @@ namespace Myriadbits.MXF
             var mp = file.GetFirstMaterialPackage();
             if (mp != null)
             {
-                TrackCount = mp.Children.OfType<MXFTrack>().Count();
+                TrackCount = mp.LogicalChildren.OfType<MXFTrack>().Count();
                 var timecodePack = mp.LogicalDescendants().OfType<MXFTimecodeComponent>().FirstOrDefault();
                 if(timecodePack != null)
                 {
