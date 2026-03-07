@@ -1,6 +1,7 @@
 ﻿#region license
+
 //
-// MXF - Myriadbits .NET MXF library. 
+// MXF - Myriadbits .NET MXF library.
 // Read MXF Files.
 // Copyright (C) 2015 Myriadbits, Jochem Bakker
 //
@@ -19,41 +20,65 @@
 //
 // For more information, contact me at: info@myriadbits.com
 //
+
 #endregion
 
+using Myriadbits.MXF.KLV;
 using System;
 using System.Collections.Generic;
-using Myriadbits.MXF.KLV;
+using System.Xml;
 
 namespace Myriadbits.MXF
 {
-    // TODO rename into MXFANCElement?
+    // TODO rename into MXFANCElement, MXFGCDataItem GCDataItem?
     public class MXFANCFrameElement : MXFEssenceElement
     {
-        public MXFANCFrameElement(MXFPack pack)
-            : base(pack)
+        public MXFANCFrameElement(MXFPack pack) : base(pack)
         {
+
             IKLVStreamReader reader = this.GetReader();
             reader.Seek(this.RelativeValueOffset);
+
             // TODO make reading more robust if we encounter end of stream
             // i.e. if declared klv length is wrong
             if (!reader.EOF)
             {
-                UInt16 nofPackets = reader.ReadUInt16();
-                long packetBegin;
-                for (int n = 0; n < nofPackets; n++)
+                switch (this.Key[14])
                 {
-                    packetBegin = reader.Position;
-                    MXFANCPacket packet = new MXFANCPacket(reader, this.Offset);
-                    this.AddChild(packet);
-                    reader.Seek(packetBegin + packet.TotalLength);
+
+                    case 0x0b: //TimedTextDataElement
+                        this.AddChild(new MXFANCPacket(reader, this.RelativeValueOffset));
+                        break;
+                    case 0x01: //ISXDDataElement
+                        this.AddChild(new MXFISXDDataElement(this));
+                        break;
+                    default:
+                        UInt16 nofPackets = reader.ReadUInt16();
+                        long packetBegin;
+                        for (int n = 0; n < nofPackets; n++)
+                        {
+                            packetBegin = reader.Position;
+                            MXFANCPacket packet = new MXFANCPacket(reader, this.Offset);
+                            this.AddChild(packet);
+                            reader.Seek(packetBegin + packet.TotalLength);
+                        }
+                        break;
                 }
             }
         }
 
+        //public override string ToString()
+        //{
+        //    if ()
+        //        return $"{this.Key.Name ?? "ANC Frame Element"} [packets {this.Children.Count}]";
+        //}
+
+
         public override string ToString()
         {
-            return $"{this.Key.Name ?? "ANC Frame Element"} [packets {this.Children.Count}]";
+            if (this.Children != null)
+                return string.Format("Generic Container Data Item [packets {0}]", this.Children.Count);
+            return string.Format("Generic Container Data Item [packets 0]");
         }
     }
 }

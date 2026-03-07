@@ -21,7 +21,6 @@
 //
 #endregion
 
-using Serilog.Core;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -39,24 +38,37 @@ namespace Myriadbits.MXF
             {0x15, "GC Picture"},
             {0x16, "GC Sound"},
             {0x17, "GC Data"},
-            {0x18, "GC Compound"}
+            {0x18, "GC Compound"},
+            {0x01, "GC Data ISXD"},
         };
 
         [Category(CATEGORYNAME)]
         public string EssenceType { get; private set; }
+        
         [Category(CATEGORYNAME)]
         public byte ElementCount { get; private set; }
+        
         [Category(CATEGORYNAME)]
         public byte ElementType { get; private set; }
+        
         [Category(CATEGORYNAME)]
         public byte ElementNumber { get; private set; }
+        
         [Category(CATEGORYNAME)]
         [TypeConverter(typeof(ByteArrayConverter))]
         public byte[] ElementTrackNumber { get; private set; }
 
-        [Browsable(false)]
+        [Category(CATEGORYNAME)]
         // TODO helper property for indexvalidator that should be avoided
         public bool IsPicture { get; private set; }
+
+        [Category(CATEGORYNAME)]
+        // TODO helper property for indexvalidator that should be avoided
+        public bool IsSound { get; private set; }
+
+        [Category(CATEGORYNAME)]
+        // TODO helper property for indexvalidator that should be avoided
+        public bool IsData { get; private set; }
 
         [Category(CATEGORYNAME)]
         // TODO helper property for indexvalidator that should be avoided
@@ -92,6 +104,8 @@ namespace Myriadbits.MXF
             }
 
             this.IsPicture = (this.Key[12] == 0x05 || this.Key[12] == 0x15);
+            this.IsSound = (this.Key[12] == 0x06 || this.Key[12] == 0x16);
+            this.IsData = (this.Key[12] == 0x07 || this.Key[12] == 0x17 || this.Key[12] == 0x01);
             this.ElementCount = this.Key[13];
             this.ElementType = this.Key[14];
             this.ElementNumber = this.Key[15];
