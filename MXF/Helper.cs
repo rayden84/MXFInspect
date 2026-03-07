@@ -77,7 +77,7 @@ namespace Myriadbits.MXF
         /// <typeparam name="T">The type of the attribute you want to retrieve</typeparam>
         /// <param name="enumVal">The enum value</param>
         /// <returns>The attribute of type T that exists on the enum value</returns>
-        /// <example><![CDATA[string desc = myEnumVariable.GetAttributeOfType<DescriptionAttribute>().Description;]]></example>
+        /// <example><![CDATA[string desc = myEnumVariable.GetAttributeOfType<DescriptionAttribute>().Name;]]></example>
         public static T GetAttributeOfType<T>(this Enum enumVal) where T : System.Attribute
         {
             if(enumVal != null)

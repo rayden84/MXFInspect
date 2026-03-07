@@ -34,7 +34,7 @@ namespace Myriadbits.MXF.Validators
     {
         public MXFValidatorUL(MXFFile file) : base(file)
         {
-            Description = "SMPTE Registers/UL";
+            Name = "SMPTE Registers/UL";
         }
 
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)

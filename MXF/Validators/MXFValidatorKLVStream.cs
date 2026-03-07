@@ -34,7 +34,7 @@ namespace Myriadbits.MXF.Validators
 
         public MXFValidatorKLVStream(MXFFile file) : base(file)
         {
-            Description = "KLV Stream";
+            Name = "KLV Stream";
         }
 
         /// <summary>

@@ -31,7 +31,7 @@ namespace Myriadbits.MXF.Extensions
 {
     public static class MXFTrackExtensions
     {
-        public static MXFSourcePackage GetContainingSourcePackage (this MXFTrack t)
+        public static MXFSourcePackage GetContainingSourcePackage(this MXFTrack t)
         {
             return t.Parent as MXFSourcePackage;
         }
@@ -46,43 +46,61 @@ namespace Myriadbits.MXF.Extensions
             return package.LogicalChildren.OfType<MXFTrack>();
         }
 
-        public static MXFSequence GetFirstMXFSequence(this MXFTrack track)
+        public static MXFSequence GetFirstSequence(this MXFTrack track)
         {
             return track.LogicalChildren.OfType<MXFSequence>().FirstOrDefault();
         }
 
+        public static MXFSourceClip GetFirstSourceClipOfFirstSequence(this MXFTrack track)
+        {
+            return track.GetFirstSequence()?.LogicalChildren.OfType<MXFSourceClip>().FirstOrDefault();
+        }
+
+        public static MXFSourcePackage GetSourcePackage(this MXFSourceClip clip)
+        {
+            return clip.Root().Descendants().
+                OfType<MXFSourcePackage>().
+                FirstOrDefault(sp => sp.PackageID == clip.SourcePackageID);
+        }
+
+        public static MXFFileDescriptor GetDescriptor(this MXFTrack track)
+        {
+            MXFSourceClip sourceClip = track.GetFirstSourceClipOfFirstSequence();
+            MXFSourcePackage containingSourcePackage = sourceClip?.GetSourcePackage();
+            return containingSourcePackage?
+                .LogicalDescendants()
+                .OfType<MXFFileDescriptor>()
+                .FirstOrDefault(d => d.LinkedTrackId == track.TrackID);
+
+        }
+
+
         public static string GetTrackInfo(this MXFTrack track)
         {
-            try
+            if (track != null)
             {
-                if (track != null)
+                StringBuilder sb = new StringBuilder();
+                MXFSequence seq = track.GetFirstSequence();
+                sb.Append($"Id: {track.TrackID}, ");
+                if (seq != null && seq.DataDefinition != null && seq.DataDefinition is UL ul)
                 {
-                    StringBuilder sb = new StringBuilder();
-                    MXFSequence seq = track.GetFirstMXFSequence();
-                    sb.Append($"Id: {track.TrackID}, ");
-                    if (seq != null && seq.DataDefinition != null && seq.DataDefinition is UL ul)
-                    {
-                        sb.Append($"{ul?.Name}, ");
-                    }
-
-                    if (track is MXFTimelineTrack timeLineTrack)
-                    {
-                        sb.Append($"EditRate: {timeLineTrack.EditRate.ToString(true)}");
-                    }
-                    if (!string.IsNullOrEmpty(track.TrackName))
-                    {
-                        sb.Append($" {{{track.TrackName}}}");
-                    }
-                    return sb.ToString();
-
+                    sb.Append($"{ul?.Name}, ");
                 }
-                return "";
+
+                if (track is MXFTimelineTrack timeLineTrack)
+                {
+                    sb.Append($"{timeLineTrack.GetDescriptor()?.EssenceContainer?.Name ?? ""}, ");
+                    sb.Append($"EditRate: {timeLineTrack.EditRate.ToString(true)}");
+                }
+
+                if (!string.IsNullOrEmpty(track.TrackName))
+                {
+                    sb.Append($" {{{track.TrackName}}}");
+                }
+                return sb.ToString();
+
             }
-            catch (Exception)
-            {
-                // TODO log this error
-                return "Unable to retrieve track info";
-            }
+            return null;
         }
     }
 }

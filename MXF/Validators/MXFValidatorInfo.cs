@@ -36,7 +36,7 @@ namespace Myriadbits.MXF.Validators
     {
         public MXFValidatorInfo(MXFFile file) : base(file)
         {
-            Description = "Track Info";
+            Name = "Track Info";
         }
 
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)

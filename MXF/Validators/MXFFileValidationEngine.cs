@@ -32,9 +32,10 @@ namespace Myriadbits.MXF.Validators
 {
     public class MXFFileValidationEngine
     {
-        public static async Task<List<MXFValidationResult>> Validate(IList<MXFValidator> validators, IProgress<TaskReport> progress = null, CancellationToken ct = default)
+        public static async Task<MXFValidationReport> Validate(IList<MXFValidator> validators, IProgress<TaskReport> progress = null, CancellationToken ct = default)
         {
             List<MXFValidationResult> resultsList = new List<MXFValidationResult>();
+            List<Exception> exceptions = new List<Exception>();
 
             // execute validators
             var sw = Stopwatch.StartNew();
@@ -43,18 +44,19 @@ namespace Myriadbits.MXF.Validators
                 ct.ThrowIfCancellationRequested();
                 try
                 {
-                    int currentPercentage = (int)(validators.IndexOf(validator) * 100.0 / validators.Count);
-
+                    int currentPercentage = (int)(validators.IndexOf(validator) + 1 * 100.0 / validators.Count);
                     resultsList.AddRange(await validator.Validate(progress, ct));
-                    progress.Report(new TaskReport(currentPercentage, $"Validating {validator.Description}"));
+                    progress.Report(new TaskReport(currentPercentage, $"Validating {validator.Name}"));
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"Validator {validator} threw an exception: {ex.Message}", ex);
+                    exceptions.Add(ex);
+                    resultsList.Add(new MXFValidationResult(MXFValidationCategory.General, MXFValidationSeverity.Error, null, null, $"Validator {validator.Name} threw an exception: {ex.Message}"));
                 }
             }
+            sw.Stop();
             Log.ForContext<MXFValidatorInfo>().Information($"Validation completed in {sw.ElapsedMilliseconds} ms");
-            return resultsList;
+            return new MXFValidationReport(resultsList,exceptions, sw.ElapsedMilliseconds);
         }
     }
 }

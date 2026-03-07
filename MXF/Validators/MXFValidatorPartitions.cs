@@ -41,7 +41,7 @@ namespace Myriadbits.MXF.Validators
 
         public MXFValidatorPartitions(MXFFile file) : base(file)
         {
-            Description = "Partition Structure";
+            Name = "Partition Structure";
 
             // if there is a RunIn consider it for the partition offsets
             var runIn = File.Descendants().OfType<MXFRunIn>().SingleOrDefault();

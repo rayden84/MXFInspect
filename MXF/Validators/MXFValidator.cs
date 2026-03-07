@@ -32,9 +32,11 @@ namespace Myriadbits.MXF.Validators
 {
     public abstract class MXFValidator
     {
-        public MXFFile File { get; init; }
-        public string Description { get; init; }
         protected List<MXFValidationResult> Results { get; set; }
+
+        public MXFFile File { get; }
+        public string Name { get; init; }
+        public string Description { get; init; }
 
         public MXFValidator(MXFFile file)
         {
@@ -45,7 +47,7 @@ namespace Myriadbits.MXF.Validators
         {
             Stopwatch sw = Stopwatch.StartNew();
             Results = await OnValidate(progress, ct);
-            Log.ForContext<MXFValidatorInfo>().Information($"Validator {this.Description} completed in {sw.ElapsedMilliseconds} ms");
+            Log.ForContext<MXFValidatorInfo>().Information($"Validator {this.Name} completed in {sw.ElapsedMilliseconds} ms");
             return Results;
         }
 

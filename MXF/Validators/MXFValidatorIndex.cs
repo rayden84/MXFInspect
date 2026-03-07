@@ -38,7 +38,7 @@ namespace Myriadbits.MXF.Validators
 
         public MXFValidatorIndex(MXFFile file) : base(file)
         {
-            Description = "Index Tables";
+            Name = "Index Tables";
         }
 
         protected override async Task<List<MXFValidationResult>> OnValidate(IProgress<TaskReport> progress = null, CancellationToken ct = default)
@@ -143,7 +143,7 @@ namespace Myriadbits.MXF.Validators
                 int validCt = 0;
                 int totalSystemItems = 0;
                 int counter = 0;
-                this.Description = "Checking for duplicates";
+                this.Name = "Checking for duplicates";
                 foreach (MXFIndexTableSegment ids in this.m_indexTables)
                 {
                     progress?.Report(new TaskReport(55 + (counter * 20) / this.m_indexTables.Count(), "Checking indices"));
@@ -196,7 +196,7 @@ namespace Myriadbits.MXF.Validators
                     // For each index table segment				
                     totalSystemItems = m_systemItems.Count();
                     counter = 0;
-                    this.Description = "Checking essence offsets";
+                    this.Name = "Checking essence offsets";
                     foreach (MXFIndexTableSegment ids in this.m_indexTables)
                     {
                         progress?.Report(new TaskReport(75 + (counter * 20) / this.m_indexTables.Count(), "Checking system items"));
@@ -239,7 +239,7 @@ namespace Myriadbits.MXF.Validators
                     // For each index table segment				
                     counter = 0;
                     totalSystemItems = m_pictureItems.Count();
-                    this.Description = "Checking picture offsets";
+                    this.Name = "Checking picture offsets";
                     foreach (MXFIndexTableSegment ids in this.m_indexTables)
                     {
                         progress?.Report(new TaskReport(75 + (counter * 20) / this.m_indexTables.Count(), ""));
@@ -359,7 +359,7 @@ namespace Myriadbits.MXF.Validators
         private void FindIndexTablesSystemItemsEssenceElements()
         {
             // Find all index tables, system items and essence elements
-            // this.Description = "Locating index tables, essence";
+            // this.Name = "Locating index tables, essence";
 
             m_indexTables = this.File.Descendants().OfType<MXFIndexTableSegment>().ToList();
             m_systemItems = this.File.Descendants().OfType<MXFSystemMetaDataPack>().ToList();
@@ -503,7 +503,7 @@ namespace Myriadbits.MXF.Validators
         //private void LoadAllPartitions()
         //{
         //    // Load all partitions
-        //    this.Description = "Loading partitions";
+        //    this.Name = "Loading partitions";
         //    List<MXFPartition> partitionsToLoad = this.File.Partitions.Where(a => !a.IsLoaded).ToList();
         //    for (int n = 0; n < partitionsToLoad.Count(); n++)
         //    {

@@ -187,11 +187,11 @@ namespace Myriadbits.MXFInspect
                     new MXFValidatorInfo(mxfFile),
                 };
 
-                var results = await MXFFileValidationEngine.Validate(validatorList, progressHandler, cts.Token);
+                var validationReport = await MXFFileValidationEngine.Validate(validatorList, progressHandler, cts.Token);
 
                 // display the one with biggest offset first, then autoresize columns executes
                 // correctly and finally reverse order, i.e. lowest offset first
-                this.tlvValidationResults.SetObjects(results.OrderByDescending(vr => vr.Offset));
+                this.tlvValidationResults.SetObjects(validationReport.ValidationResults.OrderByDescending(vr => vr.Offset));
                 this.tlvValidationResults.AutoResizeColumns();
                 this.tlvValidationResults.PrimarySortColumn = colOffset;
                 this.tlvValidationResults.PrimarySortOrder = SortOrder.Ascending;
@@ -202,6 +202,11 @@ namespace Myriadbits.MXFInspect
 
                 btnClose.Click += btnClose_Click;
                 btnClose.Click -= btnCancel_Click;
+
+                if (validationReport.OccuredExceptions.Any())
+                {
+                    MessageBox.Show("At least one Exception occured while validating file. See the error log for more info.");
+                }
             }
             catch (OperationCanceledException ex)
             {
